@@ -1,0 +1,33 @@
+package vitaliiev.resortASU.entity.auth;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
+
+import javax.persistence.*;
+import java.util.Set;
+
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@Table(name="\"role_resortASU\"")
+public class Role implements GrantedAuthority {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
+    private String name;
+    private Boolean enabled = true;
+    @ManyToMany(mappedBy = "roles")
+    private Set<User> users;
+
+    public Role(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getAuthority() {
+        return getName();
+    }
+}
