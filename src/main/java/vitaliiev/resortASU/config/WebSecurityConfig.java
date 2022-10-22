@@ -14,16 +14,13 @@ import vitaliiev.resortASU.service.auth.UserService;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter { // TODO: 16.10.2022
 
     UserService userService;
+    @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
     @Autowired
     public void setUserService(UserService userService) {
         this.userService = userService;
     }
 
-    @Autowired
-    public void setBCryptPasswordEncoder(BCryptPasswordEncoder bCryptPasswordEncoder) {
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-    }
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {

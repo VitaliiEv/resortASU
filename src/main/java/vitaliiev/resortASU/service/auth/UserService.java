@@ -11,6 +11,7 @@ import vitaliiev.resortASU.entity.auth.User;
 import vitaliiev.resortASU.repository.auth.UserRepository;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -59,7 +60,7 @@ public class UserService implements UserDetailsService {
         userRepository.delete(user);
     }
 
-    public Iterable<User> allUsers() {
+    public List<User> allUsers() {
         return userRepository.findAll();
     }
 
