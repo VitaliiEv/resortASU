@@ -1,19 +1,46 @@
 package vitaliiev.resortASU.controller.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 import vitaliiev.resortASU.entity.auth.User;
-import vitaliiev.resortASU.repository.auth.UserRepository;
+import vitaliiev.resortASU.service.auth.UserService;
 
-@RestController
-@RequestMapping("/users")
+import javax.validation.Valid;
+
+@Controller
 public class UserController {
+
+    private final UserService userService;
+
     @Autowired
-    private UserRepository userRepository;
-    @GetMapping("/all")
-    public Iterable<User> listAll() {
-        return userRepository.findAll();
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @GetMapping("/user")
+    public String visit(@AuthenticationPrincipal User user, Model model) {
+        model.addAttribute("user", user);
+        return "/user";
+    }
+
+    @PostMapping("/user")
+    private String changePassword(@ModelAttribute(name = "user") @Valid User user, BindingResult bindingResult,
+                                  Model model, @AuthenticationPrincipal User principal) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("validationErrors", bindingResult.getAllErrors());
+            return "/user";
+        }
+        if (!user.getPassword().equals(user.getPasswordConfirm())) {
+            model.addAttribute("passwordError", "Passwords dont match");
+            return "/user";
+        }
+        user.setUsername(principal.getUsername());
+        user = userService.changePassword(user);
+        model.addAttribute("user", user);
+        return "/user";
     }
 }

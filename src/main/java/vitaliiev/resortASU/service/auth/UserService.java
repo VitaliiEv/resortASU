@@ -8,7 +8,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import vitaliiev.resortASU.entity.auth.Role;
 import vitaliiev.resortASU.entity.auth.User;
-import vitaliiev.resortASU.repository.auth.RoleRepository;
 import vitaliiev.resortASU.repository.auth.UserRepository;
 
 import java.util.Collections;
@@ -16,12 +15,15 @@ import java.util.Optional;
 
 @Service
 public class UserService implements UserDetailsService {
+
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
     @Autowired
-    UserRepository userRepository;
-    @Autowired
-    RoleRepository roleRepository;
-    @Autowired
-    BCryptPasswordEncoder bCryptPasswordEncoder;
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.userRepository = userRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -33,7 +35,7 @@ public class UserService implements UserDetailsService {
         try {
             loadUserByUsername(user.getUsername());
             return false;
-        } catch (UsernameNotFoundException e)  {
+        } catch (UsernameNotFoundException e) {
             user.setRoles(Collections.singleton(new Role("ROLE_USER")));
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
             userRepository.save(user);
@@ -46,8 +48,20 @@ public class UserService implements UserDetailsService {
         return userFromDb.orElse(new User());
     }
 
+    public User changePassword(User user) {
+        Optional<User> optionalUser = Optional.ofNullable(userRepository.findByUsername(user.getUsername()));
+        User userFromDb = optionalUser.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        userFromDb.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        return userRepository.save(userFromDb);
+    }
+
+    public void deleteUser(User user) {
+        userRepository.delete(user);
+    }
+
     public Iterable<User> allUsers() {
         return userRepository.findAll();
     }
-    // TODO: 19.10.2022 delete user 
+
+
 }

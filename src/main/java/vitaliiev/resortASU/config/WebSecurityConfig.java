@@ -1,6 +1,5 @@
 package vitaliiev.resortASU.config;
 
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -14,11 +13,17 @@ import vitaliiev.resortASU.service.auth.UserService;
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter { // TODO: 16.10.2022
 
-    @Autowired
     UserService userService;
+    BCryptPasswordEncoder bCryptPasswordEncoder;
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
 
     @Autowired
-    BCryptPasswordEncoder bCryptPasswordEncoder;
+    public void setBCryptPasswordEncoder(BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    }
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
@@ -32,9 +37,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter { // TODO: 1
                 .antMatchers("/admin/**").hasRole("ADMIN")
 //                .antMatchers("/news").hasRole("USER")
                 //Доступ разрешен всем пользователей
-                .antMatchers("/", "/users", "/roles").permitAll()
+                .antMatchers("/").permitAll()
                 //Все остальные страницы требуют аутентификации
-//                .anyRequest().authenticated()
+                .anyRequest().authenticated()
                 .and()
                 //Настройка для входа в систему
                 .formLogin()

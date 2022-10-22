@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Resort ASU User</title>
+</head>
+<body>
+<div th:replace="fragments/bootstrap :: bootstrap"></div>
+<div th:replace="fragments/navigation :: menu"></div>
+<div class="container">
+<form class="form-text" th:method="POST" th:action="@{/user}" th:object="${user}">
+    <h2 class="form-signin-heading">Hello, <span sec:authentication="principal.username"/>!</h2>
+    <p>
+    <ul>
+        <li th:each="err : ${#fields.errors('*')}" th:text="${err}"/>
+        <li th:if="${passwordError} neq null" th:text="${passwordError}"/>
+    </ul>
+    </p>
+    <p>
+        <label for="password" class="visually-hidden">New password</label>
+        <input type="password" id="password" class="form-control" placeholder="New password" required
+               th:field="*{password}">
+    <div id="passwordHelpBlock" class="form-text">
+        Your password must be minimum 5 characters long.
+    </div>
+    </p>
+    <p>
+        <label for="passwordConfirm" class="visually-hidden">Confirm new password</label>
+        <input type="password" id="passwordConfirm" class="form-control" placeholder="Confirm new password"
+               required th:field="*{passwordConfirm}">
+    </p>
+
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Change password</button>
+</form>
+</div>
+</body>
+</html>

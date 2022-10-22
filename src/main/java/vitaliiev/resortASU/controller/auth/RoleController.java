@@ -10,11 +10,11 @@ import vitaliiev.resortASU.repository.auth.RoleRepository;
 @RestController
 @RequestMapping("/roles")
 public class RoleController {
-    @Autowired
-    private RoleRepository roleRepository;
+//    @Autowired
+//    private RoleRepository roleRepository;
 
-    @GetMapping("/all")
-    public Iterable<Role> listAll() {
-        return roleRepository.findAll();
-    }
+//    @GetMapping("/all")
+//    public Iterable<Role> listAll() {
+//        return roleRepository.findAll();
+//    }
 }
