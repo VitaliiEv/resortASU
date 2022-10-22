@@ -9,7 +9,7 @@ import vitaliiev.resortASU.entity.auth.User;
 public class LoginController {
 
     @GetMapping("/login")
-    private String visit(Model model) {
+    private String login(Model model) {
         model.addAttribute("user", new User());
         return "/login";
     }

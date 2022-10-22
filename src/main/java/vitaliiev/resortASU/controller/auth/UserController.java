@@ -10,6 +10,7 @@ import vitaliiev.resortASU.entity.auth.User;
 import vitaliiev.resortASU.service.auth.UserService;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Controller
 public class UserController {
@@ -22,7 +23,7 @@ public class UserController {
     }
 
     @GetMapping("/user")
-    public String visit(@AuthenticationPrincipal User user, Model model) {
+    public String userProfile(@AuthenticationPrincipal User user, Model model) {
         model.addAttribute("user", user);
         return "/user";
     }

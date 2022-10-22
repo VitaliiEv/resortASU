@@ -18,13 +18,13 @@ public class RegistrationController {
     private UserService userService;
 
     @GetMapping("/register")
-    private String visit(Model model) {
+    private String register(Model model) {
         model.addAttribute("user", new User());
         return "/register";
     }
 
     @PostMapping("/register")
-    private String register(@ModelAttribute("user") @Valid User user, BindingResult bindingResult, Model model) {
+    private String addUser(@ModelAttribute("user") @Valid User user, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("validationErrors", bindingResult.getAllErrors());
             return "/register";
