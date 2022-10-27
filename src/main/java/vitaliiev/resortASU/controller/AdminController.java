@@ -1,15 +1,11 @@
 package vitaliiev.resortASU.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import vitaliiev.resortASU.entity.auth.User;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vitaliiev.resortASU.service.auth.UserService;
-
-
-import java.util.List;
 
 @Controller
 public class AdminController {
@@ -21,16 +17,13 @@ public class AdminController {
         this.userService = userService;
     }
 
-    @GetMapping("/user")
-    public String visit(@AuthenticationPrincipal User user, Model model) {
-        model.addAttribute("user", user);
-        return "/user";
-    }
-
-    @GetMapping("/admin/users")
-    public String listUsers(Model model) {
-        List<User> users = userService.allUsers();
-        model.addAttribute("users", users);
+    @GetMapping("/admin")
+    public String adminPanel(Model model) {
+        boolean entityPersists = model.getAttribute("fragment") != null &&
+                model.getAttribute("entities") != null;
+        model.addAttribute("entityPersists", entityPersists);
         return "/admin";
     }
+
+
 }

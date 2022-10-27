@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Resort ASU User</title>
+	<title th:text="|#{title.prefix} User profile|">User profile</title>
 </head>
 <body>
 <div th:replace="fragments/bootstrap :: bootstrap"></div>
@@ -10,6 +10,8 @@
 <div class="container">
 <form class="form-text" th:method="POST" th:action="@{/user}" th:object="${user}">
     <h2 class="form-signin-heading">Hello, <span sec:authentication="principal.username"/>!</h2>
+	    <label for="username" class="visually-hidden">Username</label>
+        <input type="hidden" id="username" required th:field="*{username}" th:value="${#authentication.name}"/>
     <p>
     <ul>
         <li th:each="err : ${#fields.errors('*')}" th:text="${err}"/>

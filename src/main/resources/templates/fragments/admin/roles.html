@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Roles</title>
+</head>
+<body>
+<div th:fragment="entities (path, entities)">
+    <h2>Add role</h2>
+	<form th:method="POST" th:object ="${newEntity}" th:action="${path + '/create'}" >
+		<div class="row g-2 align-items-center">
+			<label th:for="*{id}" class="visually-hidden">Id</label>
+			<input type="hidden" id="id" required th:field="*{id}" th:value="*{id}"/>	
+			<div class="col-auto"> 
+				<label th:for="*{name}">Name: </label>
+				<input class="form-control" type="text" th:field="*{name}">				
+			</div>
+			<div class="col-auto"> 
+				<label th:for="*{enabled}">Enabled</label>
+				<input class="form-check-input" type="checkbox" th:field="*{enabled}" th:value="*{enabled}">				
+			</div>
+			<div class="col-auto">
+				<button class="btn btn-primary btn-block" type="submit">Add</button>
+			</div>
+		</div>
+	</form>	
+    <h2>Roles</h2>
+<!--	<form th:method="POST" th:action="${path}">
+		<div class="row g-2 align-items-center">
+		  <div class="col-auto">
+			<label for="username" class="visually-hidden">Name</label>
+			<input type="text" id="username" placeholder="Name" class="form-control">
+		  </div>
+		  <div class="col-auto">
+				<button class="btn btn-primary btn-block" type="submit">Find</button>
+		  </div>
+		</div>
+	</form>-->
+    <table class="table table-striped">
+        <tr>
+            <th scope="col">id</th>
+            <th scope="col">Name</th>
+            <th scope="col">Enabled</th>
+            <th scope="col"></th>
+            <th scope="col"></th>
+        </tr>
+        <tr th:each="role : ${entities}">
+            <th scope="row" th:text="${role.id}"></th>
+            <td th:text="${role.name}"></td>
+            <td th:text="${role.enabled}"></td>
+            <td>
+				<a class="btn btn-primary" th:href="${path + '/' + role.id}" role="button">Edit</a>	
+			</td>
+            <td>
+				<form th:method="POST" th:action="${'/admin/' + path + '/delete'}" >
+					<label class="visually-hidden" for="id"></label>
+					<input class="form-check-input" type="hidden" name="id" th:value="${role.id}">					
+					<button class="btn btn-primary btn-block" type="submit">Delete</button>
+				</form>
+            </td>
+        </tr>
+    </table>
+
+</div>
+<div th:fragment="entity (path, entity)">
+    <h2>Role</h2>
+	<form th:method="POST" th:object ="${entity}" th:action="${'/admin/' + path + '/update'}" >
+		<div class="row g-2 align-items-center">
+			<div class="col-auto"> 
+				<label th:for="*{id}">Id: <span th:text="*{id}"></span></label>
+				<input class="form-check-input" type="hidden" th:field="*{id}">				
+				<label th:for="*{name}">Name: <span th:text="*{name}"></span></label>
+				<input class="form-check-input" type="hidden" th:field="*{name}">		
+			</div>
+		</div>
+		<div class="row g-2 align-items-center">
+			<div class="col-auto">
+				<span>Role enabled:</span>
+				<input class="form-check-input" type="checkbox" th:field="*{enabled}" th:value="${entity}">
+				<label class="form-check-label"	th:for="*{enabled}">Enabled</label>
+			</div>
+		</div>
+		<div class="row g-2 align-items-center">
+		  <div class="col-auto">
+				<button class="btn btn-primary btn-block" type="submit">Save</button>
+		  </div>
+		</div>
+	</form>
+	<form th:method="POST" th:object ="${entity}" th:action="${'/admin/' + path + '/delete'}" >
+		<div class="row g-2 align-items-center">
+		  	<div class="col-auto"> 
+				<label class="visually-hidden" th:for="*{id}"></label>
+				<input class="form-check-input" type="hidden" th:field="*{id}"/>					
+				<button class="btn btn-primary btn-block" type="submit">Delete</button>			
+			</div>
+		</div>
+	</form>
+
+
+</div>
+</body>
+</html>

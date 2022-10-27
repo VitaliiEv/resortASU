@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Users</title>
+</head>
+<body>
+<div th:fragment="entities (path, entities)">
+    <h2>Users</h2>
+	<form th:method="POST" th:action="${path}">
+		<div class="row g-2 align-items-center">
+		  <div class="col-auto">
+			<label for="username" class="visually-hidden">Username</label>
+			<input type="text" id="username" placeholder="Username" class="form-control">
+		  </div>
+		  <div class="col-auto">
+			<label for="roles" class="visually-hidden">Roles</label>
+			<input type="text" id="roles" placeholder="Roles" class="form-control">
+		  </div>
+		  <div class="col-auto">
+				<button class="btn btn-primary btn-block" type="submit">Find</button>
+		  </div>
+		</div>
+	</form>
+    <table class="table table-striped">
+        <tr>
+            <th scope="col">id</th>
+            <th scope="col">UserName</th>
+            <th scope="col">Roles</th>
+            <th scope="col">Enabled</th>
+            <th scope="col"></th>
+            <th scope="col"></th>
+        </tr>
+        <tr th:each="u : ${entities}">
+            <th scope="row" th:text="${u.id}"></th>
+            <td th:text="${u.username}"></td>
+            <td>
+                <span th:each="role : ${u.roles}" th:text="${role.name + ' '}"/>
+            </td>
+            <td th:text="${u.enabled}"></td>
+            <td>
+				<a class="btn btn-primary" th:href="${path + '/' + u.id}" role="button">Edit</a>	
+			</td>
+            <td>
+				<form th:method="POST" th:action="${'/admin/' + path + '/delete'}" >
+					<label class="visually-hidden" for="id"></label>
+					<input class="form-check-input" type="hidden" name="id" th:value="${u.id}">					
+					<button class="btn btn-primary btn-block" type="submit">Delete</button>
+				</form>
+            </td>
+        </tr>
+    </table>
+
+</div>
+<div th:fragment="entity (path, entity, allRoles)">
+    <h2>User profile</h2>
+	<form th:method="POST" th:object ="${entity}" th:action="${'/admin/' + path + '/update/'}" >
+		<div class="row g-2 align-items-center">
+			<div class="col-auto"> 
+				<label>Id: <span th:for="*{id}"></span></label>
+				<input class="form-check-input" type="hidden" th:field="*{id}">				
+				<label>Username: <span th:text="*{username}"></span></label>
+				<input class="form-check-input" type="hidden" th:field="*{username}">	
+				<p>Current roles: <span th:each="userRole : *{roles}"><span th:text="${userRole.name + ' '}"/></span></p>			
+			</div>
+		</div>
+		<div class="row g-2 align-items-center">
+			<div class="col-auto">
+				<span>User enabled:</span>
+				<input class="form-check-input" type="checkbox" th:field="*{enabled}" th:value="${entity}">
+				<label class="form-check-label"	th:for="*{enabled}">Enabled</label>
+			</div>
+		</div>
+	
+		<div class="row g-2 align-items-center">
+			<span class="col-auto">Select roles:</span>
+			<div class="col-auto" th:each="r : ${allRoles}">
+				<input class="form-check-input" type="checkbox" 
+				th:field="*{roles}"
+				th:value="${r.id}"/>
+				<label class="form-check-label"
+				th:for="${#ids.prev('roles')}"
+				th:text="${r.name}"></label>
+			</div>
+		</div>
+		<div class="row g-2 align-items-center">
+		  <div class="col-auto">
+				<button class="btn btn-primary btn-block" type="submit">Save</button>
+		  </div>
+		</div>
+	</form>
+	<form th:method="POST" th:object ="${entity}" th:action="${'/admin/' + path + '/delete'}" >
+		<div class="row g-2 align-items-center">
+		  	<div class="col-auto"> 
+				<label class="visually-hidden" th:for="*{id}"></label>
+				<input class="form-check-input" type="hidden" th:field="*{id}">					
+				<button class="btn btn-primary btn-block" type="submit">Delete</button>			
+			</div>
+		</div>
+	</form>
+
+</div>
+</body>
+</html>

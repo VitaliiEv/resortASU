@@ -1,20 +1,67 @@
 package vitaliiev.resortASU.controller.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 import vitaliiev.resortASU.entity.auth.Role;
-import vitaliiev.resortASU.repository.auth.RoleRepository;
+import vitaliiev.resortASU.service.auth.RoleService;
 
-@RestController
-@RequestMapping("/roles")
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+
+@Controller
+@RequestMapping("/admin")
 public class RoleController {
-//    @Autowired
-//    private RoleRepository roleRepository;
+    private static final String ENTITY_NAME = "roles";
 
-//    @GetMapping("/all")
-//    public Iterable<Role> listAll() {
-//        return roleRepository.findAll();
-//    }
+    private final RoleService service;
+
+    @Autowired
+    public RoleController(RoleService service) {
+        this.service = service;
+    }
+
+    @GetMapping(ENTITY_NAME)
+    public String list(Model model, HttpServletRequest request) {
+        List<Role> entities = service.findAll();
+        Role newEntity = new Role();
+        model.addAttribute("fragment", ENTITY_NAME);
+        model.addAttribute("entities", entities);
+        model.addAttribute("newEntity", newEntity);
+        return "admin/" + ENTITY_NAME;
+    }
+
+    @PostMapping(ENTITY_NAME)
+    public String listSearchResults(@RequestParam String name) {
+/// TODO: 25.10.2022
+        return "redirect:";
+    }
+
+    @PostMapping(ENTITY_NAME + "/create")
+    public String create(@ModelAttribute(name = "entity") Role role) {
+        service.create(role);
+        return "redirect:/admin/" + ENTITY_NAME;
+    }
+
+    @GetMapping(ENTITY_NAME + "/{id}")
+    public String read(@PathVariable Integer id, Model model) {
+        Role entity = service.findRoleById(id);
+        if (entity != null) {
+            model.addAttribute("fragment", ENTITY_NAME);
+            model.addAttribute("entity", entity);
+        }
+        return "admin/" + ENTITY_NAME;
+    }
+
+    @PostMapping(ENTITY_NAME + "/update")
+    public String update(@ModelAttribute(name = "entity") Role entity) {
+        service.update(entity);
+        return "redirect:/admin/" + ENTITY_NAME + "/" + entity.getId();
+    }
+    @PostMapping(ENTITY_NAME + "/delete")
+    public String delete(@RequestParam(name = "id") Integer id) {
+        service.delete(id);
+        return "redirect:/admin/" + ENTITY_NAME;
+    }
 }

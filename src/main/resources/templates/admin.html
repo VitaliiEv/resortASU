@@ -2,14 +2,13 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>ResortASU Admin</title>
+	<title th:text="|#{title.prefix} Admin Panel|">Admin Panel</title>
 </head>
 <body>
 <div th:replace="fragments/bootstrap :: bootstrap"></div>
 <div th:replace="fragments/navigation :: menu"></div>
 <div class="container">
-    <div th:replace="fragments/entity :: table"></div>
+    <h1>Admin</h1>
 </div>
-</nav>
 </body>
 </html>

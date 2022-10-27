@@ -13,24 +13,24 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-@Table(name="\"user_resortASU\"")
+@Table(name = "\"user_resortASU\"")
 public class User implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Size(min=5, max=45, message = "Your username must be 5-45 characters long")
+    @Size(min = 5, max = 45, message = "Your username must be 5-45 characters long")
     private String username;
-    @Size(min=5, message = "Your password must be minimum 5 characters long.")
+    @Size(min = 5, message = "Your password must be minimum 5 characters long.")
     private String password;
 
     private Boolean enabled = true;
     @Transient
     private String passwordConfirm;
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name="\"userrole\"",
-            joinColumns= @JoinColumn(name="\"user_resortASU\"", referencedColumnName="\"id\""),
-            inverseJoinColumns= @JoinColumn(name="\"role_resortASU\"", referencedColumnName="\"id\""))
+    @JoinTable(name = "\"userrole\"",
+            joinColumns = @JoinColumn(name = "\"user_resortASU\"", referencedColumnName = "\"id\""),
+            inverseJoinColumns = @JoinColumn(name = "\"role_resortASU\"", referencedColumnName = "\"id\""))
     private Set<Role> roles;
 
 

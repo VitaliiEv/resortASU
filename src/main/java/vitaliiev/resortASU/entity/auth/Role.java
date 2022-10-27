@@ -14,8 +14,9 @@ import java.util.Set;
 @NoArgsConstructor
 @Table(name="\"role_resortASU\"")
 public class Role implements GrantedAuthority {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String name;
     private Boolean enabled = true;
