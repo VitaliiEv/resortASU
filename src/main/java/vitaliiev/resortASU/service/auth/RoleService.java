@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import vitaliiev.resortASU.entity.auth.Role;
-import vitaliiev.resortASU.entity.auth.User;
 import vitaliiev.resortASU.repository.auth.RoleRepository;
 
 import java.util.*;

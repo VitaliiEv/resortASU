@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import vitaliiev.resortASU.entity.auth.Role;
 import vitaliiev.resortASU.service.auth.RoleService;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Controller
@@ -23,19 +22,13 @@ public class RoleController {
     }
 
     @GetMapping(ENTITY_NAME)
-    public String list(Model model, HttpServletRequest request) {
+    public String list(Model model) {
         List<Role> entities = service.findAll();
         Role newEntity = new Role();
         model.addAttribute("fragment", ENTITY_NAME);
         model.addAttribute("entities", entities);
         model.addAttribute("newEntity", newEntity);
         return "admin/" + ENTITY_NAME;
-    }
-
-    @PostMapping(ENTITY_NAME)
-    public String listSearchResults(@RequestParam String name) {
-/// TODO: 25.10.2022
-        return "redirect:";
     }
 
     @PostMapping(ENTITY_NAME + "/create")
@@ -59,6 +52,7 @@ public class RoleController {
         service.update(entity);
         return "redirect:/admin/" + ENTITY_NAME + "/" + entity.getId();
     }
+
     @PostMapping(ENTITY_NAME + "/delete")
     public String delete(@RequestParam(name = "id") Integer id) {
         service.delete(id);
