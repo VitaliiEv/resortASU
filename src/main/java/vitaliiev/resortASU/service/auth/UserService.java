@@ -50,7 +50,6 @@ public class UserService implements UserDetailsService {
 
     public User findUserById(Long id) {
         return userRepository.findById(id).orElse(null);
-//        return userRepository.getReferenceById(id);
     }
 
     public User findUserByUsername(String username) {
@@ -122,14 +121,12 @@ public class UserService implements UserDetailsService {
     private boolean userIsAdmin(User user) {
         return user.getRoles()
                 .stream()
-                .map(Role::getName)
-                .anyMatch(r -> r.equals(roleService.getAdmin().getName()));
+                .anyMatch(r -> r.equals(roleService.getAdmin()));
     }
 
     private boolean userIsLastAdmin(User user) {
         if (userIsAdmin(user)) {
-            Role admin = roleService.findRoleById(roleService.getAdmin().getId());
-            return admin.getUsers().size() <= 1;
+            return roleService.getAdmin().getUsers().size() <= 1;
         }
         return false;
     }

@@ -2,11 +2,13 @@ package vitaliiev.resortASU.service.auth;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import vitaliiev.resortASU.entity.auth.Role;
 import vitaliiev.resortASU.repository.auth.RoleRepository;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -16,17 +18,19 @@ public class RoleService {
 
     private final RoleRepository roleRepository;
 
-    private final Role admin;
-    private final Role user;
+    private final List<Role> roles;
 
     @Autowired
     public RoleService(RoleRepository roleRepository) {
         this.roleRepository = roleRepository;
-        this.admin = this.roleRepository.findByName(DEFAULT_ADMIN);
-        this.user = this.roleRepository.findByName(DEFAULT_USER);
+        this.roles = roleRepository.findAll();
     }
 
     public void create(Role role) {
+        if (role == null) {
+            log.warn("Expected non null argument. Role not created");
+            return;
+        }
         String name = role.getName();
         if (!name.startsWith("ROLE_")) {
             log.info("Expected role name with prefix ROLE_. Got {}", name);
@@ -34,34 +38,40 @@ public class RoleService {
             role.setName(name);
             log.warn("Adding prefix automatically. New role name: {}", name);
         }
-        roleRepository.save(role);
+        try {
+            Role savedRole = roleRepository.save(role);
+            roles.add(savedRole);
+        } catch (DataIntegrityViolationException e) {
+            log.error(e.getMessage());
+        }
     }
 
-    public Role findRoleById(Integer id) {
-        return roleRepository.findById(id).orElse(null);
+    public Role findRoleById(Integer id) { //fixme use Optional
+        return roles.stream()
+                .filter(i -> i.getId().equals(id))
+                .findAny().orElse(null);
     }
 
-    public Role findRoleByName(String name) {
-        return roleRepository.findByName(name);
+    public Role findRoleByName(String name) { //fixme use Optional
+        return roles.stream()
+                .filter(i -> i.getName().equals(name))
+                .findAny().orElse(null);
     }
 
     public List<Role> findRoleByNames(String[] names) {
-        List<Role> rolesList = new ArrayList<>();
-        if (names == null || names.length == 0) {
-            return rolesList;
-        }
-        List<String> roleNamesList = Arrays.asList(names);
-        for (String roleName : names) {
-            Role role = roleRepository.findByName(roleName);
-            if (role != null) {
-                rolesList.add(role);
-            }
-        }
-        return rolesList;
+        return roles.stream()
+                .filter(r -> {
+                    for (String name : names) {
+                        if (name.contains(r.getName())) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }).collect(Collectors.toList());
     }
 
     public List<Role> findAll() {
-        return roleRepository.findAll();
+        return roles;
     }
 
     public void update(Role role) {
@@ -69,28 +79,33 @@ public class RoleService {
             log.warn("Can't disable ADMIN or USER built in role.");
             role.setEnabled(true);
         }
-        roleRepository.save(role);
+        try {
+            Role savedRole = roleRepository.save(role);
+            roles.add(savedRole);
+        } catch (DataIntegrityViolationException e) {
+            log.error(e.getMessage());
+        }
     }
 
     public void delete(Integer id) {
-        Optional<Role> optionalRole = roleRepository.findById(id);
-        optionalRole.ifPresent(r -> {
-            if (r.getName().equals(this.admin.getName()) ||
-                    r.getName().equals(this.user.getName())) {
+        Role role = this.findRoleById(id);
+        if (role != null) {
+            if (role.getName().equals(DEFAULT_ADMIN) || role.getName().equals(DEFAULT_USER)) {
                 log.warn("Cant delete predefined USER or ADMIN roles.");
             } else {
                 roleRepository.deleteById(id);
+                roles.remove(role);
             }
-        });
+        }
     }
 
 
     public Role getAdmin() {
-        return copyRole(this.admin);
+        return this.findRoleByName(DEFAULT_ADMIN);
     }
 
     public Role getUser() {
-        return copyRole(this.user);
+        return this.findRoleByName(DEFAULT_USER);
     }
 
     private Role copyRole(Role role) {
