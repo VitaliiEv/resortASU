@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.*;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import vitaliiev.resortASU.model.auth.Role;
@@ -18,6 +20,13 @@ import java.util.stream.Collectors;
 public class RoleService {
     private final static String DEFAULT_ADMIN = "ROLE_ADMIN";
     private final static String DEFAULT_USER = "ROLE_USER";
+
+    private static final ExampleMatcher SEARCH_CONDITIONS_MATCH_ALL = ExampleMatcher
+            .matching()
+            .withIgnoreNullValues()
+            .withMatcher("name", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
+            .withMatcher("enabled", ExampleMatcher.GenericPropertyMatchers.exact())
+            .withIgnorePaths("id", "users");
 
     private final RoleRepository roleRepository;
 
@@ -63,8 +72,6 @@ public class RoleService {
     }
 
     public List<Role> findRoleByNames(String[] names, boolean strict) {
-        //todo https://www.baeldung.com/spring-data-criteria-queries
-
         if (names == null || names.length == 0) {
             return new ArrayList<>();
         }
@@ -93,6 +100,11 @@ public class RoleService {
         return this.findAll().stream()
                 .filter(matcher)
                 .collect(Collectors.toList());
+    }
+
+    public List<Role> find(Role role) {
+        Example<Role> example = Example.of(role, SEARCH_CONDITIONS_MATCH_ALL);
+        return roleRepository.findAll(example, Sort.by("name"));
     }
 
     @Cacheable(cacheNames = "rolesList")
