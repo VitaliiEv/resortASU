@@ -12,6 +12,7 @@ import vitaliiev.resortASU.repository.auth.RoleRepository;
 import java.util.ArrayList;
 import java.util.List;
 
+
 @Slf4j
 class RoleServiceTest extends ResortApplicationTests {
 
@@ -22,35 +23,39 @@ class RoleServiceTest extends ResortApplicationTests {
     private RoleRepository roleRepository;
 
     private List<Role> roles = new ArrayList<>();
+    private Role role1, role2, role3;
 
     @BeforeEach
     void before() {
-
-        roles.add(new Role("TEST_USER1"));
-        roles.add(new Role("TEST_USER2"));
-        roles.add(new Role("TEST_USER3"));
+        roles = new ArrayList<>();
+        role1 = new Role("TEST_USER1");
+        role2 = new Role("TEST_USER2");
+        role3 = new Role("TEST_USER3");
+        roles.add(role1);
+        roles.add(role2);
+        roles.add(role3);
     }
 
     @AfterEach
     void after() {
         roleRepository.deleteAll(roles);
-        roles.clear();
+        roles.forEach(r -> r = null);
+        roles = null;
     }
 
     @Test
     void create() {
-        for (Role r : roles) {
-            log.warn("creating role {}, and putting it into cache", r.getName());
-            r = service.create(r);
-            log.warn("getting role {}, from cache", r.getName());
-            service.findRoleByName(r.getName());
-            log.warn("getting role {}, from repository", r.getName());
-            roleRepository.findByName(r.getName());
-        }
+        log.warn("creating role {}, and putting it into cache", role1.getName());
+        role1 = service.create(role1);
+        log.warn("getting role {}, from cache by id", role1.getName());
+        service.findRoleById(role1.getId());
+        log.warn("getting role {}, from repository", role1.getName());
+        roleRepository.findByName(role1.getName());
     }
 
     @Test
     void findRoleById() {
+
     }
 
     @Test
