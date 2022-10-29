@@ -61,8 +61,8 @@ public class UserController {
     public String listSearchResults(RedirectAttributes redirectAttributes,
                                     @RequestParam String username,
                                     @RequestParam String roles) {
-        // todo
-        List<User> entities = userService.searchUsers(username, roles);
+        // todo see role find
+        List<User> entities = userService.find(new User());
         redirectAttributes.addFlashAttribute("fragment", ENTITY_NAME);
         redirectAttributes.addFlashAttribute("entities", entities);
         return "redirect:/admin";
@@ -81,13 +81,13 @@ public class UserController {
 
     @PostMapping ("/admin/"+ ENTITY_NAME + "/update")
     public String update(@ModelAttribute(name = "entity") User entity) {
-        userService.updateUser(entity);
+        userService.update(entity);
         return "redirect:/admin/" + ENTITY_NAME + "/" + entity.getId();
     }
 
     @PostMapping("/admin/" + ENTITY_NAME + "/delete")
     public String delete(@RequestParam(name = "id") Long id) {
-        userService.deleteUserById(id);
+        userService.delete(id);
         return "redirect:/admin/" + ENTITY_NAME;
     }
 }

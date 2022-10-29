@@ -2,11 +2,16 @@ package vitaliiev.resortASU.service.auth;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import vitaliiev.resortASU.model.auth.Role;
 import vitaliiev.resortASU.model.auth.User;
 import vitaliiev.resortASU.repository.auth.UserRepository;
 
@@ -16,6 +21,12 @@ import java.util.*;
 @Service
 public class UserService implements UserDetailsService {
 
+    private static final ExampleMatcher SEARCH_CONDITIONS_MATCH_ALL = ExampleMatcher
+            .matching()
+            .withIgnoreNullValues() //todo add
+            .withMatcher("username", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
+            .withMatcher("enabled", ExampleMatcher.GenericPropertyMatchers.exact())
+            .withIgnorePaths("id", "password", "roles");
     private final UserRepository userRepository;
 
     private final RoleService roleService;
@@ -35,14 +46,18 @@ public class UserService implements UserDetailsService {
         return user.orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
-    public boolean addUser(User user) {
-        try {
+    public boolean create(User user) { //todo  fix return type
+        try { // todo not needed?
             loadUserByUsername(user.getUsername());
             return false;
         } catch (UsernameNotFoundException e) {
             user.setRoles(Collections.singleton(roleService.getUser()));
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-            userRepository.save(user);
+            try {
+                userRepository.save(user);
+            } catch (DataIntegrityViolationException dve) {
+                log.warn(dve.getMessage());
+            }
             return true;
         }
     }
@@ -55,11 +70,21 @@ public class UserService implements UserDetailsService {
         return userRepository.findByUsername(username);
     }
 
-    public User updateUser(User user) {
+    public List<User> find(User user) {
+        Example<User> example = Example.of(user, SEARCH_CONDITIONS_MATCH_ALL);
+        return userRepository.findAll(example, Sort.by("username"));
+    }
+
+    public List<User> findAll() {
+        return userRepository.findAll();
+    }
+
+    public User update(User user) {
         User userFromDb = userRepository.getReferenceById(user.getId());
-        if (userIsLastAdmin(userFromDb) && !user.getRoles().contains(roleService.getAdmin())) { // do not allow
-            // delete admin role from last admin
-            user.getRoles().add(roleService.getAdmin());
+        Role admin = roleService.getAdmin();
+        if (userIsLastAdmin(userFromDb) && !user.getRoles().contains(admin)) {
+            // do not allow delete admin role from last admin
+            user.getRoles().add(admin);
             log.info("User {} is last user with admin role.", user.getUsername());
             log.info("Cant apply current set of roles to user {}. {} added to set of roles", user.getUsername(),
                     roleService.getAdmin().getName());
@@ -71,7 +96,13 @@ public class UserService implements UserDetailsService {
         }
         userFromDb.setEnabled(user.getEnabled());
         userFromDb.setRoles(user.getRoles());
-        return userRepository.save(userFromDb);
+        try {
+            return userRepository.save(userFromDb);
+        } catch (DataIntegrityViolationException dve) {
+            log.warn(dve.getMessage());
+            return null;
+        }
+
     }
 
     public User changePassword(User user) {
@@ -81,7 +112,7 @@ public class UserService implements UserDetailsService {
         return userRepository.save(userFromDb);
     }
 
-    public void deleteUserById(Long id) {
+    public void delete(Long id) {
         User user = userRepository.findUsersById(id);
         if (userIsLastAdmin(user)) {// do not allow to delete last user with role "admin"
             log.warn("Can't delete the only remaining user with admin rights");
@@ -90,42 +121,14 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public List<User> findAll() {
-        return userRepository.findAll();
-    }
-
-    public List<User> searchUsers(String username, String roles) {
-        // todo
-//        List<User> userList = new ArrayList<>();
-//        if (username == null || username.isEmpty()) {
-//            return new ArrayList<>();
-//        }
-//
-//        User user = userRepository.findByUsername(username);
-//        if (user == null) {
-//
-//        }
-//        List<Role> roleList = rolesService.findRoleByNames(roles.split("\\s"));
-//        if (username != null && !username.isEmpty()) {
-//            user.setUsername(username);
-//        }
-//        if (roles != null && !roles.isEmpty()) {
-//
-//            user.setRoles(r);
-//        }
-//        return userRepository.findAll(Example.of(user));
-        return null;
-    }
-
-    private boolean userIsAdmin(User user) {
-        return user.getRoles()
-                .stream()
-                .anyMatch(r -> r.equals(roleService.getAdmin()));
+    private boolean userHasRole(User user, Role role) {
+        return user.getRoles().contains(role);
     }
 
     private boolean userIsLastAdmin(User user) {
-        if (userIsAdmin(user)) {
-            return roleService.getAdmin().getUsers().size() <= 1;
+        Role admin = roleService.getAdmin();
+        if (userHasRole(user, admin)) {
+            return admin.getUsers().size() <= 1;
         }
         return false;
     }

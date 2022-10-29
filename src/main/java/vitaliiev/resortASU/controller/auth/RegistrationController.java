@@ -38,7 +38,7 @@ public class RegistrationController {
             model.addAttribute("passwordError", "Passwords dont match");
             return "/register";
         }
-        if (!userService.addUser(user)) {
+        if (!userService.create(user)) {
             model.addAttribute("usernameError", "User already exists");
             return "/register";
         }
