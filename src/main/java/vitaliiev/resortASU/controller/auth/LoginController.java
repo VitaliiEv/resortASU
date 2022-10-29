@@ -3,7 +3,7 @@ package vitaliiev.resortASU.controller.auth;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import vitaliiev.resortASU.entity.auth.User;
+import vitaliiev.resortASU.model.auth.User;
 
 @Controller
 public class LoginController {

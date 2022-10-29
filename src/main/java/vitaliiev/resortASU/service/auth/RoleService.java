@@ -6,7 +6,7 @@ import org.springframework.cache.annotation.*;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import vitaliiev.resortASU.entity.auth.Role;
+import vitaliiev.resortASU.model.auth.Role;
 import vitaliiev.resortASU.repository.auth.RoleRepository;
 
 import java.util.*;

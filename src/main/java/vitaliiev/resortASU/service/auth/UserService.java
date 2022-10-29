@@ -7,8 +7,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import vitaliiev.resortASU.entity.auth.Role;
-import vitaliiev.resortASU.entity.auth.User;
+import vitaliiev.resortASU.model.auth.User;
 import vitaliiev.resortASU.repository.auth.UserRepository;
 
 import java.util.*;

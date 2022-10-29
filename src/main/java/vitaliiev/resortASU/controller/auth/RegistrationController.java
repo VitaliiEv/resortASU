@@ -7,7 +7,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import vitaliiev.resortASU.entity.auth.User;
+import vitaliiev.resortASU.model.auth.User;
 import vitaliiev.resortASU.service.auth.UserService;
 
 import javax.validation.Valid;

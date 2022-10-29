@@ -1,8 +1,8 @@
-package vitaliiev.resortASU.entity.facilities;
+package vitaliiev.resortASU.model.facilities;
 
 import lombok.Getter;
 import lombok.Setter;
-import vitaliiev.resortASU.entity.Photo;
+import vitaliiev.resortASU.model.Photo;
 
 import javax.persistence.*;
 import java.sql.Timestamp;

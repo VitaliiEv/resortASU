@@ -1,7 +1,7 @@
 package vitaliiev.resortASU.repository.auth;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import vitaliiev.resortASU.entity.auth.User;
+import vitaliiev.resortASU.model.auth.User;
 
 
 public interface UserRepository extends JpaRepository<User, Long> {

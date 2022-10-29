@@ -1,4 +1,4 @@
-package vitaliiev.resortASU.entity.auth;
+package vitaliiev.resortASU.model.auth;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

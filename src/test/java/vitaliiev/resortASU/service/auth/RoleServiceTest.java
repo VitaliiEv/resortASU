@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import vitaliiev.resortASU.ResortApplicationTests;
-import vitaliiev.resortASU.entity.auth.Role;
+import vitaliiev.resortASU.model.auth.Role;
 import vitaliiev.resortASU.repository.auth.RoleRepository;
 
 import java.util.ArrayList;
