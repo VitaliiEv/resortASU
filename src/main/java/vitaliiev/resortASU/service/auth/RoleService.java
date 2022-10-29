@@ -2,12 +2,15 @@ package vitaliiev.resortASU.service.auth;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.*;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import vitaliiev.resortASU.entity.auth.Role;
 import vitaliiev.resortASU.repository.auth.RoleRepository;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -18,19 +21,16 @@ public class RoleService {
 
     private final RoleRepository roleRepository;
 
-    private final List<Role> roles;
-
     @Autowired
     public RoleService(RoleRepository roleRepository) {
         this.roleRepository = roleRepository;
-        this.roles = roleRepository.findAll();
     }
 
-    public void create(Role role) {
-        if (role == null) {
-            log.warn("Expected non null argument. Role not created");
-            return;
-        }
+    @Caching(
+            put = {@CachePut(cacheNames = "roles", key = "#result?.id")},
+            evict = {@CacheEvict(cacheNames = "rolesList", allEntries = true)}
+    )
+    public Role create(Role role) {
         String name = role.getName();
         if (!name.startsWith("ROLE_")) {
             log.info("Expected role name with prefix ROLE_. Got {}", name);
@@ -39,81 +39,107 @@ public class RoleService {
             log.warn("Adding prefix automatically. New role name: {}", name);
         }
         try {
-            Role savedRole = roleRepository.save(role);
-            roles.add(savedRole);
+            return roleRepository.save(role);
         } catch (DataIntegrityViolationException e) {
-            log.error(e.getMessage());
+            log.warn(e.getMessage());
+            return role;
         }
     }
 
-    public Role findRoleById(Integer id) { //fixme use Optional
-        return roles.stream()
-                .filter(i -> i.getId().equals(id))
-                .findAny().orElse(null);
+    @Cacheable(cacheNames = "roles", key = "#id")
+    public Role findRoleById(Integer id) {
+        return roleRepository.findById(id).orElse(null);
     }
 
-    public Role findRoleByName(String name) { //fixme use Optional
-        return roles.stream()
-                .filter(i -> i.getName().equals(name))
-                .findAny().orElse(null);
+    public Role findRoleByName(String name) {
+        List<Role> unfilteredList = this.findRoleByNames(new String[] {name});
+        return unfilteredList.stream()
+                .filter(r-> r.getName().equals(name))
+                .findAny().orElse(null); // todo Optional
     }
 
     public List<Role> findRoleByNames(String[] names) {
-        return roles.stream()
-                .filter(r -> {
-                    for (String name : names) {
-                        if (name.contains(r.getName())) {
-                            return true;
-                        }
+        return this.findRoleByNames(names, true);
+    }
+
+    public List<Role> findRoleByNames(String[] names, boolean strict) {
+        //todo https://www.baeldung.com/spring-data-criteria-queries
+
+        if (names == null || names.length == 0) {
+            return new ArrayList<>();
+        }
+        Predicate<Role> matcher;
+        if (strict) {
+            matcher = role -> {
+                for (String roleName : names) {
+                    if (role.getName().equals(roleName)) {
+                        return true;
                     }
-                    return false;
-                }).collect(Collectors.toList());
+                }
+                return false;
+            };
+        } else {
+            matcher = role -> {
+                for (String roleName : names) {
+                    if (role.getName().contains(roleName)) {
+                        return true;
+                    }
+                }
+                return false;
+            };
+        }
+
+        // assume that roles list is small, and we can fetch it quickly
+        return this.findAll().stream()
+                .filter(matcher)
+                .collect(Collectors.toList());
     }
 
+    @Cacheable(cacheNames = "rolesList")
     public List<Role> findAll() {
-        return roles;
+        return roleRepository.findAll(Sort.by("name"));
+//        return roleRepository.findAll();
     }
 
-    public void update(Role role) {
+    @Caching(
+            put = {@CachePut(cacheNames = "roles", key = "#result?.id")},
+            evict = {@CacheEvict(cacheNames = "rolesList", allEntries = true)}
+    )
+    public Role update(Role role) {
         if (!role.getEnabled() && (role.getName().equals(DEFAULT_ADMIN) || role.getName().equals(DEFAULT_USER))) {
             log.warn("Can't disable ADMIN or USER built in role.");
             role.setEnabled(true);
         }
         try {
-            Role savedRole = roleRepository.save(role);
-            roles.add(savedRole);
+            return roleRepository.save(role);
         } catch (DataIntegrityViolationException e) {
-            log.error(e.getMessage());
+            log.warn(e.getMessage());
+            return role;
         }
     }
 
+    @Caching(
+            evict = {@CacheEvict(cacheNames = "roles", key = "#id"),
+                    @CacheEvict(cacheNames = "rolesList", allEntries = true)}
+    )
     public void delete(Integer id) {
-        Role role = this.findRoleById(id);
-        if (role != null) {
-            if (role.getName().equals(DEFAULT_ADMIN) || role.getName().equals(DEFAULT_USER)) {
+        Optional<Role> optionalRole = roleRepository.findById(id);
+        optionalRole.ifPresent(r -> {
+            if (r.getName().equals(DEFAULT_ADMIN) ||
+                    r.getName().equals(DEFAULT_USER)) {
                 log.warn("Cant delete predefined USER or ADMIN roles.");
             } else {
                 roleRepository.deleteById(id);
-                roles.remove(role);
             }
-        }
+        });
     }
 
-
     public Role getAdmin() {
-        return this.findRoleByName(DEFAULT_ADMIN);
+        return findRoleByName(DEFAULT_ADMIN);
     }
 
     public Role getUser() {
-        return this.findRoleByName(DEFAULT_USER);
+        return findRoleByName(DEFAULT_USER);
     }
 
-    private Role copyRole(Role role) {
-        Role copy = new Role();
-        copy.setId(role.getId());
-        copy.setName(role.getName());
-        copy.setEnabled(role.getEnabled());
-        copy.setUsers(role.getUsers());
-        return copy;
-    }
 }
