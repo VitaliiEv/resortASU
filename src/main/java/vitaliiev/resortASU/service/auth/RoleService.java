@@ -61,45 +61,11 @@ public class RoleService {
     }
 
     public Role findRoleByName(String name) {
-        List<Role> unfilteredList = this.findRoleByNames(new String[] {name});
-        return unfilteredList.stream()
-                .filter(r-> r.getName().equals(name))
-                .findAny().orElse(null); // todo Optional
-    }
-
-    public List<Role> findRoleByNames(String[] names) {
-        return this.findRoleByNames(names, true);
-    }
-
-    public List<Role> findRoleByNames(String[] names, boolean strict) {
-        if (names == null || names.length == 0) {
-            return new ArrayList<>();
-        }
-        Predicate<Role> matcher;
-        if (strict) {
-            matcher = role -> {
-                for (String roleName : names) {
-                    if (role.getName().equals(roleName)) {
-                        return true;
-                    }
-                }
-                return false;
-            };
-        } else {
-            matcher = role -> {
-                for (String roleName : names) {
-                    if (role.getName().contains(roleName)) {
-                        return true;
-                    }
-                }
-                return false;
-            };
-        }
-
         // assume that roles list is small, and we can fetch it quickly
         return this.findAll().stream()
-                .filter(matcher)
-                .collect(Collectors.toList());
+                .filter(r-> r.getName().equals(name))
+                .findAny()
+                .orElse(null); // todo Optional
     }
 
     public List<Role> find(Role role) {
