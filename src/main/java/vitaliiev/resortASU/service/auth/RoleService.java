@@ -129,7 +129,11 @@ public class RoleService {
                     r.getName().equals(DEFAULT_USER)) {
                 log.warn("Cant delete predefined USER or ADMIN roles.");
             } else {
-                roleRepository.deleteById(id);
+                try {
+                    roleRepository.deleteById(id);
+                } catch (DataIntegrityViolationException e) {
+                    log.warn(e.getMessage());
+                }
             }
         });
     }
