@@ -1,20 +1,18 @@
 package vitaliiev.resortASU.controller.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vitaliiev.resortASU.model.auth.User;
 import vitaliiev.resortASU.service.auth.RoleService;
 import vitaliiev.resortASU.service.auth.UserService;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @Controller
+@RequestMapping("/admin")
 public class UserController {
 
     private static final String ENTITY_NAME = "users";
@@ -27,48 +25,33 @@ public class UserController {
         this.roleService = roleService;
     }
 
-    @GetMapping("/user")
-    public String userProfile(@AuthenticationPrincipal User user, Model model) {
-        model.addAttribute("user", user);
-        return "/user";
-    }
-
-    @PostMapping("/user")
-    private String changePassword(@ModelAttribute(name = "user") @Valid User user, BindingResult bindingResult,
-                                  Model model) {
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("validationErrors", bindingResult.getAllErrors());
-            return "/user";
-        }
-        if (!user.getPassword().equals(user.getPasswordConfirm())) {
-            model.addAttribute("passwordError", "Passwords dont match");
-            return "/user";
-        }
-        user = userService.changePassword(user);
-        model.addAttribute("user", user);
-        return "/user";
-    }
-
-    @GetMapping("/admin/"+ ENTITY_NAME)
+    @GetMapping(ENTITY_NAME)
     public String list(Model model) {
+        if (!model.containsAttribute("entities")) {
+            List<User> entities = userService.findAll();
+            model.addAttribute("entities", entities);
+        }
         List<User> entities = userService.findAll();
         model.addAttribute("fragment", ENTITY_NAME);
-        model.addAttribute("entities", entities);
         return "admin/" + ENTITY_NAME;
     }
 
-    @PostMapping("/admin/"+ ENTITY_NAME)
-    public String listSearchResults(RedirectAttributes redirectAttributes,
-                                    @RequestParam String username,
-                                    @RequestParam String roles) {
-        // todo see role find
-        List<User> entities = userService.find(new User());
-        redirectAttributes.addFlashAttribute("fragment", ENTITY_NAME);
+    @PostMapping(ENTITY_NAME)
+    public String find(@ModelAttribute(name = "entity") User entity,
+//                       @RequestParam String roles, // todo
+                       @RequestParam(name = "enabled") String enabled,
+                       RedirectAttributes redirectAttributes) {
+        if (enabled.equals("all")) {
+            entity.setEnabled(null);
+        } else {
+            entity.setEnabled(Boolean.valueOf(enabled));
+        }
+        List<User> entities = userService.find(entity);
         redirectAttributes.addFlashAttribute("entities", entities);
-        return "redirect:/admin";
+        return "redirect:/admin/" + ENTITY_NAME;
     }
 
-    @GetMapping("/admin/"+ ENTITY_NAME + "/{id}")
+    @GetMapping(ENTITY_NAME + "/{id}")
     public String read(@PathVariable Long id, Model model) {
         User entity = userService.findUserById(id);
         if (entity != null) {
@@ -79,13 +62,13 @@ public class UserController {
         return "admin/" + ENTITY_NAME;
     }
 
-    @PostMapping ("/admin/"+ ENTITY_NAME + "/update")
+    @PostMapping (ENTITY_NAME + "/update")
     public String update(@ModelAttribute(name = "entity") User entity) {
         userService.update(entity);
         return "redirect:/admin/" + ENTITY_NAME + "/" + entity.getId();
     }
 
-    @PostMapping("/admin/" + ENTITY_NAME + "/delete")
+    @PostMapping(ENTITY_NAME + "/delete")
     public String delete(@RequestParam(name = "id") Long id) {
         userService.delete(id);
         return "redirect:/admin/" + ENTITY_NAME;
