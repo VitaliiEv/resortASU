@@ -7,23 +7,32 @@
 <body>
 <div th:fragment="entities (path, entities, newEntity, allRoles)">
     <div class="row">
-        <div class="col-3 col-sm-4">
+        <div class="col-3 col-sm-2">
             <h3>Search</h3>
             <form th:method="POST" th:object="${newEntity}" th:action="@{${path}+'/find'}">
                 <div class="row g-2 align-items-center">
                     <label th:for="*{id}" class="visually-hidden">Id</label>
                     <input type="hidden" id="id" required th:field="*{id}" th:value="*{id}"/>
-                    <div class="col-auto">
+                    <div>
                         <label th:for="*{username}" class="visually-hidden">Username: </label>
                         <input class="form-control" type="text" placeholder="Username" th:field="*{username}">
                     </div>
-					<div class="col-auto">
-						<label for="roles" class="visually-hidden">Roles</label>
-						<input type="text" id="roles" placeholder="Roles" class="form-control">
+					<div>
+						<p class="col-auto">Select roles:</p>
+						
+						<div th:each="r : ${allRoles}">
+							<input class="form-check-input" type="checkbox"
+								   th:field="*{roles}"
+								   th:value="${r.id}"/>
+							<label class="form-check-label"
+								   th:for="${#ids.prev('roles')}"
+								   th:text="${r.name}"></label>
+						</div>
 					</div>
-                    <div class="col-auto">
+                    <div>
+						<p class="col-auto">Status:</p>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" id="all" value="all" name="enabled" checked>
+                            <input class="form-check-input" type="radio" id="all" value="" name="enabled" checked>
                             <label class="form-check-label" for="all">All</label>
                         </div>
                         <div class="form-check">
@@ -35,7 +44,7 @@
                             <label class="form-check-label" for="false">Disabled</label>
                         </div>
                     </div>
-                    <div class="col-auto">
+                    <div>
                         <button class="btn btn-primary btn-block" type="submit">Find</button>
                     </div>
                 </div>

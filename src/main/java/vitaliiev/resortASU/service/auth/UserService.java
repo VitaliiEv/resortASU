@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import vitaliiev.resortASU.model.auth.Role;
 import vitaliiev.resortASU.model.auth.User;
 import vitaliiev.resortASU.repository.auth.UserRepository;
+import vitaliiev.resortASU.utils.CollectionElementFieldMatcher;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,9 +29,8 @@ public class UserService implements UserDetailsService {
 
     private static final ExampleMatcher SEARCH_CONDITIONS_MATCH_ALL = ExampleMatcher
             .matching()
-            .withIgnoreNullValues() //todo add roles
+            .withIncludeNullValues()
             .withMatcher("username", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
-            .withMatcher("enabled", ExampleMatcher.GenericPropertyMatchers.exact())
             .withIgnorePaths("id", "password", "roles");
     private final UserRepository userRepository;
 
@@ -71,8 +71,22 @@ public class UserService implements UserDetailsService {
     }
 
     public List<User> find(User user) {
-        Example<User> example = Example.of(user, SEARCH_CONDITIONS_MATCH_ALL);
-        return userRepository.findAll(example, Sort.by("username"));
+        ExampleMatcher newSearchConditions;
+        if (user.getEnabled() == null) {
+            newSearchConditions = SEARCH_CONDITIONS_MATCH_ALL.withIgnorePaths("enabled");
+        } else {
+            newSearchConditions = SEARCH_CONDITIONS_MATCH_ALL
+                    .withMatcher("enabled", ExampleMatcher.GenericPropertyMatchers.exact());
+        }
+        Example<User> example = Example.of(user, newSearchConditions);
+        List<User> userList = userRepository.findAll(example, Sort.by("username"));
+        if (user.getRoles() == null || user.getRoles().isEmpty()) {
+            return userList;
+        }
+        return userList.stream()
+                .filter(u -> CollectionElementFieldMatcher
+                        .matchAnyEqual(u.getRoles(), Role::getName , user.getRoles()))
+                .toList();
     }
 
     @Cacheable(cacheNames = "usersList")
@@ -85,7 +99,7 @@ public class UserService implements UserDetailsService {
             evict = {@CacheEvict(cacheNames = "usersList", allEntries = true)}
     )
     public User update(User user) {
-        // the parameter we get here doesnt contain password/ we need to get model from DB
+        // the parameter we get here doesn't contain password/ we need to get model from DB
         User userFromDb = this.findUserById(user.getId()); // uses cache
         user.setPassword(userFromDb.getPassword());
         Role admin = roleService.getAdmin();

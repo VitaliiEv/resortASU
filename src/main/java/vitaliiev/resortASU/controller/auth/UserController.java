@@ -34,19 +34,13 @@ public class UserController {
         User newEntity = new User();
         model.addAttribute("newEntity", newEntity);
         model.addAttribute("fragment", ENTITY_NAME);
+        model.addAttribute("roles", roleService.findAll());
         return "admin/" + ENTITY_NAME;
     }
 
-    @PostMapping(ENTITY_NAME)
+    @PostMapping(ENTITY_NAME + "/find")
     public String find(@ModelAttribute(name = "entity") User entity,
-//                       @RequestParam String roles, // todo
-                       @RequestParam(name = "enabled") String enabled,
                        RedirectAttributes redirectAttributes) {
-        if (enabled.equals("all")) {
-            entity.setEnabled(null);
-        } else {
-            entity.setEnabled(Boolean.valueOf(enabled));
-        }
         List<User> entities = userService.find(entity);
         redirectAttributes.addFlashAttribute("entities", entities);
         return "redirect:/admin/" + ENTITY_NAME;
