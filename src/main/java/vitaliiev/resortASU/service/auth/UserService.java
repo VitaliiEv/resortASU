@@ -2,6 +2,10 @@ package vitaliiev.resortASU.service.auth;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -24,7 +28,7 @@ public class UserService implements UserDetailsService {
 
     private static final ExampleMatcher SEARCH_CONDITIONS_MATCH_ALL = ExampleMatcher
             .matching()
-            .withIgnoreNullValues() //todo add
+            .withIgnoreNullValues() //todo add roles
             .withMatcher("username", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
             .withMatcher("enabled", ExampleMatcher.GenericPropertyMatchers.exact())
             .withIgnorePaths("id", "password", "roles");
@@ -47,22 +51,17 @@ public class UserService implements UserDetailsService {
         return user.orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
-    public boolean create(User user) { //todo  fix return type
-        try { // todo not needed?
-            loadUserByUsername(user.getUsername());
-            return false;
-        } catch (UsernameNotFoundException e) {
-            user.addRole(roleService.getUser());
-            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-            try {
-                userRepository.save(user);
-            } catch (DataIntegrityViolationException dve) {
-                log.warn(dve.getMessage());
-            }
-            return true;
-        }
+    @Caching(
+            put = {@CachePut(cacheNames = "users", key = "#result?.id")},
+            evict = {@CacheEvict(cacheNames = "usersList", allEntries = true)}
+    )
+    public User create(User user) throws DataIntegrityViolationException {
+        user.addRole(roleService.getUser());
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        return userRepository.save(user);
     }
 
+    @Cacheable(cacheNames = "users", key = "#id")
     public User findUserById(Long id) {
         return userRepository.findById(id).orElse(null);
     }
@@ -76,43 +75,53 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll(example, Sort.by("username"));
     }
 
+    @Cacheable(cacheNames = "usersList")
     public List<User> findAll() {
         return userRepository.findAll();
     }
 
+    @Caching(
+            put = {@CachePut(cacheNames = "users", key = "#result?.id")},
+            evict = {@CacheEvict(cacheNames = "usersList", allEntries = true)}
+    )
     public User update(User user) {
-        User userFromDb = userRepository.getReferenceById(user.getId());
+        // the parameter we get here doesnt contain password/ we need to get model from DB
+        User userFromDb = this.findUserById(user.getId()); // uses cache
+        user.setPassword(userFromDb.getPassword());
         Role admin = roleService.getAdmin();
         if (userIsLastAdmin(userFromDb) && !user.getRoles().contains(admin)) {
             // do not allow delete admin role from last admin
             user.getRoles().add(admin);
             log.info("User {} is last user with admin role.", user.getUsername());
             log.info("Cant apply current set of roles to user {}. {} added to set of roles", user.getUsername(),
-                    roleService.getAdmin().getName());
+                   admin.getName());
         }
         if (user.getRoles().isEmpty()) {
             user.getRoles().add(roleService.getUser());
             log.info("Cant apply empty set of roles to user {}. {} added to set of roles", user.getUsername(),
                     roleService.getUser().getName());
         }
-        userFromDb.setEnabled(user.getEnabled());
-        userFromDb.addRoles(user.getRoles());
         try {
-            return userRepository.save(userFromDb);
+            return userRepository.save(user);
         } catch (DataIntegrityViolationException dve) {
             log.warn(dve.getMessage());
             return null;
         }
 
     }
-
+    @Caching(
+            put = {@CachePut(cacheNames = "users", key = "#result?.id")},
+            evict = {@CacheEvict(cacheNames = "usersList", allEntries = true)}
+    )
     public User changePassword(User user) {
-        Optional<User> optionalUser = Optional.ofNullable(userRepository.findByUsername(user.getUsername()));
-        User userFromDb = optionalUser.orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        userFromDb.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        return userRepository.save(userFromDb);
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        return userRepository.save(user);
     }
 
+    @Caching(
+            evict = {@CacheEvict(cacheNames = "users", key = "#id"),
+                    @CacheEvict(cacheNames = "usersList", allEntries = true)}
+    )
     public void delete(Long id) {
         User user = userRepository.findUsersById(id);
         if (userIsLastAdmin(user)) {// do not allow to delete last user with role "admin"

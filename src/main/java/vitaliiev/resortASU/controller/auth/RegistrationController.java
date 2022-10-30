@@ -1,6 +1,8 @@
 package vitaliiev.resortASU.controller.auth;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -12,10 +14,11 @@ import vitaliiev.resortASU.service.auth.UserService;
 
 import javax.validation.Valid;
 
+@Slf4j
 @Controller
 public class RegistrationController {
 
-    private UserService userService;
+    private final UserService userService;
 
     @Autowired
     public RegistrationController(UserService userService) {
@@ -38,12 +41,16 @@ public class RegistrationController {
             model.addAttribute("passwordError", "Passwords dont match");
             return "/register";
         }
-        if (!userService.create(user)) {
-            model.addAttribute("usernameError", "User already exists");
+        try {
+            user = userService.create(user);
+            model.addAttribute("user", user);
+            return "redirect:/";
+        } catch (DataIntegrityViolationException e) {
+            String message = "Can't create user: user already exists. ";
+            log.warn(message + e.getMessage());
+            model.addAttribute("usernameError", message);
             return "/register";
         }
-        model.addAttribute("user", user);
-        return "redirect:/";
     }
 
 }
