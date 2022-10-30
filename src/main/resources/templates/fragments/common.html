@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Common</title>
+</head>
+<body>
+<div th:fragment="confirmFormDialog (title, text, buttonText, id)">
+<!-- Button trigger modal -->
+	<!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirmFormDialog" th:text="${buttonText}">-->
+	<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirmFormDialog"
+	th:attr="data-bs-target=${'#confirmFormDialog'+id}" th:text="${buttonText}">
+	  Confirm
+	</button>
+
+	<!-- Modal -->
+	<div class="modal fade" id="confirmFormDialog" tabindex="-1" aria-labelledby="confirmFormDialogLabel" aria-hidden="true"
+	th:id="${'confirmFormDialog'+id}"
+	th:attr="aria-labelledby=${'confirmFormDialogLabel'+id}">
+	  <div class="modal-dialog">
+		<div class="modal-content">
+		  <div class="modal-header">
+			<h5 class="modal-title fs-5" id="confirmFormDialogLabel" th:id="${'confirmFormDialogLabel'+id}" th:text="${title}">Confirm action</h5>
+			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		  </div>
+		  <div class="modal-body">
+			<p  th:text="${text}"></p>
+		  </div>
+		  <div class="modal-footer">
+			<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+			<button type="submit" class="btn btn-primary" th:text="${buttonText}">Confirm</button>
+		  </div>
+		</div>
+	  </div>
+	</div>
+
+</div>
+</body>
+</html>

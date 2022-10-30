@@ -35,15 +35,15 @@ public class RoleController {
     }
 
     @PostMapping(ENTITY_NAME + "/find")
-    public String find(@ModelAttribute(name = "entity") Role role,
+    public String find(@ModelAttribute(name = "entity") Role entity,
                        @RequestParam(name = "enabled") String enabled,
                        RedirectAttributes redirectAttributes) {
         if (enabled.equals("all")) {
-            role.setEnabled(null);
+            entity.setEnabled(null);
         } else {
-            role.setEnabled(Boolean.valueOf(enabled));
+            entity.setEnabled(Boolean.valueOf(enabled));
         }
-        List<Role> entities = service.find(role);
+        List<Role> entities = service.find(entity);
         redirectAttributes.addFlashAttribute("entities", entities);
         return "redirect:/admin/" + ENTITY_NAME;
     }
