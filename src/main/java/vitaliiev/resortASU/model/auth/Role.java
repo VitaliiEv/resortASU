@@ -13,7 +13,7 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(of={"name"})
 @Table(name="\"role_resortASU\"")
 public class Role implements GrantedAuthority {
 
@@ -22,9 +22,8 @@ public class Role implements GrantedAuthority {
     private Integer id;
     private String name;
     private Boolean enabled = true;
-    @EqualsAndHashCode.Exclude
     @ManyToMany(mappedBy = "roles")
-    private Set<User> users;
+    private Set<User> users; //todo cascading delete
 
     public Role(String name) {
         this.name = name;

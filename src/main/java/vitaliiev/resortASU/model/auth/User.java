@@ -1,5 +1,6 @@
 package vitaliiev.resortASU.model.auth;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,6 +14,7 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
+@EqualsAndHashCode(of={"username"})
 @Table(name = "\"user_resortASU\"")
 public class User implements UserDetails {
 
@@ -23,7 +25,6 @@ public class User implements UserDetails {
     private String username;
     @Size(min = 5, message = "Your password must be minimum 5 characters long.")
     private String password;
-
     private Boolean enabled = true;
     @Transient
     private String passwordConfirm;
