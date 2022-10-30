@@ -5,56 +5,83 @@
     <title>Users</title>
 </head>
 <body>
-<div th:fragment="entities (path, entities)">
-    <h2>Users</h2>
-	<form th:method="POST" th:action="${path}">
-		<div class="row g-2 align-items-center">
-		  <div class="col-auto">
-			<label for="username" class="visually-hidden">Username</label>
-			<input type="text" id="username" placeholder="Username" class="form-control">
-		  </div>
-		  <div class="col-auto">
-			<label for="roles" class="visually-hidden">Roles</label>
-			<input type="text" id="roles" placeholder="Roles" class="form-control">
-		  </div>
-		  <div class="col-auto">
-				<button class="btn btn-primary btn-block" type="submit">Find</button>
-		  </div>
-		</div>
-	</form>
-    <table class="table table-striped">
-        <tr>
-            <th scope="col">id</th>
-            <th scope="col">UserName</th>
-            <th scope="col">Roles</th>
-            <th scope="col">Enabled</th>
-            <th scope="col"></th>
-            <th scope="col"></th>
-        </tr>
-        <tr th:each="u : ${entities}">
-            <th scope="row" th:text="${u.id}"></th>
-            <td th:text="${u.username}"></td>
-            <td>
-                <span th:each="role : ${u.roles}" th:text="${role.name + ' '}"/>
-            </td>
-            <td th:text="${u.enabled}"></td>
-            <td>
-				<a class="btn btn-primary" th:href="${path + '/' + u.id}" role="button">Edit</a>	
-			</td>
-            <td>
-				<form th:method="POST" th:action="${'/admin/' + path + '/delete'}" >
-					<label class="visually-hidden" for="id"></label>
-					<input class="form-check-input" type="hidden" name="id" th:value="${u.id}">					
-					<button class="btn btn-primary btn-block" type="submit">Delete</button>
-				</form>
-            </td>
-        </tr>
+<div th:fragment="entities (path, entities, newEntity, allRoles)">
+    <div class="row">
+        <div class="col-3 col-sm-4">
+            <h3>Search</h3>
+            <form th:method="POST" th:object="${newEntity}" th:action="@{${path}+'/find'}">
+                <div class="row g-2 align-items-center">
+                    <label th:for="*{id}" class="visually-hidden">Id</label>
+                    <input type="hidden" id="id" required th:field="*{id}" th:value="*{id}"/>
+                    <div class="col-auto">
+                        <label th:for="*{username}" class="visually-hidden">Username: </label>
+                        <input class="form-control" type="text" placeholder="Username" th:field="*{username}">
+                    </div>
+					<div class="col-auto">
+						<label for="roles" class="visually-hidden">Roles</label>
+						<input type="text" id="roles" placeholder="Roles" class="form-control">
+					</div>
+                    <div class="col-auto">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="all" value="all" name="enabled" checked>
+                            <label class="form-check-label" for="all">All</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="true" value="true" name="enabled">
+                            <label class="form-check-label" for="true">Enabled</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="false" value="false" name="enabled">
+                            <label class="form-check-label" for="false">Disabled</label>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-primary btn-block" type="submit">Find</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+		<div class="col-3 col-sm-8">	
+		<h2>Users</h2>
+		<table class="table table-striped">
+			<tr>
+				<th scope="col">id</th>
+				<th scope="col">UserName</th>
+				<th scope="col">Roles</th>
+				<th scope="col">Enabled</th>
+				<th scope="col"></th>
+				<th scope="col"></th>
+			</tr>
+			<tr th:each="u : ${entities}">
+				<th scope="row" th:text="${u.id}"></th>
+				<td th:text="${u.username}"></td>
+				<td>
+					<span th:each="role : ${u.roles}" th:text="${role.name + ' '}"/>
+				</td>
+				<td th:text="${u.enabled}"></td>
+				<td>
+					<a class="btn btn-primary" th:href="@{${path} + '/' + ${u.id}}" role="button">Edit</a>	
+				</td>
+				<td>
+                    <form th:method="POST" th:action="@{'/admin/'+${path}+'/delete'}">
+                            <label class="visually-hidden" for="id"></label>
+                            <input class="form-check-input" type="hidden" name="id" th:value="${u.id}">
+                            <div th:replace="/fragments/common :: confirmFormDialog ('Delete?',
+                                'Do you want to delete this user profile',
+                                'Delete',
+								${u.id})">
+                                <button class="btn btn-primary btn-block" type="submit">Delete</button>
+                            </div>
+                    </form>
+				</td>
+			</tr>
     </table>
-
+	</div>
+	</div>
 </div>
 <div th:fragment="entity (path, entity, allRoles)">
     <h2>User profile</h2>
-	<form th:method="POST" th:object ="${entity}" th:action="${'/admin/' + path + '/update/'}" >
+	<form th:method="POST" th:object ="${entity}" th:action="@{'/admin/' + ${path} + '/update/'}" >
 		<div class="row g-2 align-items-center">
 			<div class="col-auto"> 
 				<label>Id: <span th:for="*{id}"></span></label>
@@ -89,15 +116,20 @@
 		  </div>
 		</div>
 	</form>
-	<form th:method="POST" th:object ="${entity}" th:action="${'/admin/' + path + '/delete'}" >
-		<div class="row g-2 align-items-center">
-		  	<div class="col-auto"> 
-				<label class="visually-hidden" th:for="*{id}"></label>
-				<input class="form-check-input" type="hidden" th:field="*{id}">					
-				<button class="btn btn-primary btn-block" type="submit">Delete</button>			
-			</div>
-		</div>
-	</form>
+     <form th:method="POST" th:object="${entity}" th:action="@{'/admin/'+${path}+'/delete'}">
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+                        <label class="visually-hidden" th:for="*{id}"></label>
+                        <input class="form-check-input" type="hidden" th:field="*{id}"/>
+                        <div th:replace="/fragments/common :: confirmFormDialog ('Delete?',
+                        'This action will also delete this ROLE from all user profiles?',
+                        'Delete',
+						*{id})">
+                            <button class="btn btn-primary btn-block" type="submit">Delete</button>
+                        </div>
+                    </div>
+                </div>
+    </form>
 
 </div>
 </body>

@@ -31,7 +31,8 @@ public class UserController {
             List<User> entities = userService.findAll();
             model.addAttribute("entities", entities);
         }
-        List<User> entities = userService.findAll();
+        User newEntity = new User();
+        model.addAttribute("newEntity", newEntity);
         model.addAttribute("fragment", ENTITY_NAME);
         return "admin/" + ENTITY_NAME;
     }
