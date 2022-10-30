@@ -9,15 +9,18 @@
 <div th:replace="fragments/navigation :: menu"></div>
 <div class="container">
 <form class="form-text" th:method="POST" th:action="@{/user}" th:object="${user}">
-    <h2 class="form-signin-heading">Hello, <span sec:authentication="principal.username"/>!</h2>
-	    <label for="username" class="visually-hidden">Username</label>
-        <input type="hidden" id="username" required th:field="*{username}" th:value="${#authentication.name}"/>
+    <h2 class="form-signin-heading">Hello<span th:text="*{', ' + username}"/>!</h2>
+		<label class="visually-hidden" th:for="*{id}">Id</label>
+        <input type="hidden" required th:field="*{id}"/>
+	    <label class="visually-hidden"th:for="*{username}">Username</label>
+        <input type="hidden" required th:field="*{username}"/>
     <p>
     <ul>
         <li th:each="err : ${#fields.errors('*')}" th:text="${err}"/>
-        <li th:if="${passwordError} neq null" th:text="${passwordError}"/>
+		<div th:if="${passwordError} ne null" >
+			<li th:text="${passwordError}"/>
+		</div>
     </ul>
-    </p>
     <p>
         <label for="password" class="visually-hidden">New password</label>
         <input type="password" id="password" class="form-control" placeholder="New password" required
