@@ -48,20 +48,15 @@ public class RoleService {
             put = {@CachePut(cacheNames = "roles", key = "#result?.id")},
             evict = {@CacheEvict(cacheNames = "rolesList", allEntries = true)}
     )
-    public Role create(Role role) {
-        String name = role.getName().toUpperCase();
+    public Role create(Role role) throws DataIntegrityViolationException {
+        String name = role.getName().toUpperCase().trim();
         if (!name.startsWith(NAME_PREFIX)) {
             log.info("Expected role name with prefix ROLE_. Got {}", name);
             name = NAME_PREFIX + name;
-            role.setName(name);
             log.warn("Adding prefix automatically. New role name: {}", name);
         }
-        try {
-            return roleRepository.save(role);
-        } catch (DataIntegrityViolationException e) {
-            log.warn(e.getMessage());
-            return role;
-        }
+        role.setName(name);
+        return roleRepository.save(role);
     }
 
     @Cacheable(cacheNames = "roles", key = "#id")

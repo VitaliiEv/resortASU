@@ -1,6 +1,8 @@
 package vitaliiev.resortASU.controller.auth;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +12,7 @@ import vitaliiev.resortASU.service.auth.RoleService;
 
 import java.util.List;
 
+@Slf4j
 @Controller
 @RequestMapping("/admin")
 public class RoleController {
@@ -49,8 +52,14 @@ public class RoleController {
     }
 
     @PostMapping(ENTITY_NAME + "/create")
-    public String create(@ModelAttribute(name = "entity") Role role) {
-        service.create(role);
+    public String create(@ModelAttribute(name = "entity") Role role, RedirectAttributes redirectAttributes) {
+        try {
+            service.create(role);
+        } catch (DataIntegrityViolationException e) {
+            String message = "Role already exists. ";
+            log.warn(message + e.getMessage());
+            redirectAttributes.addFlashAttribute("creationError", message);
+        }
         return "redirect:/admin/" + ENTITY_NAME;
     }
 

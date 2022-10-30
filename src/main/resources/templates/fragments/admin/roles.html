@@ -15,6 +15,9 @@
                     <label th:for="*{id}" class="visually-hidden">Id</label>
                     <input type="hidden" id="id" required th:field="*{id}" th:value="*{id}"/>
                     <div class="col-auto">
+						<ul th:if="${creationError} ne null" class="text-warning">
+							<li th:text="${creationError}"/>
+						</ul>
                         <label th:for="*{name}" class="visually-hidden">Name: </label>
                         <input class="form-control" type="text" placeholder="Name" th:field="*{name}">
                     </div>
