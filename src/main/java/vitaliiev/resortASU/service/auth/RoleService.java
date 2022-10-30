@@ -2,7 +2,10 @@ package vitaliiev.resortASU.service.auth;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.*;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -11,15 +14,15 @@ import org.springframework.stereotype.Service;
 import vitaliiev.resortASU.model.auth.Role;
 import vitaliiev.resortASU.repository.auth.RoleRepository;
 
-import java.util.*;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
 public class RoleService {
-    private final static String DEFAULT_ADMIN = "ROLE_ADMIN";
-    private final static String DEFAULT_USER = "ROLE_USER";
+    private final static String NAME_PREFIX = "ROLE_";
+    private final static String DEFAULT_ADMIN = NAME_PREFIX + "ADMIN";
+    private final static String DEFAULT_USER = NAME_PREFIX + "USER";
 
     private static final ExampleMatcher SEARCH_CONDITIONS_MATCH_ALL = ExampleMatcher
             .matching()
@@ -40,10 +43,10 @@ public class RoleService {
             evict = {@CacheEvict(cacheNames = "rolesList", allEntries = true)}
     )
     public Role create(Role role) {
-        String name = role.getName();
-        if (!name.startsWith("ROLE_")) {
+        String name = role.getName().toUpperCase();
+        if (!name.startsWith(NAME_PREFIX)) {
             log.info("Expected role name with prefix ROLE_. Got {}", name);
-            name = "ROLE_" + name;
+            name = NAME_PREFIX + name;
             role.setName(name);
             log.warn("Adding prefix automatically. New role name: {}", name);
         }
@@ -76,7 +79,6 @@ public class RoleService {
     @Cacheable(cacheNames = "rolesList")
     public List<Role> findAll() {
         return roleRepository.findAll(Sort.by("name"));
-//        return roleRepository.findAll();
     }
 
     @Caching(
@@ -116,7 +118,7 @@ public class RoleService {
         });
     }
 
-    public Role getAdmin() {
+    public Role getAdmin() { //todo improve caching
         return findRoleByName(DEFAULT_ADMIN);
     }
 
