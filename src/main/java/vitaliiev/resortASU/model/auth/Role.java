@@ -23,7 +23,7 @@ public class Role implements GrantedAuthority {
     private String name;
     private Boolean enabled = true;
     @ManyToMany(mappedBy = "roles")
-    private Set<User> users; //todo cascading delete
+    private Set<User> users;
 
     public Role(String name) {
         this.name = name;

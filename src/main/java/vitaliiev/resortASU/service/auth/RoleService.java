@@ -14,8 +14,9 @@ import org.springframework.stereotype.Service;
 import vitaliiev.resortASU.model.auth.Role;
 import vitaliiev.resortASU.repository.auth.RoleRepository;
 
+import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -23,7 +24,12 @@ public class RoleService {
     private final static String NAME_PREFIX = "ROLE_";
     private final static String DEFAULT_ADMIN = NAME_PREFIX + "ADMIN";
     private final static String DEFAULT_USER = NAME_PREFIX + "USER";
+    private final static Set<String> predefinedRoles = new HashSet<>();
 
+    static {
+        predefinedRoles.add(DEFAULT_ADMIN);
+        predefinedRoles.add(DEFAULT_USER);
+    }
     private static final ExampleMatcher SEARCH_CONDITIONS_MATCH_ALL = ExampleMatcher
             .matching()
             .withIgnoreNullValues()
@@ -86,8 +92,8 @@ public class RoleService {
             evict = {@CacheEvict(cacheNames = "rolesList", allEntries = true)}
     )
     public Role update(Role role) {
-        if (!role.getEnabled() && (role.getName().equals(DEFAULT_ADMIN) || role.getName().equals(DEFAULT_USER))) {
-            log.warn("Can't disable ADMIN or USER built in role.");
+        if (!role.getEnabled() && (predefinedRoles.contains(role.getName()))) {
+            log.warn("Can't disable built in predefined role {}.", role.getName());
             role.setEnabled(true);
         }
         try {
@@ -103,19 +109,19 @@ public class RoleService {
                     @CacheEvict(cacheNames = "rolesList", allEntries = true)}
     )
     public void delete(Integer id) {
-        Optional<Role> optionalRole = roleRepository.findById(id);
-        optionalRole.ifPresent(r -> {
-            if (r.getName().equals(DEFAULT_ADMIN) ||
-                    r.getName().equals(DEFAULT_USER)) {
-                log.warn("Cant delete predefined USER or ADMIN roles.");
+        Role role = this.findRoleById(id); // for maximum cache use
+        if (role != null) {
+            if (predefinedRoles.contains(role.getName())) {
+                log.warn("Cant delete built in predefined role {}.", role.getName());
             } else {
                 try {
+                    role.getUsers().forEach(u -> u.removeRole(role));
                     roleRepository.deleteById(id);
                 } catch (DataIntegrityViolationException e) {
                     log.warn(e.getMessage());
                 }
             }
-        });
+        }
     }
 
     public Role getAdmin() { //todo improve caching

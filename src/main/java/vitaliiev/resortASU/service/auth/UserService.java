@@ -15,7 +15,8 @@ import vitaliiev.resortASU.model.auth.Role;
 import vitaliiev.resortASU.model.auth.User;
 import vitaliiev.resortASU.repository.auth.UserRepository;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -51,7 +52,7 @@ public class UserService implements UserDetailsService {
             loadUserByUsername(user.getUsername());
             return false;
         } catch (UsernameNotFoundException e) {
-            user.setRoles(Collections.singleton(roleService.getUser()));
+            user.addRole(roleService.getUser());
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
             try {
                 userRepository.save(user);
@@ -95,7 +96,7 @@ public class UserService implements UserDetailsService {
                     roleService.getUser().getName());
         }
         userFromDb.setEnabled(user.getEnabled());
-        userFromDb.setRoles(user.getRoles());
+        userFromDb.addRoles(user.getRoles());
         try {
             return userRepository.save(userFromDb);
         } catch (DataIntegrityViolationException dve) {

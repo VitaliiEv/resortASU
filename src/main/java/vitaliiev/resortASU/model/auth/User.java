@@ -59,4 +59,26 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return this.enabled;
     }
+
+    public void addRole(Role role) {
+        if (!this.roles.contains(role)) {
+            this.roles.add(role);
+            role.getUsers().add(this);
+        }
+    }
+
+    public void removeRole(Role role) {
+        if (this.roles.contains(role)) {
+            this.roles.remove(role);
+            role.getUsers().remove(this);
+        }
+    }
+
+    public void addRoles(Set<Role> roles) {
+        roles.forEach(this::addRole);
+    }
+
+    public void removeRoles(Set<Role> roles) {
+        roles.forEach(this::removeRole);
+    }
 }
