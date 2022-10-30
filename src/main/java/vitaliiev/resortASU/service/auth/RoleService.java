@@ -32,9 +32,8 @@ public class RoleService {
     }
     private static final ExampleMatcher SEARCH_CONDITIONS_MATCH_ALL = ExampleMatcher
             .matching()
-            .withIgnoreNullValues()
+            .withIncludeNullValues()
             .withMatcher("name", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
-            .withMatcher("enabled", ExampleMatcher.GenericPropertyMatchers.exact())
             .withIgnorePaths("id", "users");
 
     private final RoleRepository roleRepository;
@@ -73,7 +72,14 @@ public class RoleService {
     }
 
     public List<Role> find(Role role) {
-        Example<Role> example = Example.of(role, SEARCH_CONDITIONS_MATCH_ALL);
+        ExampleMatcher newSearchConditions;
+        if (role.getEnabled() == null) {
+            newSearchConditions = SEARCH_CONDITIONS_MATCH_ALL.withIgnorePaths("enabled");
+        } else {
+            newSearchConditions = SEARCH_CONDITIONS_MATCH_ALL
+                    .withMatcher("enabled", ExampleMatcher.GenericPropertyMatchers.exact());
+        }
+        Example<Role> example = Example.of(role, newSearchConditions);
         return roleRepository.findAll(example, Sort.by("name"));
     }
 

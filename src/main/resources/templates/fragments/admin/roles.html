@@ -8,7 +8,7 @@
 <div th:fragment="entities (path, entities, newEntity)">
     <div class="row">
 
-        <div class="col-3 col-sm-4">
+        <div class="col-3 col-sm-2">
             <h3>Add</h3>
             <form th:method="POST" th:object="${newEntity}" th:action="@{${path}+'/create'}">
                 <div class="row g-2 align-items-center">
@@ -35,13 +35,14 @@
                 <div class="row g-2 align-items-center">
                     <label th:for="*{id}" class="visually-hidden">Id</label>
                     <input type="hidden" id="id" required th:field="*{id}" th:value="*{id}"/>
-                    <div class="col-auto">
+                    <div>
                         <label th:for="*{name}" class="visually-hidden">Name: </label>
                         <input class="form-control" type="text" placeholder="Name" th:field="*{name}">
                     </div>
-                    <div class="col-auto">
+                    <div>
+						<p class="col-auto">Status:</p>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" id="all" value="all" name="enabled" checked>
+                            <input class="form-check-input" type="radio" id="all" value="" name="enabled" checked>
                             <label class="form-check-label" for="all">All</label>
                         </div>
                         <div class="form-check">
@@ -53,7 +54,7 @@
                             <label class="form-check-label" for="false">Disabled</label>
                         </div>
                     </div>
-                    <div class="col-auto">
+                    <div>
                         <button class="btn btn-primary btn-block" type="submit">Find</button>
                     </div>
                 </div>
