@@ -12,7 +12,7 @@
     <h2 class="form-signin-heading">Registration</h2>
 
     <p>
-    <ul>
+    <ul class="text-warning">
         <li th:each="err : ${#fields.errors('*')}" th:text="${err}"/>
         <li th:if="${usernameError} neq null" th:text="${usernameError}"/>
         <li th:if="${passwordError} neq null" th:text="${passwordError}"/>

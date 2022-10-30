@@ -15,7 +15,7 @@
 	    <label class="visually-hidden"th:for="*{username}">Username</label>
         <input type="hidden" required th:field="*{username}"/>
     <p>
-    <ul>
+    <ul class="text-warning">
         <li th:each="err : ${#fields.errors('*')}" th:text="${err}"/>
 		<div th:if="${passwordError} ne null" >
 			<li th:text="${passwordError}"/>
