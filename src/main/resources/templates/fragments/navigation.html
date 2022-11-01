@@ -51,6 +51,28 @@
                         </ul>
 
                     </li>
+                   <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            Resort
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/resort/description">Resort</a></li>						
+                            <li><a class="dropdown-item" href="/resort/buildings">Buildings</a></li>
+                            <li><a class="dropdown-item" href="/resort/floors">Floors</a></li>							
+                            <li><a class="dropdown-item" href="/resort/classes">Classes</a></li>
+                            <li><a class="dropdown-item" href="/resort/types">Types</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="#">Not payed</a></li>
+                            <li><a class="dropdown-item" href="#">Check-in today</a></li>
+                            <li><a class="dropdown-item" href="#">Check-out today</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/photos">Photos</a>
+                    </li>										
                     <div sec:authorize="hasRole('ROLE_ADMIN')">
 					    <li class="nav-item dropdown">
 							 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"

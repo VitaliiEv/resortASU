@@ -20,8 +20,8 @@ public class Resort {
     @ManyToOne(optional = false)
     private ResortType resorttype;
     @ManyToOne(optional = false)
-    private ResortStars resortstars;
-    @ManyToOne(optional = false)
+    private ResortClass resortClass;
+    @ManyToOne(optional = true) //todo not working right now change true to false
     private Photo photo;
     private Timestamp lastchanged;
 }
