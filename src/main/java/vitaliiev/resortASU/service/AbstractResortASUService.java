@@ -9,24 +9,25 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import vitaliiev.resortASU.model.AbstractResortASUEntity;
+import vitaliiev.resortASU.repository.ResortASURepository;
 
 import java.util.List;
 
 @Slf4j
 @Service
-public abstract class AbstractResortASUService<T extends AbstractResortASUEntity<ID>, ID extends Number> implements ResortASUService<T, ID> {
+public abstract class AbstractResortASUService<T extends AbstractResortASUEntity<ID>, ID extends Number>
+        implements ResortASUService<T, ID> {
+
     protected static final String CLASS_NAME = "AbstractResortASUService"; // override  this
     protected static final String CACHE_NAME = CLASS_NAME;
     protected static final String CACHE_LIST_NAME = CLASS_NAME + "List";
 
+    private final ResortASURepository<T, ID> repository;
 
-    private final JpaRepository<T, ID> repository;
-
-/    @Autowired
-    public AbstractResortASUService(JpaRepository<T, ID> repository) { // FIXME: 02.11.2022
+    @Autowired
+    public AbstractResortASUService(ResortASURepository<T, ID> repository) { // FIXME: 02.11.2022
         this.repository = repository;
     }
 

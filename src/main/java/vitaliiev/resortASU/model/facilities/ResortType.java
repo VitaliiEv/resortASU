@@ -1,23 +1,26 @@
 package vitaliiev.resortASU.model.facilities;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import vitaliiev.resortASU.model.AbstractResortASUEntity;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
-import java.util.Collection;
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
-public class ResortType {
+@EqualsAndHashCode
+public class ResortType extends AbstractResortASUEntity<Integer> {
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Exclude
     private Integer id;
     private String name;
     private String description;
-    private Timestamp lastchanged;
     @OneToMany(mappedBy = "resorttype")
-    private Collection<Resort> resorts;
+    private Set<Resort> resorts;
 }
