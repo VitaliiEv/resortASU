@@ -1,7 +1,7 @@
 package vitaliiev.resortASU.repository.facilities;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import vitaliiev.resortASU.model.facilities.ResortType;
-import vitaliiev.resortASU.repository.ResortASURepository;
 
-public interface ResortTypeRepository extends ResortASURepository<ResortType, Integer> {
+public interface ResortTypeRepository extends JpaRepository<ResortType, Integer> {
 }

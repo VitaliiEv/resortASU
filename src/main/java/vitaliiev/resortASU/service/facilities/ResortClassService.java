@@ -19,7 +19,9 @@ import java.util.List;
 @Slf4j
 @Service
 public class ResortClassService {
-
+    private static final String ENTITY_NAME = ResortClass.ENTITY_NAME;
+    private static final String CACHE_NAME = ENTITY_NAME;
+    private static final String CACHE_LIST_NAME = ENTITY_NAME + "List";    
     private static final String DEFAULT_CLASS = "no class";
 
     private static final ExampleMatcher SEARCH_CONDITIONS_MATCH_ALL = ExampleMatcher
@@ -37,24 +39,16 @@ public class ResortClassService {
     }
 
     @Caching(
-            put = {@CachePut(cacheNames = "classes", key = "#result?.id")},
-            evict = {@CacheEvict(cacheNames = "classesList", allEntries = true)}
+            put = {@CachePut(cacheNames = CACHE_NAME, key = "#result?.id")},
+            evict = {@CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
     )
     public ResortClass create(ResortClass entity) throws DataIntegrityViolationException {
         return repository.save(entity);
     }
 
-    @Cacheable(cacheNames = "classes", key = "#id")
+    @Cacheable(cacheNames = CACHE_NAME, key = "#id")
     public ResortClass findById(Integer id) {
         return repository.findById(id).orElse(null);
-    }
-
-    public ResortClass findRoleByClass(String resortClass) {
-        // assume that list is small, and we can fetch it quickly
-        return this.findAll().stream()
-                .filter(e-> e.getResortClass().equals(resortClass))
-                .findAny()
-                .orElse(null); // todo Optional
     }
 
     public List<ResortClass> find(ResortClass entity) {
@@ -62,14 +56,14 @@ public class ResortClassService {
         return repository.findAll(example, Sort.by("id"));
     }
 
-    @Cacheable(cacheNames = "classesList")
+    @Cacheable(cacheNames = CACHE_LIST_NAME)
     public List<ResortClass> findAll() {
         return repository.findAll(Sort.by("id"));
     }
 
     @Caching(
-            put = {@CachePut(cacheNames = "classes", key = "#result?.id")},
-            evict = {@CacheEvict(cacheNames = "classesList", allEntries = true)}
+            put = {@CachePut(cacheNames = CACHE_NAME, key = "#result?.id")},
+            evict = {@CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
     )
     public ResortClass update(ResortClass entity) {
         try {
@@ -81,8 +75,8 @@ public class ResortClassService {
     }
 
     @Caching(
-            evict = {@CacheEvict(cacheNames = "classes", key = "#id"),
-                    @CacheEvict(cacheNames = "classesList", allEntries = true)}
+            evict = {@CacheEvict(cacheNames = CACHE_NAME, key = "#id"),
+                    @CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
     )
     public void delete(Integer id) {
         ResortClass entity = this.findById(id); // for maximum cache use

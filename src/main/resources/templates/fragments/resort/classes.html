@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Classes</title>
+</head>
+<body>
+<div th:fragment="entities (path, entities, newEntity)">
+    <div class="row">
+
+        <div class="col-3 col-sm-2">
+            <h3>Add</h3>
+            <form th:method="POST" th:object="${newEntity}" th:action="@{${path}+'/create'}">
+                <div class="row g-2 align-items-center">
+                    <label th:for="*{id}" class="visually-hidden">Id</label>
+                    <input type="hidden" id="id" required th:field="*{id}" th:value="*{id}"/>
+                    <div class="col-auto">
+						<ul th:if="${creationError} ne null" class="text-warning">
+							<li th:text="${creationError}"/>
+						</ul>
+                        <label th:for="*{resortClass}" class="visually-hidden">Class: </label>
+                        <input class="form-control" type="text" placeholder="Class" th:field="*{resortClass}">
+                    </div>
+					<div class="col-auto">
+                        <label th:for="*{description}" class="form-label">Description: </label>
+						<textarea class="form-control" rows="3" th:field="*{description}"></textarea>
+                    </div>
+
+                    <div class="col-auto">
+                        <button class="btn btn-primary btn-block" type="submit">Add</button>
+                    </div>
+                </div>
+            </form>
+            <h3>Search</h3>
+            <form th:method="POST" th:object="${newEntity}" th:action="@{${path}+'/find'}">
+                <div class="row g-2 align-items-center">
+                    <label th:for="*{id}" class="visually-hidden">Id</label>
+                    <input type="hidden" id="id" required th:field="*{id}" th:value="*{id}"/>
+                    <div class="col-auto">
+                        <label th:for="*{resortClass}" class="visually-hidden">Class: </label>
+                        <input class="form-control" type="text" placeholder="Class" th:field="*{resortClass}">
+                    </div>
+					<div class="col-auto">
+                        <label th:for="*{description}" class="visually-hidden">Description: </label>
+                        <input class="form-control" type="text" placeholder="Description" th:field="*{description}">
+                    </div>
+                    <div>
+                        <button class="btn btn-primary btn-block" type="submit">Find</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-3 col-sm-8">
+            <h2>Classes</h2>
+            <table class="table table-striped">
+                <tr>
+                    <th scope="col">id</th>
+                    <th scope="col">Class</th>
+                    <th scope="col">Description</th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                </tr>
+                <tr th:each="e : ${entities}">
+                    <th scope="row" th:text="${e.id}"></th>
+                    <td th:text="${e.resortClass}"></td>
+                    <td th:text="${e.description}"></td>
+                    <td>
+                        <a class="btn btn-primary" th:href="@{${path}+'/'+${e.id}}" role="button">Edit</a>
+                    </td>
+                    <td>
+                        <form th:method="POST" th:action="@{'/resort/'+${path}+'/delete'}">
+                            <label class="visually-hidden" for="id"></label>
+                            <input class="form-check-input" type="hidden" name="id" th:value="${e.id}">
+                            <div th:replace="/fragments/common :: confirmFormDialog ('Delete?',
+                                'Resorts of this class will have no class after this action.',
+                                'Delete',
+								${e.id})">
+                                <button class="btn btn-primary btn-block" type="submit">Delete</button>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+<div th:fragment="entity (path, entity)">
+    <div class="row">
+
+        <div class="col-6 col-sm-3">
+            <h2>Class</h2>
+            <form th:method="POST" th:object="${entity}" th:action="@{'/resort/'+${path}+'/update'}">
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+                        <label th:for="*{id}">Id: <span th:text="*{id}"></span></label>
+                        <input class="form-check-input" type="hidden" th:field="*{id}"/>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+                        <label th:for="*{resortClass}">Class: <span th:text="*{resortClass}"></span></label>
+                        <input class="form-check-input" type="hidden" th:field="*{resortClass}"/>
+                    </div>
+                </div>
+				<div class="col-auto">
+                        <label th:for="*{description}" class="form-label">Description: </label>
+						<textarea class="form-control" rows="3" th:field="*{description}"></textarea>
+                 </div>
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+                        <button class="btn btn-primary btn-block" type="submit">Save</button>
+                    </div>
+                </div>
+            </form>
+            <form th:method="POST" th:object="${entity}" th:action="@{'/resort/'+${path}+'/delete'}">
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+                        <label class="visually-hidden" th:for="*{id}"></label>
+                        <input class="form-check-input" type="hidden" th:field="*{id}"/>
+                        <div th:replace="/fragments/common :: confirmFormDialog ('Delete?',
+                        'Resorts of this class will have no class after this action.',
+                        'Delete',
+						*{id})">
+                            <button class="btn btn-primary btn-block" type="submit">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

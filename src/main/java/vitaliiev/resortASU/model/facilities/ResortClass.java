@@ -13,6 +13,7 @@ import java.util.Set;
 @EqualsAndHashCode
 //@Table(name="\"role_resortASU\"")
 public class ResortClass {
+    public static final String ENTITY_NAME = "ResortClass";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
