@@ -24,6 +24,7 @@ public class ResortTypeService {
     protected static final String ENTITY_NAME = ResortType.ENTITY_NAME;
     protected static final String CACHE_NAME = ENTITY_NAME;
     protected static final String CACHE_LIST_NAME = ENTITY_NAME + "List";
+    private static final String DEFAULT_VALUE = "default";
 
     private static final ExampleMatcher SEARCH_CONDITIONS_MATCH_ALL = ExampleMatcher
             .matching()

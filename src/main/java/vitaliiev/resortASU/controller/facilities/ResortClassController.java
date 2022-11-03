@@ -14,9 +14,11 @@ import java.util.List;
 
 @Slf4j
 @Controller
-@RequestMapping("/resort")
+//@RequestMapping("/resort")
 public class ResortClassController {
-    private static final String ENTITY_NAME = "classes";
+    private static final String FRAGMENT_NAME = "classes";
+    private static final String SECTION_NAME = "resort";
+    private static final String REQUEST_MAPPING = "/" + SECTION_NAME + "/" + FRAGMENT_NAME;
 
     private final ResortClassService service;
 
@@ -25,27 +27,27 @@ public class ResortClassController {
         this.service = service;
     }
 
-    @GetMapping(ENTITY_NAME)
+    @GetMapping(REQUEST_MAPPING)
     public String list(Model model) {
         if (!model.containsAttribute("entities")) {
             List<ResortClass> entities = service.findAll();
             model.addAttribute("entities", entities);
         }
         ResortClass newEntity = new ResortClass();
-        model.addAttribute("fragment", ENTITY_NAME);
+        model.addAttribute("fragment", FRAGMENT_NAME);
         model.addAttribute("newEntity", newEntity);
-        return "resort/" + ENTITY_NAME;
+        return SECTION_NAME + "/" + FRAGMENT_NAME;
     }
 
-    @PostMapping(ENTITY_NAME + "/find")
+    @PostMapping(REQUEST_MAPPING + "/find")
     public String find(@ModelAttribute(name = "entity") ResortClass entity,
                        RedirectAttributes redirectAttributes) {
         List<ResortClass> entities = service.find(entity);
         redirectAttributes.addFlashAttribute("entities", entities);
-        return "redirect:/resort/" + ENTITY_NAME;
+        return "redirect:" + REQUEST_MAPPING;
     }
 
-    @PostMapping(ENTITY_NAME + "/create")
+    @PostMapping(REQUEST_MAPPING + "/create")
     public String create(@ModelAttribute(name = "entity") ResortClass entity, RedirectAttributes redirectAttributes) {
         try {
             service.create(entity);
@@ -53,28 +55,28 @@ public class ResortClassController {
             log.warn(e.getMessage());
             redirectAttributes.addFlashAttribute("creationError: ", e.getMessage());
         }
-        return "redirect:/resort/" + ENTITY_NAME;
+        return "redirect:" + REQUEST_MAPPING;
     }
 
-    @GetMapping(ENTITY_NAME + "/{id}")
+    @GetMapping(REQUEST_MAPPING + "/{id}")
     public String read(@PathVariable Integer id, Model model) {
         ResortClass entity = service.findById(id);
         if (entity != null) {
-            model.addAttribute("fragment", ENTITY_NAME);
+            model.addAttribute("fragment", FRAGMENT_NAME);
             model.addAttribute("entity", entity);
         }
-        return "resort/" + ENTITY_NAME;
+        return SECTION_NAME + "/" + FRAGMENT_NAME;
     }
 
-    @PostMapping(ENTITY_NAME + "/update")
+    @PostMapping(REQUEST_MAPPING + "/update")
     public String update(@ModelAttribute(name = "entity") ResortClass entity) {
         service.update(entity);
-        return "redirect:/resort/" + ENTITY_NAME + "/" + entity.getId();
+        return "redirect:/resort/" + FRAGMENT_NAME + "/" + entity.getId();
     }
 
-    @PostMapping(ENTITY_NAME + "/delete")
+    @PostMapping(FRAGMENT_NAME + "/delete")
     public String delete(@RequestParam(name = "id") Integer id) {
         service.delete(id);
-        return "redirect:/resort/" + ENTITY_NAME;
+        return "redirect:" + REQUEST_MAPPING;
     }
 }

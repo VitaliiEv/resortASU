@@ -11,7 +11,6 @@ import java.util.Set;
 @Getter
 @Setter
 @EqualsAndHashCode
-//@Table(name="\"role_resortASU\"")
 public class ResortClass {
     public static final String ENTITY_NAME = "ResortClass";
 
@@ -21,6 +20,7 @@ public class ResortClass {
     private Integer id;
     private String resortClass;
     private String description;
+    @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "resortClass")
     private Set<Resort> resorts;
 }

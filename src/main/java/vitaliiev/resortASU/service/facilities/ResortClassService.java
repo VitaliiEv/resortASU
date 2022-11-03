@@ -22,7 +22,7 @@ public class ResortClassService {
     private static final String ENTITY_NAME = ResortClass.ENTITY_NAME;
     private static final String CACHE_NAME = ENTITY_NAME;
     private static final String CACHE_LIST_NAME = ENTITY_NAME + "List";    
-    private static final String DEFAULT_CLASS = "no class";
+    private static final String DEFAULT_VALUE = "no class";
 
     private static final ExampleMatcher SEARCH_CONDITIONS_MATCH_ALL = ExampleMatcher
             .matching()
