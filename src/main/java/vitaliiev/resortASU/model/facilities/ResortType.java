@@ -3,15 +3,18 @@ package vitaliiev.resortASU.model.facilities;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import vitaliiev.resortASU.model.AbstractResortASUEntity;
 
-import javax.persistence.*;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import java.util.Set;
 
-@Entity
 @Getter
 @Setter
-@EqualsAndHashCode
-public class ResortType {
+@EqualsAndHashCode(callSuper = false)
+public class ResortType extends AbstractResortASUEntity/*<Integer>*/ {
     public static final String ENTITY_NAME = "ResortType";
 
     @Id
