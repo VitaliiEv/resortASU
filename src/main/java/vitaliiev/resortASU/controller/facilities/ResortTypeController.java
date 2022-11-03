@@ -8,7 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vitaliiev.resortASU.model.facilities.ResortType;
-import vitaliiev.resortASU.service.ResortASUService;
+import vitaliiev.resortASU.service.facilities.ResortTypeService;
 
 import java.util.List;
 
@@ -18,10 +18,10 @@ public class ResortTypeController {
     private static final String FRAGMENT_NAME = "types";
     private static final String SECTION_NAME = "resort";
     private static final String REQUEST_MAPPING = "/" + SECTION_NAME + "/" + FRAGMENT_NAME;
-    private final ResortASUService<ResortType, Integer> service;
+    private final ResortTypeService service;
 
     @Autowired
-    public ResortTypeController(ResortASUService<ResortType, Integer> service) {
+    public ResortTypeController(ResortTypeService service) {
         this.service = service;
     }
 

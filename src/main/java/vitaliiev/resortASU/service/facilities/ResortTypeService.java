@@ -12,35 +12,33 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import vitaliiev.resortASU.model.facilities.ResortType;
-import vitaliiev.resortASU.repository.ResortASURepository;
-import vitaliiev.resortASU.service.ResortASUService;
+import vitaliiev.resortASU.repository.facilities.ResortTypeRepository;
 
 import java.util.List;
 
 @Slf4j
 @Service
-public class ResortTypeService implements ResortASUService<ResortType, Integer> {
+public class ResortTypeService {
 
 
-    protected static final String ENTITY_NAME = ResortType.ENTITY_NAME; // override  this
+    protected static final String ENTITY_NAME = ResortType.ENTITY_NAME;
     protected static final String CACHE_NAME = ENTITY_NAME;
     protected static final String CACHE_LIST_NAME = ENTITY_NAME + "List";
 
     private static final ExampleMatcher SEARCH_CONDITIONS_MATCH_ALL = ExampleMatcher
-            .matching() // fixme
+            .matching()
             .withIncludeNullValues()
             .withMatcher("name", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
             .withMatcher("description", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
             .withIgnorePaths("id", "resorts");
 
-    private final ResortASURepository<ResortType, Integer> repository;
+    private final ResortTypeRepository repository;
 
     @Autowired
-    public ResortTypeService(ResortASURepository<ResortType, Integer> repository) {
+    public ResortTypeService(ResortTypeRepository repository) {
         this.repository = repository;
     }
 
-    @Override
     @Caching(
             put = {@CachePut(cacheNames = CACHE_NAME, key = "#result?.id")},
             evict = {@CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
@@ -49,25 +47,21 @@ public class ResortTypeService implements ResortASUService<ResortType, Integer> 
         return repository.save(entity);
     }
 
-    @Override
     @Cacheable(cacheNames = CACHE_NAME, key = "#id")
     public ResortType findById(Integer id) {
         return repository.findById(id).orElse(null);
     }
 
-    @Override
     public List<ResortType> find(ResortType entity) {
-        Example<ResortType> example = Example.of(entity, getSearchConditions());
+        Example<ResortType> example = Example.of(entity, SEARCH_CONDITIONS_MATCH_ALL);
         return repository.findAll(example, Sort.by("id"));
     }
 
-    @Override
     @Cacheable(cacheNames = CACHE_LIST_NAME)
     public List<ResortType> findAll() {
         return repository.findAll(Sort.by("id"));
     }
 
-    @Override
     @Caching(
             put = {@CachePut(cacheNames = CACHE_NAME, key = "#result?.id")},
             evict = {@CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
@@ -81,7 +75,6 @@ public class ResortTypeService implements ResortASUService<ResortType, Integer> 
         }
     }
 
-    @Override
     @Caching(
             evict = {@CacheEvict(cacheNames = CACHE_NAME, key = "#id"),
                     @CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
@@ -95,8 +88,4 @@ public class ResortTypeService implements ResortASUService<ResortType, Integer> 
 
     }
 
-    @Override
-    public ExampleMatcher getSearchConditions() {
-        return SEARCH_CONDITIONS_MATCH_ALL;
-    }
 }
