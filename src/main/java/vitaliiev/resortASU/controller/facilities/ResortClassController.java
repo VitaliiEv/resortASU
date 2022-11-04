@@ -48,7 +48,7 @@ public class ResortClassController {
     }
 
     @PostMapping(REQUEST_MAPPING + "/create")
-    public String create(@ModelAttribute(name = "entity") ResortClass entity, RedirectAttributes redirectAttributes) {
+    public String create(@ModelAttribute(name = "newEntity") ResortClass entity, RedirectAttributes redirectAttributes) {
         try {
             service.create(entity);
         } catch (DataIntegrityViolationException e) {

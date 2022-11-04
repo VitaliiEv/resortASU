@@ -46,7 +46,7 @@ public class RoleController {
     }
 
     @PostMapping(ENTITY_NAME + "/create")
-    public String create(@ModelAttribute(name = "entity") Role role, RedirectAttributes redirectAttributes) {
+    public String create(@ModelAttribute(name = "newEntity") Role role, RedirectAttributes redirectAttributes) {
         try {
             service.create(role);
         } catch (DataIntegrityViolationException e) {
