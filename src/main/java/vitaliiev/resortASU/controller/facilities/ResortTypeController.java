@@ -51,7 +51,7 @@ public class ResortTypeController {
             service.create(entity);
         } catch (DataIntegrityViolationException e) {
             log.warn(e.getMessage());
-            redirectAttributes.addFlashAttribute("creationError: ", e.getMessage());
+            redirectAttributes.addFlashAttribute("creationError", e.getMessage());
         }
         return "redirect:" + REQUEST_MAPPING;
     }
