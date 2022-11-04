@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Photos</title>
+</head>
+<body>
+<div th:fragment="entities (path, entities, newEntity)">
+    <div class="row">
+
+        <div class="col-3 col-sm-3">
+            <h3>Add</h3>
+            <form enctype="multipart/form-data"
+			th:method="POST" th:object="${newEntity}" th:action="@{${path}+'/create'}" >
+                <div class="row g-2 align-items-center">
+                    <label th:for="*{id}" class="visually-hidden">Id</label>
+                    <input type="hidden" id="id" required th:field="*{id}" th:value="*{id}"/>
+                    <div class="col-auto">
+						<ul th:if="${creationError} ne null" class="text-warning">
+							<li th:text="${creationError}"/>
+						</ul>
+                    </div>
+					<div class="col-auto">
+					  <label th:for="*{image}" class="visually-hidden">Upload images</label>
+					  <input class="form-control" type="file" th:field="*{image}" accept="image/*" multiple>
+					</div>
+
+                    <div class="col-auto">
+                        <button class="btn btn-primary btn-block" type="submit">Add</button>
+                    </div>
+                </div>
+            </form>
+            <h3>Search</h3>
+            <form th:method="POST" th:object="${newEntity}" th:action="@{${path}+'/find'}">
+                <div class="row g-2 align-items-center">
+                    <label th:for="*{id}" class="visually-hidden">Id</label>
+                    <input type="hidden" id="id" required th:field="*{id}" th:value="*{id}"/>
+                    <div class="col-auto">
+                        <label th:for="*{created}" class="visually-hidden">Type: </label>
+                        <input class="form-control" type="text" placeholder="Class" th:field="*{created}">
+                    </div>
+                    <div>
+                        <button class="btn btn-primary btn-block" type="submit">Find</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-3 col-sm-8">
+            <h2>Photos</h2>
+            <table class="table table-striped">
+                <tr>
+                    <th scope="col">id</th>
+                    <th scope="col">Photo</th>
+                    <th scope="col">CreationDate</th>
+                    <th scope="col">Resorts</th>
+                    <th scope="col">Suits (as main photo)</th>
+					<th scope="col">Suits (gallery)</th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>					
+                </tr>
+                <tr th:each="e : ${entities}">
+                    <th scope="row" th:text="${e.id}"></th>
+                    <td th:text="${e.image}"></td>						
+                    <td th:text="${e.created}"></td>
+                    <td th:text="'Placeholder Resorts'"></td>				
+                    <td th:text="'Placeholder Suits (as main photo)'"></td>
+                    <td th:text="'Placeholder Suits (gallery)'"></td>					
+                    <td>
+                        <a class="btn btn-primary" th:href="@{${path}+'/'+${e.id}}" role="button">Edit</a>
+                    </td>
+                    <td>
+                        <form th:method="POST" th:action="@{'/resort/'+${path}+'/delete'}">
+                            <label class="visually-hidden" for="id"></label>
+                            <input class="form-check-input" type="hidden" name="id" th:value="${e.id}">
+                            <div th:replace="/fragments/common :: confirmFormDialog ('Delete?',
+                                'If this foto is set as main photo for resort ar suit, resort and suit photos will be set to default.',
+                                'Delete',
+								${e.id})">
+                                <button class="btn btn-primary btn-block" type="submit">Delete</button>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+<div th:fragment="entity (path, entity)">
+    <div class="row">
+
+        <div class="col-6 col-sm-3">
+            <h2>Photo</h2>
+            <form th:method="POST" th:object="${entity}" th:action="@{'/resort/'+${path}+'/update'}">
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+                        <label th:for="*{id}">Id: <span th:text="*{id}"></span></label>
+                        <input class="form-check-input" type="hidden" th:field="*{id}"/>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+                        <label th:for="*{created}">Created: <span th:text="*{created}"></span></label>
+                        <input class="form-check-input" type="hidden" th:field="*{created}"/>
+                    </div>
+                </div>
+				<div class="col-auto">
+                        Placeholder
+                 </div>
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+                        <button class="btn btn-primary btn-block" type="submit">Save</button>
+                    </div>
+                </div>
+            </form>
+            <form th:method="POST" th:object="${entity}" th:action="@{'/resort/'+${path}+'/delete'}">
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+                        <label class="visually-hidden" th:for="*{id}"></label>
+                        <input class="form-check-input" type="hidden" th:field="*{id}"/>
+                        <div th:replace="/fragments/common :: confirmFormDialog ('Delete?',
+                        'If this foto is set as main photo for resort ar suit, resort and suit photos will be set to default.',
+                        'Delete',
+						*{id})">
+                            <button class="btn btn-primary btn-block" type="submit">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -2,6 +2,8 @@ package vitaliiev.resortASU.utils;
 
 
 import java.util.Collection;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -64,5 +66,10 @@ public class CollectionElementFieldMatcher {
         return element -> patterns.stream()
                 .map(fieldExtractor)
                 .anyMatch(fieldValue -> fieldValue.contains(fieldExtractor.apply(element)));
+    }
+
+    public static <T> Predicate<T> distinctByKey(Function<T, ?> fieldExtractor) {
+        Set<Object> seen = ConcurrentHashMap.newKeySet();
+        return t -> seen.add(fieldExtractor.apply(t));
     }
 }
