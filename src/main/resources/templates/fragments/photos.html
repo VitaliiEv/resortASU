@@ -16,13 +16,13 @@
                     <label th:for="*{id}" class="visually-hidden">Id</label>
                     <input type="hidden" id="id" required th:field="*{id}" th:value="*{id}"/>
                     <div class="col-auto">
-						<ul th:if="${creationError} ne null" class="text-warning">
-							<li th:text="${creationError}"/>
+						<ul th:if="${creationErrors} ne null" class="text-warning">
+							<li th:text="${creationErrors}"/>
 						</ul>
                     </div>
 					<div class="col-auto">
-					  <label th:for="*{image}" class="visually-hidden">Upload images</label>
-					  <input class="form-control" type="file" th:field="*{image}" accept="image/*" multiple>
+					  <label for="image" class="visually-hidden">Upload images</label>
+					  <input class="form-control" type="file" id="image" name="image" accept="image/*" multiple>
 					</div>
 
                     <div class="col-auto">
