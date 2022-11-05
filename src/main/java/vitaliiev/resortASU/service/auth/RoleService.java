@@ -24,11 +24,15 @@ public class RoleService {
     private final static String NAME_PREFIX = "ROLE_";
     private final static String DEFAULT_ADMIN = NAME_PREFIX + "ADMIN";
     private final static String DEFAULT_USER = NAME_PREFIX + "USER";
+    private final static String DEFAULT_CONTENT_MANAGER = NAME_PREFIX + "CONTENT_MANAGER";
+    private final static String DEFAULT_PROPERTY_MANAGER = NAME_PREFIX + "PROPERTY_MANAGER";
     private final static Set<String> predefinedRoles = new HashSet<>();
 
     static {
         predefinedRoles.add(DEFAULT_ADMIN);
         predefinedRoles.add(DEFAULT_USER);
+        predefinedRoles.add(DEFAULT_CONTENT_MANAGER);
+        predefinedRoles.add(DEFAULT_PROPERTY_MANAGER);
     }
     private static final ExampleMatcher SEARCH_CONDITIONS_MATCH_ALL = ExampleMatcher
             .matching()
@@ -68,7 +72,7 @@ public class RoleService {
         return this.findAll().stream()
                 .filter(r-> r.getName().equals(name))
                 .findAny()
-                .orElse(null); // todo Optional
+                .orElse(null);
     }
 
     public List<Role> find(Role role) {
