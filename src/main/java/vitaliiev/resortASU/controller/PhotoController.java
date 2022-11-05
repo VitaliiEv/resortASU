@@ -79,7 +79,7 @@ public class PhotoController {
     @PostMapping(REQUEST_MAPPING + "/update")
     public String update(@ModelAttribute(name = "entity") Photo entity) {
         service.update(entity);
-        return "redirect:/resort/" + FRAGMENT_NAME + "/" + entity.getId();
+        return "redirect:" + REQUEST_MAPPING + "/" + entity.getId();
     }
 
     @PostMapping(REQUEST_MAPPING + "/delete")
