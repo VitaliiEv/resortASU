@@ -40,7 +40,7 @@ public class PhotoController {
     }
 
     @PostMapping(REQUEST_MAPPING + "/find")
-    public String find(@ModelAttribute(name = "entity") Photo entity,
+    public String find(@ModelAttribute(name = "newEntity") Photo entity,
                        RedirectAttributes redirectAttributes) {
         List<Photo> entities = service.find(entity);
         redirectAttributes.addFlashAttribute("entities", entities);

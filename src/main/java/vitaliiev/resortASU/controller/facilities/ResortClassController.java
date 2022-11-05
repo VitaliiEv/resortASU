@@ -40,7 +40,7 @@ public class ResortClassController {
     }
 
     @PostMapping(REQUEST_MAPPING + "/find")
-    public String find(@ModelAttribute(name = "entity") ResortClass entity,
+    public String find(@ModelAttribute(name = "newEntity") ResortClass entity,
                        RedirectAttributes redirectAttributes) {
         List<ResortClass> entities = service.find(entity);
         redirectAttributes.addFlashAttribute("entities", entities);
