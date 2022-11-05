@@ -30,20 +30,24 @@
                     </div>
                 </div>
             </form>
-            <h3>Search</h3>
+<!--            <h3>Search</h3>
             <form th:method="POST" th:object="${newEntity}" th:action="@{${path}+'/find'}">
                 <div class="row g-2 align-items-center">
                     <label th:for="*{id}" class="visually-hidden">Id</label>
                     <input type="hidden" id="id" required th:field="*{id}" th:value="*{id}"/>
                     <div class="col-auto">
-                        <label th:for="*{created}" class="visually-hidden">Type: </label>
-                        <input class="form-control" type="text" placeholder="Class" th:field="*{created}">
+                        <label for="createdAfter" class="visually-hidden">Created after: </label>
+                        <input class="form-control" type="text" placeholder="Created" id="createdAfter" name="createdAfter">
+                    </div>
+					<div class="col-auto">
+                        <label for="createdBefore" class="visually-hidden">Created after: </label>
+                        <input class="form-control" type="text" placeholder="Created" id="createdBefore" name="createdBefore">
                     </div>
                     <div>
                         <button class="btn btn-primary btn-block" type="submit">Find</button>
                     </div>
                 </div>
-            </form>
+            </form>-->
         </div>
 
         <div class="col-3 col-sm-8">
@@ -61,7 +65,9 @@
                 </tr>
                 <tr th:each="e : ${entities}">
                     <th scope="row" th:text="${e.id}"></th>
-                    <td th:text="${e.image}"></td>						
+                    <td>
+						<img th:src="@{'data' :e.image}" class="img-fluid" th:alt="${e.filename}">
+					</td>						
                     <td th:text="${e.created}"></td>
                     <td th:text="'Placeholder Resorts'"></td>				
                     <td th:text="'Placeholder Suits (as main photo)'"></td>

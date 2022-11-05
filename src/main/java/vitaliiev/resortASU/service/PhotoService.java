@@ -78,6 +78,7 @@ public class PhotoService {
     public List<Photo> find(Photo entity) {
         Example<Photo> example = Example.of(entity, SEARCH_CONDITIONS_MATCH_ALL);
         return repository.findAll(example, Sort.by("id"));
+        // todo
     }
 
     @Cacheable(cacheNames = CACHE_LIST_NAME)
@@ -125,6 +126,7 @@ public class PhotoService {
         byte[] image = multipartFile.getBytes();
         MessageDigest md = MessageDigest.getInstance("MD5");
         String hash = Arrays.toString(md.digest(image));
+        String.valueOf(image);
         String filename = Path.of(multipartFile.getOriginalFilename())
                 .getFileName()
                 .toString();
