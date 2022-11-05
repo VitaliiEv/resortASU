@@ -16,6 +16,7 @@ import vitaliiev.resortASU.model.Photo;
 import vitaliiev.resortASU.repository.PhotoRepository;
 import vitaliiev.resortASU.utils.CollectionElementFieldMatcher;
 
+import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.security.MessageDigest;
@@ -125,8 +126,7 @@ public class PhotoService {
         Photo photo = new Photo();
         byte[] image = multipartFile.getBytes();
         MessageDigest md = MessageDigest.getInstance("MD5");
-        String hash = Arrays.toString(md.digest(image));
-        String.valueOf(image);
+        String hash = DatatypeConverter.printHexBinary(md.digest(image));
         String filename = Path.of(multipartFile.getOriginalFilename())
                 .getFileName()
                 .toString();
