@@ -5,7 +5,7 @@
     <title>Photos</title>
 </head>
 <body>
-<div th:fragment="entities (path, entities, newEntity)">
+<div th:fragment="entities (path, entities, newEntity, photoPath)">
     <div class="row">
 
         <div class="col-3 col-sm-3">
@@ -15,9 +15,9 @@
                 <div class="row g-2 align-items-center">
                     <label th:for="*{id}" class="visually-hidden">Id</label>
                     <input type="hidden" id="id" required th:field="*{id}" th:value="*{id}"/>
-                    <div class="col-auto">
-						<ul th:if="${creationErrors} ne null" class="text-warning">
-							<li th:text="${creationErrors}"/>
+                    <div th:if="${creationErrors} ne null" class="col-auto">
+						<ul th:each="error : ${creationErrors}" class="text-warning">
+							<li th:text="${error}"/>
 						</ul>
                     </div>
 					<div class="col-auto">
@@ -66,7 +66,9 @@
                 <tr th:each="e : ${entities}">
                     <th scope="row" th:text="${e.id}"></th>
                     <td>
-						<img th:src="@{e.image}" class="img-fluid" th:alt="${e.filename}">
+						<a th:href="@{${photoPath}+'/'+${e.hash}+${e.filetype}}">
+						<img th:src="@{${photoPath}+'/'+${e.hash}+${e.filetype}}" class="img-fluid" th:alt="${e.filename}">
+						</a>
 					</td>						
                     <td th:text="${e.created}"></td>
                     <td th:text="'Placeholder Resorts'"></td>				

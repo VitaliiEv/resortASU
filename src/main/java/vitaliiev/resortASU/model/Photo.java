@@ -24,9 +24,9 @@ public class Photo {
     private Long id; // TODO: 20.10.2022 many to many
     @EqualsAndHashCode.Include
     private String hash;
-    private byte[] image;
     @ToString.Include
     private String filename;
+    private String filetype;
     private Timestamp created;
     @OneToMany(mappedBy = "photo")
     private Set<Resort> resorts;

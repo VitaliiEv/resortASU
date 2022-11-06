@@ -2,7 +2,6 @@ package vitaliiev.resortASU.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +10,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vitaliiev.resortASU.model.Photo;
 import vitaliiev.resortASU.service.PhotoService;
 
-import java.util.ArrayList;
+import java.net.URI;
 import java.util.List;
 
 @Slf4j
@@ -36,6 +35,8 @@ public class PhotoController {
         Photo newEntity = new Photo();
         model.addAttribute("fragment", FRAGMENT_NAME);
         model.addAttribute("newEntity", newEntity);
+        URI uri = service.getStoragePath().toUri();
+        model.addAttribute("photoPath",uri.toString());
         return SECTION_NAME + "/" + FRAGMENT_NAME;
     }
 
@@ -48,19 +49,10 @@ public class PhotoController {
     }
 
     @PostMapping(REQUEST_MAPPING + "/create")
-    public String create(@RequestParam(name = "image") MultipartFile[] entities, RedirectAttributes redirectAttributes) {
-        List<Photo> entityList = service.multipartFileToPhotoList(entities);
-        List<String> messages = new ArrayList<>();
-        entityList.forEach(entity -> {
-            try {
-                service.create(entity);
-            } catch (DataIntegrityViolationException e) {
-                String message = "Photo " + entity.getFilename() + " not added: " + e.getMessage();
-                log.warn(message);
-                messages.add(message);
-            }
-        });
-        if (!redirectAttributes.getFlashAttributes().isEmpty()) {
+    public String create(@RequestParam(name = "image") MultipartFile[] entities,
+                         RedirectAttributes redirectAttributes) {
+        List<String> messages = service.create(entities);
+        if (!messages.isEmpty()) { //todo
             redirectAttributes.addFlashAttribute("creationErrors", messages);
         }
         return "redirect:" + REQUEST_MAPPING;

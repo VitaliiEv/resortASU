@@ -14,19 +14,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import vitaliiev.resortASU.model.Photo;
 import vitaliiev.resortASU.repository.PhotoRepository;
-import vitaliiev.resortASU.utils.CollectionElementFieldMatcher;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 @Slf4j
 @Service
@@ -34,7 +32,6 @@ public class PhotoService {
     private static final String ENTITY_NAME = Photo.ENTITY_NAME;
     private static final String CACHE_NAME = ENTITY_NAME;
     private static final String CACHE_LIST_NAME = ENTITY_NAME + "List";
-//    private static final String DEFAULT_VALUE = "no class";
 
     private static final ExampleMatcher SEARCH_CONDITIONS_MATCH_ALL = ExampleMatcher
             .matching()
@@ -43,9 +40,12 @@ public class PhotoService {
 
     private final PhotoRepository repository;
 
+    private final UploadService uploadService;
+
     @Autowired
-    public PhotoService(PhotoRepository repository) {
+    public PhotoService(PhotoRepository repository, UploadService uploadService) {
         this.repository = repository;
+        this.uploadService = uploadService;
     }
 
     @Caching(
@@ -56,19 +56,30 @@ public class PhotoService {
         return repository.save(entity);
     }
 
-    public List<Photo> multipartFileToPhotoList(MultipartFile[] entities) {
-        return Arrays.stream(entities)
-                .map(entity -> {
+    public Photo create(MultipartFile entity) throws IOException {
+        Photo photoEntity = multipartFileToPhoto(entity);
+        String filename = photoEntity.getHash() + photoEntity.getFiletype();
+        uploadService.store(entity, filename);
+        return this.create(photoEntity);
+    }
+
+    public List<String> create(MultipartFile[] entities) {
+        List<String> messages = new ArrayList<>();
+        Arrays.stream(entities)
+                .forEach(entity -> {
                     try {
-                        return multipartFileToPhoto(entity);
-                    } catch (IOException | NoSuchAlgorithmException | SQLException e) {
-                        log.warn("Cannot map MultiPartFile to Photo: " + e.getMessage());
+                        this.create(entity);
+                    } catch (IOException e) {
+                        String message = "Cannot extract data from form data.";
+                        log.warn(message + ". " + e.getMessage());
+                        messages.add(message);
+                    } catch (DataIntegrityViolationException e) {
+                        String message = "Cannot add file to repository: " + entity.getOriginalFilename();
+                        log.warn(message + ". " + e.getMessage());
+                        messages.add(message);
                     }
-                    return null;
-                })
-                .filter(Objects::nonNull)
-                .filter(CollectionElementFieldMatcher.distinctByKey(Photo::getHash))
-                .toList();
+                });
+        return messages;
     }
 
     @Cacheable(cacheNames = CACHE_NAME, key = "#id")
@@ -105,36 +116,49 @@ public class PhotoService {
                     @CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
     )
     public void delete(Long id) {
-//        Photo entity = this.findById(id); // for maximum cache use
+
         try {
+            Photo entity = this.findById(id);
+            uploadService.delete(entity.getHash() + entity.getFiletype());
             // todo, delete from suit, etc
 //            entity.getResorts().forEach(r -> r.setPhoto(findRoleByClass(DEFAULT_CLASS))); //todo implement photo
             repository.deleteById(id);
-        } catch (DataIntegrityViolationException e) {
+        } catch (DataIntegrityViolationException | IOException e) {
             log.warn(e.getMessage());
         }
 
     }
 
-    private Photo multipartFileToPhoto(MultipartFile multipartFile) throws IOException, NoSuchAlgorithmException,
-            SQLException {
-        if (multipartFile.getOriginalFilename() == null && !multipartFile.isEmpty()) {
+    private Photo multipartFileToPhoto(MultipartFile multipartFile) throws IOException {
+        String originalFilename = multipartFile.getOriginalFilename();
+        if (originalFilename == null || originalFilename.isEmpty()) {
             throw new IOException("Filename not set, skipping.");
         }
-//        multipartFile.getContentType(); // todo filter mimetype
 
         Photo photo = new Photo();
-        byte[] image = multipartFile.getBytes();
-        MessageDigest md = MessageDigest.getInstance("MD5");
-        String hash = DatatypeConverter.printHexBinary(md.digest(image));
-        String filename = Path.of(multipartFile.getOriginalFilename())
+
+        String filename = Path.of(originalFilename)
                 .getFileName()
                 .toString();
-
-        photo.setImage(image);
-        photo.setHash(hash);
-        photo.setCreated(Timestamp.from(Instant.now()));
         photo.setFilename(filename);
+
+        String[] filenameParts = filename.split("\\.");
+        String filetype = "." + filenameParts[filenameParts.length - 1];
+        photo.setFiletype(filetype);
+
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            String hash = DatatypeConverter.printHexBinary(md.digest(multipartFile.getBytes()));
+            photo.setHash(hash);
+        } catch (NoSuchAlgorithmException e) {
+            log.warn(e.getMessage());
+        }
+
+        photo.setCreated(Timestamp.from(Instant.now()));
         return photo;
+    }
+
+    public Path getStoragePath() {
+        return this.uploadService.getRelativePath();
     }
 }
