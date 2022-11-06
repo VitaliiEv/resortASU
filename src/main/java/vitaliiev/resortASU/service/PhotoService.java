@@ -22,8 +22,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -56,31 +54,18 @@ public class PhotoService {
         return repository.save(entity);
     }
 
-    public Photo create(MultipartFile entity) throws IOException {
+    @Caching(
+            put = {@CachePut(cacheNames = CACHE_NAME, key = "#result?.id")},
+            evict = {@CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
+    )
+    public Photo create(MultipartFile entity) throws IOException, DataIntegrityViolationException {
         Photo photoEntity = multipartFileToPhoto(entity);
         String filename = photoEntity.getHash() + photoEntity.getFiletype();
+        Photo savedPhoto = this.create(photoEntity);
         uploadService.store(entity, filename);
-        return this.create(photoEntity);
+        return savedPhoto;
     }
 
-    public List<String> create(MultipartFile[] entities) {
-        List<String> messages = new ArrayList<>();
-        Arrays.stream(entities)
-                .forEach(entity -> {
-                    try {
-                        this.create(entity);
-                    } catch (IOException e) {
-                        String message = "Cannot extract data from form data.";
-                        log.warn(message + ". " + e.getMessage());
-                        messages.add(message);
-                    } catch (DataIntegrityViolationException e) {
-                        String message = "Cannot add file to repository: " + entity.getOriginalFilename();
-                        log.warn(message + ". " + e.getMessage());
-                        messages.add(message);
-                    }
-                });
-        return messages;
-    }
 
     @Cacheable(cacheNames = CACHE_NAME, key = "#id")
     public Photo findById(Long id) {
@@ -115,18 +100,12 @@ public class PhotoService {
             evict = {@CacheEvict(cacheNames = CACHE_NAME, key = "#id"),
                     @CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
     )
-    public void delete(Long id) {
-
-        try {
-            Photo entity = this.findById(id);
-            uploadService.delete(entity.getHash() + entity.getFiletype());
-            // todo, delete from suit, etc
+    public void delete(Long id) throws IOException, DataIntegrityViolationException {
+        Photo entity = this.findById(id);
+        uploadService.delete(entity.getHash() + entity.getFiletype());
+        // todo, delete from suit, etc
 //            entity.getResorts().forEach(r -> r.setPhoto(findRoleByClass(DEFAULT_CLASS))); //todo implement photo
-            repository.deleteById(id);
-        } catch (DataIntegrityViolationException | IOException e) {
-            log.warn(e.getMessage());
-        }
-
+        repository.deleteById(id);
     }
 
     private Photo multipartFileToPhoto(MultipartFile multipartFile) throws IOException {
@@ -159,6 +138,6 @@ public class PhotoService {
     }
 
     public Path getStoragePath() {
-        return this.uploadService.getRelativePath();
+        return this.uploadService.getDirectory();
     }
 }

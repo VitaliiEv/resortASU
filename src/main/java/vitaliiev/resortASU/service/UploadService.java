@@ -22,6 +22,14 @@ public class UploadService {
     private final Path basePath;
     private String[] filetypes;
 
+    public UploadService(Path basePath, String[] filetypes) throws IOException {
+        this(basePath, basePath.relativize(basePath), filetypes);
+    }
+
+    public UploadService(Path basePath) throws IOException {
+        this(basePath, basePath.relativize(basePath));
+    }
+
     public UploadService(Path basePath, Path relativePath) throws IOException {
         if (Files.exists(basePath) && Files.isDirectory(basePath)) {
             this.relativePath = relativePath;
@@ -41,7 +49,7 @@ public class UploadService {
     }
 
     public UploadService(Path basePath, Path relativePath, String[] filetypes) throws IOException {
-        this(relativePath, basePath);
+        this(basePath, relativePath);
         this.filetypes = filetypes;
         StringBuilder pattern = new StringBuilder();
         for (int i = 0; i < filetypes.length; i++) {

@@ -30,9 +30,13 @@ public class SpringConfig {
     @Bean
     public UploadService photoUploadService() throws IOException {
         String[] acceptedFiletypes = new String[]{"jpg", "jpeg", "png", "gif", "bmp", "svg"};
-        Path basePath = Path.of(System.getProperty("catalina.base"));
-        Path relativePath = Path.of("photos/");
-        return new UploadService(basePath, relativePath, acceptedFiletypes);
+        String relativePathString = "photos/";
+        Path relativePath = Path.of(relativePathString);
+            if (System.getProperties().containsKey("catalina.base")) {
+                Path basePath = Path.of(System.getProperty("catalina.base"));
+            return new UploadService(basePath, relativePath, acceptedFiletypes);
+        } else {
+            return new UploadService(relativePath, acceptedFiletypes);
+        }
     }
-
 }

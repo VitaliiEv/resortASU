@@ -66,8 +66,8 @@
                 <tr th:each="e : ${entities}">
                     <th scope="row" th:text="${e.id}"></th>
                     <td>
-						<a th:href="@{${photoPath}+'/'+${e.hash}+${e.filetype}}">
-						<img th:src="@{${photoPath}+'/'+${e.hash}+${e.filetype}}" class="img-fluid" th:alt="${e.filename}">
+						<a th:href="@{${photoPath}+${e.hash}+${e.filetype}}">
+						<img th:src="@{${photoPath}+${e.hash}+${e.filetype}}" class="img-fluid" th:alt="${e.filename}">
 						</a>
 					</td>						
                     <td th:text="${e.created}"></td>
