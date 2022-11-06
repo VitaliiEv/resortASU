@@ -2,7 +2,10 @@ package vitaliiev.resortASU.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +15,6 @@ import vitaliiev.resortASU.model.Photo;
 import vitaliiev.resortASU.service.PhotoService;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,12 +26,9 @@ public class PhotoController {
     private static final String REQUEST_MAPPING = "/" + FRAGMENT_NAME;
     private final PhotoService service;
 
-    private final URI storage;
-
     @Autowired
     public PhotoController(PhotoService service) {
         this.service = service;
-        this.storage = service.getStoragePath().toUri();
     }
 
     @GetMapping(REQUEST_MAPPING)
@@ -41,7 +40,6 @@ public class PhotoController {
         Photo newEntity = new Photo();
         model.addAttribute("fragment", FRAGMENT_NAME);
         model.addAttribute("newEntity", newEntity);
-        model.addAttribute("photoPath", this.storage.toString());
         return SECTION_NAME + "/" + FRAGMENT_NAME;
     }
 
@@ -60,7 +58,7 @@ public class PhotoController {
         for (MultipartFile entity : entities) {
             try {
                 service.create(entity);
-            } catch (IOException e) {
+            } catch (IOException | IllegalArgumentException e) {
                 String message = e.getMessage();
                 log.warn(message);
                 messages.add(message);
@@ -69,6 +67,7 @@ public class PhotoController {
                 log.warn(message + ". " + e.getMessage());
                 messages.add(message);
             }
+
         }
         if (!messages.isEmpty()) {
             redirectAttributes.addFlashAttribute("creationErrors", messages);
@@ -86,6 +85,24 @@ public class PhotoController {
         return SECTION_NAME + "/" + FRAGMENT_NAME;
     }
 
+    @GetMapping(REQUEST_MAPPING + "/{id}/{filename}")
+    @ResponseBody
+    public ResponseEntity<Resource> download(@PathVariable Long id,
+                                             @PathVariable String filename,
+                                             Model model) {
+        try {
+            Photo photo = this.service.findById(id); // for caching
+            Resource resource = this.service.download(photo.getHash()+photo.getFiletype());
+            return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
+                    "attachment; filename=\"" + filename + "\"").body(resource);
+        } catch (IOException e) {
+            String message = "Could not access resource: " + e.getMessage();
+            log.warn(message);
+            model.addAttribute("downloadError", message);
+        }
+        return null;
+    }
+
     @PostMapping(REQUEST_MAPPING + "/update")
     public String update(@ModelAttribute(name = "entity") Photo entity) {
         service.update(entity);
@@ -99,7 +116,7 @@ public class PhotoController {
         } catch (IOException e) {
             log.warn("Cannot delete file from filesystem. " + e.getMessage());
         } catch (DataIntegrityViolationException e) {
-            log.warn("Cannot delete file from repository. "  + e.getMessage());
+            log.warn("Cannot delete file from repository. " + e.getMessage());
         }
         return "redirect:" + REQUEST_MAPPING;
     }

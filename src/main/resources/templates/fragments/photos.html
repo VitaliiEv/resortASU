@@ -5,7 +5,7 @@
     <title>Photos</title>
 </head>
 <body>
-<div th:fragment="entities (path, entities, newEntity, photoPath)">
+<div th:fragment="entities (path, entities, newEntity)">
     <div class="row">
 
         <div class="col-3 col-sm-3">
@@ -66,8 +66,8 @@
                 <tr th:each="e : ${entities}">
                     <th scope="row" th:text="${e.id}"></th>
                     <td>
-						<a th:href="@{${photoPath}+${e.hash}+${e.filetype}}">
-						<img th:src="@{${photoPath}+${e.hash}+${e.filetype}}" class="img-fluid" th:alt="${e.filename}">
+						<a th:href="@{${path} + '/' + ${e.id} + '/' + ${e.filename}}">
+						<img th:src="@{${path} + '/' + ${e.id} + '/' + ${e.filename}}" class="img-fluid" th:alt="${e.filename}">
 						</a>
 					</td>						
                     <td th:text="${e.created}"></td>

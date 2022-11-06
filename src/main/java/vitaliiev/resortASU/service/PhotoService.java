@@ -6,6 +6,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.core.io.Resource;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -58,11 +59,19 @@ public class PhotoService {
             put = {@CachePut(cacheNames = CACHE_NAME, key = "#result?.id")},
             evict = {@CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
     )
-    public Photo create(MultipartFile entity) throws IOException, DataIntegrityViolationException {
+    public Photo create(MultipartFile entity) throws IOException, DataIntegrityViolationException, IllegalArgumentException {
         Photo photoEntity = multipartFileToPhoto(entity);
         String filename = photoEntity.getHash() + photoEntity.getFiletype();
         Photo savedPhoto = this.create(photoEntity);
-        uploadService.store(entity, filename);
+        try {
+            uploadService.store(entity, filename);
+        } catch (IOException e) {
+            throw new IOException(e);
+        } catch (IllegalArgumentException iae) {
+            throw new IllegalArgumentException(iae);
+        } finally { //revert changes
+            repository.deleteById(photoEntity.getId());
+        }
         return savedPhoto;
     }
 
@@ -70,6 +79,16 @@ public class PhotoService {
     @Cacheable(cacheNames = CACHE_NAME, key = "#id")
     public Photo findById(Long id) {
         return repository.findById(id).orElse(null);
+    }
+
+    public Resource download(Long id) throws IOException {
+        Photo photo = this.findById(id);
+        String filename = photo.getHash() + photo.getFiletype();
+        return this.uploadService.loadAsResource(filename);
+    }
+
+    public Resource download(String filename) throws IOException {
+        return this.uploadService.loadAsResource(filename);
     }
 
     public List<Photo> find(Photo entity) {
@@ -138,6 +157,6 @@ public class PhotoService {
     }
 
     public Path getStoragePath() {
-        return this.uploadService.getDirectory();
+        return this.uploadService.getStorage();
     }
 }
