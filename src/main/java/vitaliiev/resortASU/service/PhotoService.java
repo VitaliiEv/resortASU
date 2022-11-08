@@ -66,11 +66,11 @@ public class PhotoService {
         try {
             uploadService.store(entity, filename);
         } catch (IOException e) {
+            repository.deleteById(photoEntity.getId());
             throw new IOException(e);
         } catch (IllegalArgumentException iae) {
-            throw new IllegalArgumentException(iae);
-        } finally { //revert changes
             repository.deleteById(photoEntity.getId());
+            throw new IllegalArgumentException(iae);
         }
         return savedPhoto;
     }
