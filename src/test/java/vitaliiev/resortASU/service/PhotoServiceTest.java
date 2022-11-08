@@ -37,8 +37,8 @@ class PhotoServiceTest extends ResortApplicationTests {
     CacheManager cacheManager;
 
     @BeforeEach
-    void setUp() throws IOException {
-        this.imageFile = new MockMultipartFile("data", "image.svg", "image/svg", "some xml".getBytes());
+    void setUp() {
+        this.imageFile = new MockMultipartFile("data", "image.jpg", "image/jpg", "some xml".getBytes());
         this.imageFiles = new MockMultipartFile[] {imageFile};
         this.photo = new Photo();
         this.photo.setFilename("image.svg");
