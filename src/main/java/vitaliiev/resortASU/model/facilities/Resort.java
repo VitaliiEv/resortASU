@@ -6,11 +6,14 @@ import vitaliiev.resortASU.model.Photo;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
 public class Resort {
+
+    public static final String ENTITY_NAME = "Resort";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,10 +21,16 @@ public class Resort {
     private String name;
     private String description;
     @ManyToOne(optional = false)
+    @JoinColumn(name = "resorttype")
     private ResortType resorttype;
     @ManyToOne(optional = false)
+    @JoinColumn(name = "resortclass")
     private ResortClass resortClass;
-    @ManyToOne(optional = true) //todo not working right now change true to false
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "photo")
     private Photo photo;
-    private Timestamp lastchanged;
+    @OneToMany(mappedBy = "resort")
+    private Set<Building> buildings;
+    private Timestamp lastChanged;
+    private Boolean deleted = false;
 }

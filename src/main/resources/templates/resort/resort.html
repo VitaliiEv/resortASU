@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+	<title th:text="|#{title.prefix} Resort|">Types</title>
+</head>
+<body>
+	<div th:replace="fragments/bootstrap :: bootstrap"></div>
+	<div th:replace="fragments/navigation :: menu"></div>
+	<div class="container">
+		<div th:replace="${entities} ? ~{${'/fragments/resort/' + fragment} :: entities (${fragment}, ${entities}, ${newEntity}, ${resortTypes}, ${resortClasses}, ${pathToStorage})} : ~{}"></div>
+		<div th:replace="${entity} ? ~{${'/fragments/resort/' + fragment} :: entity (${fragment}, ${entity}, ${resortTypes}, ${resortClasses}, ${pathToStorage})} : ~{}"></div>
+	</div>
+
+</div>
+</body>
+</html>
