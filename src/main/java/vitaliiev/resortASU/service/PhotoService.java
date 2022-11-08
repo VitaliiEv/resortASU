@@ -34,8 +34,8 @@ public class PhotoService {
 
     private static final ExampleMatcher SEARCH_CONDITIONS_MATCH_ALL = ExampleMatcher
             .matching()
-            .withIncludeNullValues() //todo
-            .withIgnorePaths("id", "resorts"); // todo add suits, etc
+            .withIncludeNullValues()
+            .withIgnorePaths("id", "resorts");
 
     private final PhotoRepository repository;
 
@@ -156,7 +156,4 @@ public class PhotoService {
         return photo;
     }
 
-    public Path getStoragePath() {
-        return this.uploadService.getStorage();
-    }
 }
