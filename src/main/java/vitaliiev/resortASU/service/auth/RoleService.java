@@ -129,7 +129,7 @@ public class RoleService {
         }
     }
 
-    public Role getAdmin() { //todo improve caching
+    public Role getAdmin() {
         return findRoleByName(DEFAULT_ADMIN);
     }
 
