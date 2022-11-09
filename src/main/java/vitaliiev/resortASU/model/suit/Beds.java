@@ -1,31 +1,29 @@
-package vitaliiev.resortASU.model.facilities;
+package vitaliiev.resortASU.model.suit;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.util.Set;
 
 @Entity
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
-public class Building {
-    public static final String ENTITY_NAME = "Building";
+public class Beds {
+    public static final String ENTITY_NAME = "Beds";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @EqualsAndHashCode.Include
-    private String name;
+    private String beds;
     @EqualsAndHashCode.Include
-    private String description;
-    private Timestamp lastChanged;
-    @ManyToOne
-    @JoinColumn(name = "resort")
-    private Resort resort;
+    private Integer beds_adult;
+    @EqualsAndHashCode.Include
+    private Integer beds_child;
     @OneToMany
-    private Set<BuildingFloor> buildingFloors;
+    private Set<SuitType> suitTypes;
+
 }

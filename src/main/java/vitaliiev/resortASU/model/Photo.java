@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import vitaliiev.resortASU.model.facilities.Resort;
+import vitaliiev.resortASU.model.suit.SuitType;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -21,7 +22,7 @@ public class Photo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // TODO: 20.10.2022 many to many
+    private Long id;
     @EqualsAndHashCode.Include
     private String hash;
     @ToString.Include
@@ -30,5 +31,6 @@ public class Photo {
     private Timestamp created;
     @OneToMany(mappedBy = "photo")
     private Set<Resort> resorts;
-
+    @OneToMany(mappedBy = "mainphoto")
+    private Set<SuitType> suitTypes;
 }

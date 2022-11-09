@@ -1,0 +1,33 @@
+package vitaliiev.resortASU.model.reserve;
+
+import lombok.Getter;
+import lombok.Setter;
+import vitaliiev.resortASU.model.customer.Customer;
+
+import javax.persistence.*;
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.util.Set;
+
+@Entity
+@Getter
+@Setter
+public class Reserve {
+    public static final String ENTITY_NAME = "Reserve";
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private Date checkin;
+    private Date checkout;
+    @ManyToOne
+    private PaymentStatus paymentstatus;
+    @ManyToOne
+    private PaymentType paymenttype;
+    private Timestamp created;
+    private Timestamp lastchanged;
+    @ManyToMany
+    @JoinTable(name = "customerreserve",
+            joinColumns = @JoinColumn(name = "customer_id"))
+    private Set<Customer> customers;
+}

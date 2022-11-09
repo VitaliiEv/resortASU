@@ -1,4 +1,4 @@
-package vitaliiev.resortASU.model.facilities;
+package vitaliiev.resortASU.model.suit;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -12,20 +12,18 @@ import java.util.Set;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
-public class Building {
-    public static final String ENTITY_NAME = "Building";
+public class Features {
+    public static final String ENTITY_NAME = "Features";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @EqualsAndHashCode.Include
-    private String name;
-    @EqualsAndHashCode.Include
+    private String feature;
     private String description;
-    private Timestamp lastChanged;
-    @ManyToOne
-    @JoinColumn(name = "resort")
-    private Resort resort;
-    @OneToMany
-    private Set<BuildingFloor> buildingFloors;
+    private Timestamp lastchanged;
+    private Boolean deleted = false;
+    @ManyToMany(mappedBy = "features")
+    private Set<SuitType> suitTypes;
+
 }

@@ -17,7 +17,7 @@ public class Resort {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id; // TODO: 20.10.2022 one to many 
+    private Integer id;
     private String name;
     private String description;
     @ManyToOne(optional = false)
@@ -26,7 +26,7 @@ public class Resort {
     @ManyToOne(optional = false)
     @JoinColumn(name = "resortclass")
     private ResortClass resortClass;
-    @ManyToOne(optional = true)
+    @ManyToOne
     @JoinColumn(name = "photo")
     private Photo photo;
     @OneToMany(mappedBy = "resort")

@@ -5,27 +5,20 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.util.Set;
 
 @Entity
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
-public class Building {
-    public static final String ENTITY_NAME = "Building";
+public class Floor {
+    public static final String ENTITY_NAME = "Floor";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @EqualsAndHashCode.Include
-    private String name;
-    @EqualsAndHashCode.Include
-    private String description;
-    private Timestamp lastChanged;
-    @ManyToOne
-    @JoinColumn(name = "resort")
-    private Resort resort;
+    private String floor;
     @OneToMany
     private Set<BuildingFloor> buildingFloors;
 }
