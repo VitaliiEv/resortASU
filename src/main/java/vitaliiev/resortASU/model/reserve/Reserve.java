@@ -30,4 +30,6 @@ public class Reserve {
     @JoinTable(name = "customerreserve",
             joinColumns = @JoinColumn(name = "customer_id"))
     private Set<Customer> customers;
+    @OneToMany
+    private Set<ReserveSuit> reserveSuit;
 }

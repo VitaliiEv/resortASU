@@ -12,8 +12,8 @@ import java.util.Set;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
-public class Features {
-    public static final String ENTITY_NAME = "Features";
+public class Feature {
+    public static final String ENTITY_NAME = "Feature";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

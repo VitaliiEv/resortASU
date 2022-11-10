@@ -3,8 +3,10 @@ package vitaliiev.resortASU.model.suit;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import vitaliiev.resortASU.model.reserve.ReserveSuit;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -23,7 +25,6 @@ public class Suit {
     @ManyToOne
     private SuitType suittype;
     private String comment;
-//    @ManyToOne
-//    @JoinTable(name = "buildingfloor")
-//    private Suit suit;
+    @OneToMany
+    private Set<ReserveSuit> reserveSuit;
 }

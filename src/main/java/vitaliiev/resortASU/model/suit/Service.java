@@ -3,6 +3,7 @@ package vitaliiev.resortASU.model.suit;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import vitaliiev.resortASU.model.reserve.ReserveServices;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -13,8 +14,8 @@ import java.util.Set;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
-public class Services {
-    public static final String ENTITY_NAME = "Services";
+public class Service {
+    public static final String ENTITY_NAME = "Service";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,5 +30,7 @@ public class Services {
     private Boolean deleted = false;
     @ManyToMany(mappedBy = "services")
     private Set<SuitType> suitTypes;
+    @OneToMany
+    private Set<ReserveServices> reserveServices;
 
 }
