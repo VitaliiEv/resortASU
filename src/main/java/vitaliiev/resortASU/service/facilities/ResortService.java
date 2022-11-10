@@ -32,6 +32,7 @@ public class ResortService {
             .withIncludeNullValues()
             .withMatcher("name", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
             .withMatcher("description", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
+            .withMatcher("deleted", ExampleMatcher.GenericPropertyMatchers.exact())
             .withIgnorePaths("id", "resorts", "lastChanged");
 
     private final ResortRepository repository;
@@ -65,6 +66,14 @@ public class ResortService {
         return repository.findAll(Sort.by("id"));
     }
 
+    @Cacheable(cacheNames = CACHE_LIST_NAME)
+    public List<Resort> findAllPresent() {
+        Resort entity = new Resort();
+        entity.setDeleted(false);
+        Example<Resort> example = Example.of(entity, SEARCH_CONDITIONS_MATCH_ALL);
+        return repository.findAll(example, Sort.by("id"));
+    }
+
     @Caching(
             put = {@CachePut(cacheNames = CACHE_NAME, key = "#result?.id")},
             evict = {@CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
@@ -83,8 +92,10 @@ public class ResortService {
                     @CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
     )
     public void delete(Integer id) {
+        Resort entity = this.findById(id);
+        entity.setDeleted(true);
         try {
-            repository.deleteById(id);
+            repository.save(entity);
         } catch (DataIntegrityViolationException e) {
             log.warn(e.getMessage());
         }

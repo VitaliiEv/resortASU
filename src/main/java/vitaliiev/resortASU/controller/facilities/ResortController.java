@@ -40,7 +40,7 @@ public class ResortController {
     @GetMapping(REQUEST_MAPPING)
     public String list(Model model) {
         if (!model.containsAttribute("entities")) {
-            List<Resort> entities = service.findAll();
+            List<Resort> entities = service.findAllPresent();
             model.addAttribute("entities", entities);
         }
         Resort newEntity = new Resort();
