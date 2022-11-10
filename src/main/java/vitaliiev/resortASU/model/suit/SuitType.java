@@ -35,8 +35,8 @@ public class SuitType {
     private Photo mainphoto;
     @ManyToMany
     @JoinTable(name = "suitfeatures", joinColumns = @JoinColumn(name = "features_id"))
-    private Set<Feature> features;
+    private Set<Features> features;
     @ManyToMany
     @JoinTable(name = "suitservices", joinColumns = @JoinColumn(name = "services_id"))
-    private Set<Service> services;
+    private Set<Services> services;
 }

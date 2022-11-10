@@ -2,7 +2,7 @@ package vitaliiev.resortASU.model.reserve;
 
 import lombok.Getter;
 import lombok.Setter;
-import vitaliiev.resortASU.model.suit.Service;
+import vitaliiev.resortASU.model.suit.Services;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -18,7 +18,7 @@ public class ReserveServices {
     private Long id;
 
     @ManyToOne
-    private Service service;
+    private Services services;
     @ManyToOne
     private ReserveSuit reservesuit;
     private BigDecimal price;
