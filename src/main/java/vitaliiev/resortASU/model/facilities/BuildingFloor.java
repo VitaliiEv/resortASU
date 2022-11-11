@@ -9,7 +9,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @Setter
-@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
+@EqualsAndHashCode
 public class BuildingFloor {
     public static final String ENTITY_NAME = "BuildingFloor";
 
@@ -20,4 +20,6 @@ public class BuildingFloor {
     private Building building;
     @ManyToOne
     private Floor floor;
+
+
 }

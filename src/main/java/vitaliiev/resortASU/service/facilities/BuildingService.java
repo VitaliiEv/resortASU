@@ -83,7 +83,18 @@ public class BuildingService {
                     @CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
     )
     public void delete(Integer id) {
+        Building entity = this.findById(id);
+
+        if (entity.getBuildingFloors() != null &&
+                !entity.getBuildingFloors().isEmpty()) {
+            entity.getBuildingFloors()
+                    .stream()
+                    .filter(bf -> bf.getBuilding().equals(entity))
+                    .forEach(bf -> bf.getBuilding().removeBuildingFloor(bf));
+            entity.getBuildingFloors().clear();
+        }
         try {
+            entity.getResort().removeBuilding(entity);
             repository.deleteById(id);
         } catch (DataIntegrityViolationException e) {
             log.warn(e.getMessage());

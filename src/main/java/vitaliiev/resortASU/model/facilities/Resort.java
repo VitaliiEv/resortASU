@@ -33,4 +33,8 @@ public class Resort {
     private Set<Building> buildings;
     private Timestamp lastChanged;
     private Boolean deleted = false;
+
+    public void removeBuilding(Building building) {
+        this.buildings.remove(building);
+    }
 }
