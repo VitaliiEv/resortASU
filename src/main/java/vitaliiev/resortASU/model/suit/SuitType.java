@@ -41,4 +41,5 @@ public class SuitType {
     @JoinTable(name = "suitservices", joinColumns = @JoinColumn(name = "services_id"),
             inverseJoinColumns = @JoinColumn(name = "suittype_id"))
     private Set<Services> services;
+    private Boolean deleted = false;
 }

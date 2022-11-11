@@ -27,4 +27,5 @@ public class Suit {
     private String comment;
     @OneToMany
     private Set<ReserveSuit> reserveSuit;
+    private Boolean deleted = false;
 }
