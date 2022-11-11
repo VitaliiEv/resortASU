@@ -28,6 +28,7 @@ public class Building {
     private Resort resort;
     @OneToMany
     private Set<BuildingFloor> buildingFloors;
+    private Boolean deleted = false;
 
     public void removeBuildingFloor(BuildingFloor buildingFloor) {
         this.buildingFloors.remove(buildingFloor);

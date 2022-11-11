@@ -65,6 +65,14 @@ public class BuildingService {
         return repository.findAll(Sort.by("id"));
     }
 
+    @Cacheable(cacheNames = CACHE_LIST_NAME)
+    public List<Building> findAllPresent() {
+        Building entity = new Building();
+        entity.setDeleted(false);
+        Example<Building> example = Example.of(entity, SEARCH_CONDITIONS_MATCH_ALL);
+        return repository.findAll(example, Sort.by("id"));
+    }
+
     @Caching(
             put = {@CachePut(cacheNames = CACHE_NAME, key = "#result?.id")},
             evict = {@CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
@@ -84,18 +92,9 @@ public class BuildingService {
     )
     public void delete(Integer id) {
         Building entity = this.findById(id);
-
-        if (entity.getBuildingFloors() != null &&
-                !entity.getBuildingFloors().isEmpty()) {
-            entity.getBuildingFloors()
-                    .stream()
-                    .filter(bf -> bf.getBuilding().equals(entity))
-                    .forEach(bf -> bf.getBuilding().removeBuildingFloor(bf));
-            entity.getBuildingFloors().clear();
-        }
+        entity.setDeleted(true);
         try {
-            entity.getResort().removeBuilding(entity);
-            repository.deleteById(id);
+            repository.save(entity);
         } catch (DataIntegrityViolationException e) {
             log.warn(e.getMessage());
         }

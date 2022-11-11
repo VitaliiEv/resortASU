@@ -21,4 +21,5 @@ public class Floor {
     private String floor;
     @OneToMany
     private Set<BuildingFloor> buildingFloors;
+    private Boolean deleted = false;
 }
