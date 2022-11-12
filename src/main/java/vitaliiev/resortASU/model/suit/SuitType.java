@@ -22,7 +22,7 @@ public class SuitType {
     private Integer id;
     @ManyToOne
     @JoinTable(name = "suitclass")
-    private SuitClass suitClass_id;
+    private SuitClass suitClass;
     private Timestamp lastchanged;
     @ManyToOne
     @JoinTable(name = "beds")

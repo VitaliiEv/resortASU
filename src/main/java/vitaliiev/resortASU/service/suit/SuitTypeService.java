@@ -11,8 +11,8 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import vitaliiev.resortASU.model.suit.SuitType;
-import vitaliiev.resortASU.repository.suit.SuitTypeRepository;
+import vitaliiev.resortASU.model.suit.SuitClass;
+import vitaliiev.resortASU.repository.suit.SuitClassRepository;
 
 import java.util.List;
 
@@ -21,26 +21,21 @@ import java.util.List;
 public class SuitTypeService {
 
 
-    protected static final String ENTITY_NAME = SuitType.ENTITY_NAME;
+    protected static final String ENTITY_NAME = SuitClass.ENTITY_NAME;
     protected static final String CACHE_NAME = ENTITY_NAME;
     protected static final String CACHE_LIST_NAME = ENTITY_NAME + "List";
 
     private static final ExampleMatcher SEARCH_CONDITIONS_MATCH_ALL = ExampleMatcher
             .matching()
             .withIncludeNullValues()
-            .withMatcher("suitClass_id", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
-            .withMatcher("lastchanged", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
-            .withMatcher("beds_id", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
-            .withMatcher("area", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
-            .withMatcher("currentprice", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
-            .withMatcher("minimumprice", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
-            .withMatcher("area", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
-            .withIgnorePaths("id", "mainphoto");
+            .withMatcher("suitclass", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
+            .withMatcher("description", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
+            .withIgnorePaths("id", "lastchanged", "suitTypes");
 
-    private final SuitTypeRepository repository;
+    private final SuitClassRepository repository;
 
     @Autowired
-    public SuitTypeService(SuitTypeRepository repository) {
+    public SuitTypeService(SuitClassRepository repository) {
         this.repository = repository;
     }
 
@@ -48,37 +43,30 @@ public class SuitTypeService {
             put = {@CachePut(cacheNames = CACHE_NAME, key = "#result?.id")},
             evict = {@CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
     )
-    public SuitType create(SuitType entity) throws DataIntegrityViolationException {
+    public SuitClass create(SuitClass entity) throws DataIntegrityViolationException {
         return repository.save(entity);
     }
 
     @Cacheable(cacheNames = CACHE_NAME, key = "#id")
-    public SuitType findById(Integer id) {
+    public SuitClass findById(Integer id) {
         return repository.findById(id).orElse(null);
     }
 
-    public List<SuitType> find(SuitType entity) {
-        Example<SuitType> example = Example.of(entity, SEARCH_CONDITIONS_MATCH_ALL);
+    public List<SuitClass> find(SuitClass entity) {
+        Example<SuitClass> example = Example.of(entity, SEARCH_CONDITIONS_MATCH_ALL);
         return repository.findAll(example, Sort.by("id"));
     }
 
     @Cacheable(cacheNames = CACHE_LIST_NAME)
-    public List<SuitType> findAll() {
+    public List<SuitClass> findAll() {
         return repository.findAll(Sort.by("id"));
-    }
-
-    @Cacheable(cacheNames = CACHE_LIST_NAME)
-    public List<SuitType> findAllPresent() {
-        SuitType entity = new SuitType();
-        Example<SuitType> example = Example.of(entity, SEARCH_CONDITIONS_MATCH_ALL);
-        return repository.findAll(example, Sort.by("id"));
     }
 
     @Caching(
             put = {@CachePut(cacheNames = CACHE_NAME, key = "#result?.id")},
             evict = {@CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
     )
-    public SuitType update(SuitType entity) {
+    public SuitClass update(SuitClass entity) {
 
         try {
             return repository.save(entity);
@@ -93,14 +81,13 @@ public class SuitTypeService {
                     @CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
     )
     public void delete(Integer id) {
-        SuitType entity = this.findById(id);
-        entity.setDeleted(true);
+//        SuitClass entity = this.findById(id);
+//        entity.setDeleted(true);
         try {
-            repository.save(entity);
+//            repository.save(entity);
+            repository.deleteById(id);
         } catch (DataIntegrityViolationException e) {
             log.warn(e.getMessage());
         }
-
     }
-
 }
