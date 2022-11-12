@@ -27,11 +27,12 @@ public class SuitService {
 
     private static final ExampleMatcher SEARCH_CONDITIONS_MATCH_ALL = ExampleMatcher
             .matching()
-            .withIncludeNullValues()
+            .withIgnoreNullValues()
             .withMatcher("number", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
             .withMatcher("suitstatus", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
             .withMatcher("Suit", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
             .withMatcher("comment", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
+            .withMatcher("deleted", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
             .withIgnorePaths("id", "reserveSuit");
 
     private final SuitRepository repository;
@@ -67,6 +68,7 @@ public class SuitService {
     @Cacheable(cacheNames = CACHE_LIST_NAME)
     public List<Suit> findAllPresent() {
         Suit entity = new Suit();
+        entity.setDeleted(false);
         Example<Suit> example = Example.of(entity, SEARCH_CONDITIONS_MATCH_ALL);
         return repository.findAll(example, Sort.by("id"));
     }
