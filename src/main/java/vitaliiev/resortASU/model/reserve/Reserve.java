@@ -24,6 +24,8 @@ public class Reserve {
     private PaymentStatus paymentstatus;
     @ManyToOne
     private PaymentType paymenttype;
+    @ManyToOne
+    private ReserveStatus reserveStatus;
     private Timestamp created;
     private Timestamp lastchanged;
     @ManyToMany
