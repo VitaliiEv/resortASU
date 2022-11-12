@@ -29,7 +29,8 @@ public class Resort {
     @ManyToOne
     @JoinColumn(name = "photo")
     private Photo photo;
-    @OneToMany(mappedBy = "resort")
+//    @OneToMany(mappedBy = "resort")
+    @OneToMany(mappedBy = "resort", fetch = FetchType.EAGER) // fixme creates unnecessary sql queries
     private Set<Building> buildings;
     private Timestamp lastChanged;
     private Boolean deleted = false;

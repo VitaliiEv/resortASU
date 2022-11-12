@@ -29,7 +29,7 @@ public class ResortService {
 
     private static final ExampleMatcher SEARCH_CONDITIONS_MATCH_ALL = ExampleMatcher
             .matching()
-            .withIncludeNullValues()
+            .withIgnoreNullValues()
             .withMatcher("name", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
             .withMatcher("description", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
             .withMatcher("deleted", ExampleMatcher.GenericPropertyMatchers.exact())
@@ -80,6 +80,9 @@ public class ResortService {
     )
     public Resort update(Resort entity) {
         try {
+            Resort oldEntity = this.findById(entity.getId());
+            entity.setId(oldEntity.getId());
+
             return repository.save(entity);
         } catch (DataIntegrityViolationException e) {
             log.warn(e.getMessage());
@@ -92,9 +95,9 @@ public class ResortService {
                     @CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
     )
     public void delete(Integer id) {
-        Resort entity = this.findById(id);
-        entity.setDeleted(true);
         try {
+            Resort entity = this.findById(id);
+            entity.setDeleted(true);
             repository.save(entity);
         } catch (DataIntegrityViolationException e) {
             log.warn(e.getMessage());

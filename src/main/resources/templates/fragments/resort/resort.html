@@ -25,14 +25,18 @@
                         <label th:for="*{description}" class="form-label">Description: </label>
 						<textarea class="form-control" rows="3" th:field="*{description}"></textarea>
                     </div>
-					<select class="form-select" aria-label="Select type" th:field="*{resorttype}">
-						  <option value="" selected >Select type</option>
-						  <option th:each="type : ${resortTypes}" th:text="${type.name}" th:value="${type.id}">type</option>
-					</select>
-					<select class="form-select" aria-label="Select type" th:field="*{resortClass}">
-						  <option value="" selected >Select class</option>
-						  <option th:each="class : ${resortClasses}" th:text="${class.resortClass}" th:value="${class.id}">type</option>
-					</select>					
+					<div class="col-auto">
+						<select class="form-select" aria-label="Select type" th:field="*{resorttype}">
+							  <option value="" selected >Select type</option>
+							  <option th:each="type : ${resortTypes}" th:text="${type.name}" th:value="${type.id}">type</option>
+						</select>
+                    </div>
+					<div class="col-auto">
+						<select class="form-select" aria-label="Select type" th:field="*{resortClass}">
+							  <option value="" selected >Select class</option>
+							  <option th:each="class : ${resortClasses}" th:text="${class.resortClass}" th:value="${class.id}">type</option>
+						</select>
+                    </div>					
                     <div class="col-auto">
                         <button class="btn btn-primary btn-block" type="submit">Add</button>
                     </div>
@@ -74,17 +78,17 @@
                 <tr th:each="e : ${entities}">
                     <th scope="row" th:text="${e.id}"></th>
 					<td >
-						<a th:if="${e.photo ne null}" th:href="@{${pathToStorage} + '/' + ${e.id} + '/' + ${e.filename}}">
-							<img th:src="@{${pathToStorage} + '/' + ${e.id} + '/' + ${e.filename}}" class="img-fluid" th:alt="${e.filename}">
+						<a th:if="${e.photo ne null}" th:href="@{'/' + ${pathToStorage} + '/' + ${e.photo.id} + '/' + ${e.photo.filename}}">
+							<img th:src="@{'/' + ${pathToStorage} + '/' + ${e.photo.id} + '/' + ${e.photo.filename}}" class="img-fluid" th:alt="${e.photo.filename}">
 						</a>
-						<span th:if="${e.photo eq null}" th:text="No photo" />
+						<span th:if="${e.photo eq null}" th:text="'No photo'" />
 					</td>
                     <td th:text="${e.name}"></td>
                     <td th:text="${e.description}"></td>
                     <td th:text="${e.resorttype.name}"></td>
                     <td th:text="${e.resortClass.resortClass}"></td>
                     <td>
-                        <a class="btn btn-primary" th:href="@{${path}+'/'+${e.id}}" role="button">Edit</a>
+                        <a class="btn btn-primary" th:href="@{'/resort/' + ${path}+'/'+${e.id}}" role="button">Edit</a>
                     </td>
                     <td>
                         <form th:method="POST" th:action="@{'/resort/'+${path}+'/delete'}">
@@ -109,7 +113,7 @@
     <div class="row">
 
         <div class="col-6 col-sm-3">
-            <h2>Building</h2>
+            <h2>Resort</h2>
             <form th:method="POST" th:object="${entity}" th:action="@{'/resort/'+${path}+'/update'}">
                 <div class="row g-2 align-items-center">
                     <div class="col-auto">
@@ -119,14 +123,41 @@
                 </div>
                 <div class="row g-2 align-items-center">
                     <div class="col-auto">
-                        <label th:for="*{name}">Building: <span th:text="*{name}"></span></label>
-                        <input class="form-check-input" type="hidden" th:field="*{name}"/>
+						<!--<a th:href="@{${entity.id} + '/' + ${entity.filename}}">
+						<img th:src="@{${entity.id} + '/' + ${entity.filename}}" class="img-fluid" th:alt="${e.filename}">
+						</a>-->
+						<label th:for="*{photo}" class="visually-hidden"></label>
+                        <input class="form-check-input" type="hidden" th:field="*{photo}"/>
+						<a th:if="${entity.photo ne null}" th:href="@{'/' + ${pathToStorage} + '/' + ${entity.photo.id} + '/' + ${entity.photo.filename}}">
+						<img th:src="@{'/' + ${pathToStorage} + '/' + *{photo.id} + '/' + *{photo.filename}}" class="img-fluid" th:alt="*{photo.filename}">
+						</a>
+						<span th:if="${entity.photo eq null}" th:text="'No photo'" />						
                     </div>
                 </div>
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+                        <label th:for="*{name}">Resort: <span th:text="*{name}"></span></label>
+                        <input class="form-check-input" type="hidden" th:field="*{name}"/>
+                    </div>
+                </div>				
 				<div class="col-auto">
                         <label th:for="*{description}" class="form-label">Description: </label>
 						<textarea class="form-control" rows="3" th:field="*{description}"></textarea>
                  </div>
+				<div class="col-auto">
+					<select class="form-select" aria-label="Select type" th:field="*{resorttype}">
+						  <option value="" selected >Select type</option>
+						  <option th:each="type : ${resortTypes}" th:text="${type.name}" th:value="${type.id}">type</option>
+					</select>
+                </div>
+				<div class="col-auto">
+					<select class="form-select" aria-label="Select type" th:field="*{resortClass}">
+						  <option value="" selected >Select class</option>
+						  <option th:each="class : ${resortClasses}" th:text="${class.resortClass}" th:value="${class.id}">type</option>
+					</select>
+                </div>
+				<label th:for="*{buildings}" class="visually-hidden"></label>
+                <input class="form-check-input" type="hidden" th:field="*{buildings}"/>				
                 <div class="row g-2 align-items-center">
                     <div class="col-auto">
                         <button class="btn btn-primary btn-block" type="submit">Save</button>

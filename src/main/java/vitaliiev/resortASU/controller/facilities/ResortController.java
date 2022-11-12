@@ -48,7 +48,6 @@ public class ResortController {
         model.addAttribute("newEntity", newEntity);
         model.addAttribute("resortTypes", this.resortTypeService.findAll());
         model.addAttribute("resortClasses", this.resortClassService.findAll());
-
         model.addAttribute("pathToStorage", this.uploadService.getStorage().toString());
         return SECTION_NAME + "/" + FRAGMENT_NAME;
     }
@@ -78,6 +77,9 @@ public class ResortController {
         if (entity != null) {
             model.addAttribute("fragment", FRAGMENT_NAME);
             model.addAttribute("entity", entity);
+            model.addAttribute("resortTypes", this.resortTypeService.findAll());
+            model.addAttribute("resortClasses", this.resortClassService.findAll());
+            model.addAttribute("pathToStorage", this.uploadService.getStorage().toString());
         }
         return SECTION_NAME + "/" + FRAGMENT_NAME;
     }
