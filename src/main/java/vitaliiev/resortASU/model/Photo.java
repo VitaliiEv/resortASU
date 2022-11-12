@@ -29,8 +29,10 @@ public class Photo {
     private String filename;
     private String filetype;
     private Timestamp created;
-    @OneToMany(mappedBy = "photo")
+//    @OneToMany(mappedBy = "photo")
+    @OneToMany(mappedBy = "photo", fetch = FetchType.EAGER) // fixme creates unnecessary sql queries
     private Set<Resort> resorts;
-    @OneToMany(mappedBy = "mainphoto")
+//    @OneToMany(mappedBy = "mainphoto")
+    @OneToMany(mappedBy = "mainphoto", fetch = FetchType.EAGER) // fixme creates unnecessary sql queries
     private Set<SuitType> suitTypes;
 }

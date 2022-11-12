@@ -13,6 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vitaliiev.resortASU.model.Photo;
 import vitaliiev.resortASU.service.PhotoService;
+import vitaliiev.resortASU.service.facilities.ResortService;
+import vitaliiev.resortASU.service.suit.SuitTypeService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,10 +27,14 @@ public class PhotoController {
     private static final String SECTION_NAME = "";
     private static final String REQUEST_MAPPING = "/" + FRAGMENT_NAME;
     private final PhotoService service;
+    private final SuitTypeService suitTypeService;
+    private final ResortService resortService;
 
     @Autowired
-    public PhotoController(PhotoService service) {
+    public PhotoController(PhotoService service, SuitTypeService suitTypeService, ResortService resortService) {
         this.service = service;
+        this.suitTypeService = suitTypeService;
+        this.resortService = resortService;
     }
 
     @GetMapping(REQUEST_MAPPING)
@@ -40,6 +46,8 @@ public class PhotoController {
         Photo newEntity = new Photo();
         model.addAttribute("fragment", FRAGMENT_NAME);
         model.addAttribute("newEntity", newEntity);
+        model.addAttribute("allSuitTypes", suitTypeService.findAllPresent());
+        model.addAttribute("allResorts", resortService.findAllPresent());
         return SECTION_NAME + "/" + FRAGMENT_NAME;
     }
 
@@ -81,6 +89,8 @@ public class PhotoController {
         if (entity != null) {
             model.addAttribute("fragment", FRAGMENT_NAME);
             model.addAttribute("entity", entity);
+            model.addAttribute("allSuitTypes", suitTypeService.findAllPresent());
+            model.addAttribute("allResorts", resortService.findAllPresent());
         }
         return SECTION_NAME + "/" + FRAGMENT_NAME;
     }

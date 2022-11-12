@@ -12,9 +12,15 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import vitaliiev.resortASU.model.Photo;
+import vitaliiev.resortASU.model.facilities.Resort;
+import vitaliiev.resortASU.model.suit.SuitType;
 import vitaliiev.resortASU.repository.PhotoRepository;
+import vitaliiev.resortASU.service.facilities.ResortService;
+import vitaliiev.resortASU.service.suit.SuitTypeService;
+import vitaliiev.resortASU.utils.CollectionsUtils;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
@@ -41,10 +47,17 @@ public class PhotoService {
 
     private final UploadService uploadService;
 
+    private final ResortService resortService;
+
+    private final SuitTypeService suitTypeService;
+
     @Autowired
-    public PhotoService(PhotoRepository repository, UploadService uploadService) {
+    public PhotoService(PhotoRepository repository, UploadService uploadService, ResortService resortService,
+                        SuitTypeService suitTypeService) {
         this.repository = repository;
         this.uploadService = uploadService;
+        this.resortService = resortService;
+        this.suitTypeService = suitTypeService;
     }
 
     @Caching(
@@ -59,7 +72,8 @@ public class PhotoService {
             put = {@CachePut(cacheNames = CACHE_NAME, key = "#result?.id")},
             evict = {@CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
     )
-    public Photo create(MultipartFile entity) throws IOException, DataIntegrityViolationException, IllegalArgumentException {
+    public Photo create(MultipartFile entity) throws IOException, DataIntegrityViolationException,
+            IllegalArgumentException {
         Photo photoEntity = multipartFileToPhoto(entity);
         String filename = photoEntity.getHash() + photoEntity.getFiletype();
         Photo savedPhoto = this.create(photoEntity);
@@ -77,6 +91,7 @@ public class PhotoService {
 
 
     @Cacheable(cacheNames = CACHE_NAME, key = "#id")
+    @Transactional
     public Photo findById(Long id) {
         return repository.findById(id).orElse(null);
     }
@@ -108,6 +123,14 @@ public class PhotoService {
     )
     public Photo update(Photo entity) {
         try {
+            Photo oldEntity = this.findById(entity.getId());
+            CollectionsUtils.updateNestedEntitySetWithNewValues(oldEntity, entity, Photo::getResorts,
+                    Resort::setPhoto, resortService::update);
+            oldEntity.setResorts(entity.getResorts());
+            CollectionsUtils.updateNestedEntitySetWithNewValues(oldEntity, entity, Photo::getSuitTypes,
+                    SuitType::setMainphoto, suitTypeService::update);
+            oldEntity.setSuitTypes(entity.getSuitTypes());
+            entity = oldEntity;
             return repository.save(entity);
         } catch (DataIntegrityViolationException e) {
             log.warn(e.getMessage());

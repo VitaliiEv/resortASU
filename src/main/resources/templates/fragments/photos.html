@@ -56,26 +56,25 @@
                 <tr>
                     <th scope="col">id</th>
                     <th scope="col">Photo</th>
-                    <th scope="col">CreationDate</th>
                     <th scope="col">Resorts</th>
-                    <th scope="col">Suits (as main photo)</th>
-					<th scope="col">Suits (gallery)</th>
+                    <th scope="col">Suits</th>
                     <th scope="col"></th>
                     <th scope="col"></th>					
                 </tr>
                 <tr th:each="e : ${entities}">
                     <th scope="row" th:text="${e.id}"></th>
                     <td>
-						<a th:href="@{${path} + '/' + ${e.id} + '/' + ${e.filename}}">
-						<img th:src="@{${path} + '/' + ${e.id} + '/' + ${e.filename}}" class="img-fluid" th:alt="${e.filename}">
+						<!--<a th:href="@{'/' + ${e.id} + '/' + ${e.filename}}">
+						<img th:src="@{'/' + ${e.id} + '/' + ${e.filename}}" class="img-fluid" th:alt="${e.filename}">
+						</a>-->
+						<a th:href="@{'/'+${path} + '/' + ${e.id} + '/' + ${e.filename}}">
+						<img th:src="@{'/'+${path} + '/' + ${e.id} + '/' + ${e.filename}}" class="img-fluid" th:alt="${e.filename}">
 						</a>
 					</td>						
-                    <td th:text="${e.created}"></td>
-                    <td th:text="'Placeholder Resorts'"></td>				
-                    <td th:text="'Placeholder Suits (as main photo)'"></td>
-                    <td th:text="'Placeholder Suits (gallery)'"></td>					
+                    <td><span th:if="${e.resorts} ne null" th:each="r : ${e.resorts}"><p><a th:href="@{'/resort/resort/'+${r.id}}" th:text="${r.name}"></a/></p></td>
+					<td><span th:if="${e.suitTypes) ne null" th:each="st : ${e.suitTypes}"><p><a th:href="@{'/suit/suit/'+${st.id}}" th:text="${st.suitClass.suitclass}+ ', '+ ${st.beds.beds}"></a/></p></td>				
                     <td>
-                        <a class="btn btn-primary" th:href="@{${path}+'/'+${e.id}}" role="button">Edit</a>
+                        <a class="btn btn-primary" th:href="@{'/'+${path}+'/'+${e.id}}" role="button">Edit</a>
                     </td>
                     <td>
                         <form th:method="POST" th:action="@{'/'+${path}+'/delete'}">
@@ -96,12 +95,12 @@
     </div>
 
 </div>
-<div th:fragment="entity (path, entity)">
+<div th:fragment="entity (path, entity, allSuitTypes, allResorts)">
     <div class="row">
 
         <div class="col-6 col-sm-3">
             <h2>Photo</h2>
-            <form th:method="POST" th:object="${entity}" th:action="@{'/resort/'+${path}+'/update'}">
+            <form th:method="POST" th:object="${entity}" th:action="@{'/'+${path}+'/update'}">
                 <div class="row g-2 align-items-center">
                     <div class="col-auto">
                         <label th:for="*{id}">Id: <span th:text="*{id}"></span></label>
@@ -110,13 +109,42 @@
                 </div>
                 <div class="row g-2 align-items-center">
                     <div class="col-auto">
+						<!--<a th:href="@{'/' + *{id} + '/' + *{filename}}">
+						<img th:src="@{'/' + ${entity.id} + '/' + ${entity.filename}}" class="img-fluid" th:alt="${e.filename}">
+						</a>-->
+						<a th:href="@{'/' + ${path} + '/' + *{id} + '/' + *{filename}}">
+						<img th:src="@{'/' + ${path} + '/' + *{id} + '/' + *{filename}}" class="img-fluid" th:alt="*{filename}">
+						</a>						
+                    </div>
+                </div>
+				<div class="row g-2 align-items-center">
+                    <div class="col-auto">
                         <label th:for="*{created}">Created: <span th:text="*{created}"></span></label>
                         <input class="form-check-input" type="hidden" th:field="*{created}"/>
                     </div>
                 </div>
-				<div class="col-auto">
-                        Placeholder
-                 </div>
+				<div class="row g-2 align-items-center">
+					<span class="col-auto">Attach as main photo for suit type:</span>
+					<div class="col-auto" th:if="${not #lists.isEmpty(allSuitTypes)}" th:each="st : ${allSuitTypes}">
+						<input class="form-check-input" type="checkbox" th:field="*{suitTypes}"	th:value="${st.id}"/>
+						<label class="form-check-label" th:for="${#ids.prev('suitTypes')}" th:text="${st.suitClass.suitclass}+ ', '+ ${st.beds.beds}"></label>
+					</div>
+					<div class="col-auto" th:if="${#lists.isEmpty(allSuitTypes)}">
+							<p>No suit types found</p>
+					</div>					
+				</div>
+				<div class="row g-2 align-items-center">
+					<span class="col-auto">Attach as main photo for resort:</span>
+					<div class="col-auto" th:if="${not #lists.isEmpty(allResorts)}" th:each="resort : ${allResorts}">
+						<p>
+							<input class="form-check-input" type="checkbox" th:field="*{resorts}"	th:value="${resort.id}"/>
+							<label class="form-check-label" th:for="${#ids.prev('resorts')}" th:text="${resort.name}"></label>
+						</p>
+					</div>
+					<div class="col-auto" th:if="${#lists.isEmpty(allResorts)}">
+							<p>No resorts found</p>
+					</div>					
+				</div>									
                 <div class="row g-2 align-items-center">
                     <div class="col-auto">
                         <button class="btn btn-primary btn-block" type="submit">Save</button>
