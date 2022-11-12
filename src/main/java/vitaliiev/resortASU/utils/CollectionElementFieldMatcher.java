@@ -2,8 +2,6 @@ package vitaliiev.resortASU.utils;
 
 
 import java.util.Collection;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -20,7 +18,7 @@ public class CollectionElementFieldMatcher {
                                                Collection<T> patterns) {
         return collection.stream()
                 .distinct()
-                .filter(equalsFilter(fieldExtractor,patterns))
+                .filter(equalsFilter(fieldExtractor, patterns))
                 .count() == patterns.size();
 
     }
@@ -36,7 +34,7 @@ public class CollectionElementFieldMatcher {
                                                Collection<T> patterns) {
         return collection.stream()
                 .distinct()
-                .anyMatch(equalsFilter(fieldExtractor,patterns));
+                .anyMatch(equalsFilter(fieldExtractor, patterns));
 
     }
 
@@ -50,12 +48,12 @@ public class CollectionElementFieldMatcher {
                                                         Collection<T> patterns) {
         return collection.stream()
                 .distinct()
-                .filter(containsSubstringFilter(fieldExtractor,patterns))
+                .filter(containsSubstringFilter(fieldExtractor, patterns))
                 .count() == patterns.size();
     }
 
     private static <T, R> Predicate<T> equalsFilter(Function<T, R> fieldExtractor,
-                                                            Collection<T> patterns) {
+                                                    Collection<T> patterns) {
         return element -> patterns.stream()
                 .map(fieldExtractor)
                 .anyMatch(fieldValue -> fieldValue.equals(fieldExtractor.apply(element)));
@@ -66,10 +64,5 @@ public class CollectionElementFieldMatcher {
         return element -> patterns.stream()
                 .map(fieldExtractor)
                 .anyMatch(fieldValue -> fieldValue.contains(fieldExtractor.apply(element)));
-    }
-
-    public static <T> Predicate<T> distinctByKey(Function<T, ?> fieldExtractor) {
-        Set<Object> seen = ConcurrentHashMap.newKeySet();
-        return t -> seen.add(fieldExtractor.apply(t));
     }
 }
