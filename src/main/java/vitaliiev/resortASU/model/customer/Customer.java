@@ -13,31 +13,27 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(callSuper = false)
 public class Customer {
     public static final String ENTITY_NAME = "Customer";
 
     @Id
+    @EqualsAndHashCode.Exclude
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @EqualsAndHashCode.Include
     private String firstname;
-    @EqualsAndHashCode.Include
     private String surname;
-    @EqualsAndHashCode.Include
     private String middlename;
-    @EqualsAndHashCode.Include
     private String phone;
-    @EqualsAndHashCode.Include
     private String email;
-    @EqualsAndHashCode.Include
     private Date birthdate;
     @ManyToOne
     private Gender gender_id;
     @ManyToOne
+    @EqualsAndHashCode.Exclude
     private Appeal appeal_id;
-    @EqualsAndHashCode.Include
-    private String adress;
+    @EqualsAndHashCode.Exclude
+    private String address;
     private Timestamp lastchanged;
     @OneToMany
     private Set<Document> documents;
