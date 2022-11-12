@@ -11,8 +11,8 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import vitaliiev.resortASU.model.suit.Suit;
-import vitaliiev.resortASU.repository.suit.SuitRepository;
+import vitaliiev.resortASU.model.reserve.Reserve;
+import vitaliiev.resortASU.repository.reserve.ReserveRepository;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ import java.util.List;
 public class ReserveService {
 
 
-    protected static final String ENTITY_NAME = Suit.ENTITY_NAME;
+    protected static final String ENTITY_NAME = Reserve.ENTITY_NAME;
     protected static final String CACHE_NAME = ENTITY_NAME;
     protected static final String CACHE_LIST_NAME = ENTITY_NAME + "List";
 
@@ -33,12 +33,13 @@ public class ReserveService {
             .withMatcher("checkout", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
             .withMatcher("paymentstatus", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
             .withMatcher("paymenttype", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
-            .withIgnorePaths("id", "created", "lastchanged", "customers", "reserveSuit");
+            .withMatcher("reserveStatus", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
+            .withIgnorePaths("id", "created", "lastchanged", "customers", "reserveReserve");
 
-    private final SuitRepository repository;
+    private final ReserveRepository repository;
 
     @Autowired
-    public ReserveService(SuitRepository repository) {
+    public ReserveService(ReserveRepository repository) {
         this.repository = repository;
     }
 
@@ -46,37 +47,31 @@ public class ReserveService {
             put = {@CachePut(cacheNames = CACHE_NAME, key = "#result?.id")},
             evict = {@CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
     )
-    public Suit create(Suit entity) throws DataIntegrityViolationException {
+    public Reserve create(Reserve entity) throws DataIntegrityViolationException {
         return repository.save(entity);
     }
 
     @Cacheable(cacheNames = CACHE_NAME, key = "#id")
-    public Suit findById(Long id) {
+    public Reserve findById(Long id) {
         return repository.findById(id).orElse(null);
     }
 
-    public List<Suit> find(Suit entity) {
-        Example<Suit> example = Example.of(entity, SEARCH_CONDITIONS_MATCH_ALL);
+    public List<Reserve> find(Reserve entity) {
+        Example<Reserve> example = Example.of(entity, SEARCH_CONDITIONS_MATCH_ALL);
         return repository.findAll(example, Sort.by("id"));
     }
 
     @Cacheable(cacheNames = CACHE_LIST_NAME)
-    public List<Suit> findAll() {
+    public List<Reserve> findAll() {
         return repository.findAll(Sort.by("id"));
     }
 
-    @Cacheable(cacheNames = CACHE_LIST_NAME)
-    public List<Suit> findAllPresent() {
-        Suit entity = new Suit();
-        Example<Suit> example = Example.of(entity, SEARCH_CONDITIONS_MATCH_ALL);
-        return repository.findAll(example, Sort.by("id"));
-    }
 
     @Caching(
             put = {@CachePut(cacheNames = CACHE_NAME, key = "#result?.id")},
             evict = {@CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
     )
-    public Suit update(Suit entity) {
+    public Reserve update(Reserve entity) {
 
         try {
             return repository.save(entity);
@@ -86,19 +81,19 @@ public class ReserveService {
         }
     }
 
-    @Caching(
-            evict = {@CacheEvict(cacheNames = CACHE_NAME, key = "#id"),
-                    @CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
-    )
-    public void delete(Long id) {
-        Suit entity = this.findById(id);
-        entity.setDeleted(true);
-        try {
-            repository.save(entity);
-        } catch (DataIntegrityViolationException e) {
-            log.warn(e.getMessage());
-        }
-
-    }
+//    @Caching(
+//            evict = {@CacheEvict(cacheNames = CACHE_NAME, key = "#id"),
+//                    @CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
+//    )
+//    public void delete(Long id) {
+//        Reserve entity = this.findById(id);
+//        entity.setDeleted(true);
+//        try {
+//            repository.save(entity);
+//        } catch (DataIntegrityViolationException e) {
+//            log.warn(e.getMessage());
+//        }
+//
+//    }
 
 }

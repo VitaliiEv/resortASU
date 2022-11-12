@@ -11,8 +11,8 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import vitaliiev.resortASU.model.suit.Suit;
-import vitaliiev.resortASU.repository.suit.SuitRepository;
+import vitaliiev.resortASU.model.customer.Customer;
+import vitaliiev.resortASU.repository.customer.CustomerRepository;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ import java.util.List;
 public class CustomerService {
 
 
-    protected static final String ENTITY_NAME = Suit.ENTITY_NAME;
+    protected static final String ENTITY_NAME = Customer.ENTITY_NAME;
     protected static final String CACHE_NAME = ENTITY_NAME;
     protected static final String CACHE_LIST_NAME = ENTITY_NAME + "List";
 
@@ -37,10 +37,10 @@ public class CustomerService {
             .withMatcher("phone", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
             .withIgnorePaths("id", "documents", "reserves");
 
-    private final SuitRepository repository;
+    private final CustomerRepository repository;
 
     @Autowired
-    public CustomerService(SuitRepository repository) {
+    public CustomerService(CustomerRepository repository) {
         this.repository = repository;
     }
 
@@ -48,29 +48,29 @@ public class CustomerService {
             put = {@CachePut(cacheNames = CACHE_NAME, key = "#result?.id")},
             evict = {@CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
     )
-    public Suit create(Suit entity) throws DataIntegrityViolationException {
+    public Customer create(Customer entity) throws DataIntegrityViolationException {
         return repository.save(entity);
     }
 
     @Cacheable(cacheNames = CACHE_NAME, key = "#id")
-    public Suit findById(Long id) {
+    public Customer findById(Long id) {
         return repository.findById(id).orElse(null);
     }
 
-    public List<Suit> find(Suit entity) {
-        Example<Suit> example = Example.of(entity, SEARCH_CONDITIONS_MATCH_ALL);
+    public List<Customer> find(Customer entity) {
+        Example<Customer> example = Example.of(entity, SEARCH_CONDITIONS_MATCH_ALL);
         return repository.findAll(example, Sort.by("id"));
     }
 
     @Cacheable(cacheNames = CACHE_LIST_NAME)
-    public List<Suit> findAll() {
+    public List<Customer> findAll() {
         return repository.findAll(Sort.by("id"));
     }
 
     @Cacheable(cacheNames = CACHE_LIST_NAME)
-    public List<Suit> findAllPresent() {
-        Suit entity = new Suit();
-        Example<Suit> example = Example.of(entity, SEARCH_CONDITIONS_MATCH_ALL);
+    public List<Customer> findAllPresent() {
+        Customer entity = new Customer();
+        Example<Customer> example = Example.of(entity, SEARCH_CONDITIONS_MATCH_ALL);
         return repository.findAll(example, Sort.by("id"));
     }
 
@@ -78,7 +78,7 @@ public class CustomerService {
             put = {@CachePut(cacheNames = CACHE_NAME, key = "#result?.id")},
             evict = {@CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
     )
-    public Suit update(Suit entity) {
+    public Customer update(Customer entity) {
 
         try {
             return repository.save(entity);
@@ -93,9 +93,9 @@ public class CustomerService {
                     @CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
     )
     public void delete(Long id) {
-        Suit entity = this.findById(id);
-        entity.setDeleted(true);
         try {
+            Customer entity = this.findById(id);
+            entity.getReserves().forEach(reserve -> reserve.removeCustomer(entity));
             repository.save(entity);
         } catch (DataIntegrityViolationException e) {
             log.warn(e.getMessage());

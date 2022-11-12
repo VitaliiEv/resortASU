@@ -34,4 +34,18 @@ public class Reserve {
     private Set<Customer> customers;
     @OneToMany
     private Set<ReserveSuit> reserveSuit;
+
+    public void addCustomer(Customer customer) {
+        if (this.customers.contains(customer)) {
+            this.customers.add(customer);
+            customer.getReserves().add(this);
+        }
+    }
+
+    public void removeCustomer(Customer customer) {
+        if (this.customers.contains(customer)) {
+            this.customers.remove(customer);
+            customer.getReserves().remove(this);
+        }
+    }
 }
