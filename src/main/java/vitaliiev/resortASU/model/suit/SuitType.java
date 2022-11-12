@@ -21,17 +21,17 @@ public class SuitType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @ManyToOne
-    @JoinTable(name = "suitclass")
+    @JoinColumn(name="suitclass")
     private SuitClass suitClass;
     private Timestamp lastchanged;
     @ManyToOne
-    @JoinTable(name = "beds")
-    private Beds beds_id;
+    @JoinColumn(name="beds")
+    private Beds beds;
     private Double area;
     private BigDecimal currentprice;
     private BigDecimal minimumprice;
     @ManyToOne
-    @JoinTable(name = "photo")
+    @JoinColumn(name = "mainphoto")
     private Photo mainphoto;
     @ManyToMany
     @JoinTable(name = "suitfeatures", joinColumns = @JoinColumn(name = "features_id"),
