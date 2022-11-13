@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Suit Types</title>
+</head>
+<body>
+<div th:fragment="entities (path, entities, newEntity, bedsList, suitClasses, pathToStorage)">
+    <div class="row">
+
+        <div class="col-3 col-sm-2">
+            <h3>Add</h3>
+<!--            <form th:method="POST" th:object="${newEntity}" th:action="@{${path}+'/create'}">
+                <div class="row g-2 align-items-center">
+                    <label th:for="*{id}" class="visually-hidden">Id</label>
+                    <input type="hidden" id="id" required th:field="*{id}" th:value="*{id}"/>
+                    <div class="col-auto">
+						<ul th:if="${creationError} ne null" class="text-warning">
+							<li th:text="${creationError}"/>
+						</ul>
+                        <label th:for="*{name}" class="visually-hidden">Name: </label>
+                        <input class="form-control" type="text" placeholder="Name" th:field="*{name}">
+                    </div>
+					<div class="col-auto">
+                        <label th:for="*{description}" class="form-label">Description: </label>
+						<textarea class="form-control" rows="3" th:field="*{description}"></textarea>
+                    </div>
+					<div class="col-auto">
+						<select class="form-select" aria-label="Select type" th:field="*{resorttype}">
+							  <option value="" selected >Select type</option>
+							  <option th:each="type : ${resortTypes}" th:text="${type.name}" th:value="${type.id}">type</option>
+						</select>
+                    </div>
+					<div class="col-auto">
+						<select class="form-select" aria-label="Select type" th:field="*{resortClass}">
+							  <option value="" selected >Select class</option>
+							  <option th:each="class : ${resortClasses}" th:text="${class.resortClass}" th:value="${class.id}">type</option>
+						</select>
+                    </div>					
+                    <div class="col-auto">
+                        <button class="btn btn-primary btn-block" type="submit">Add</button>
+                    </div>
+                </div>
+            </form>-->
+<!--            <h3>Search</h3>
+            <form th:method="POST" th:object="${newEntity}" th:action="@{${path}+'/find'}">
+                <div class="row g-2 align-items-center">
+                    <label th:for="*{id}" class="visually-hidden">Id</label>
+                    <input type="hidden" id="id" required th:field="*{id}" th:value="*{id}"/>
+                    <div class="col-auto">
+                        <label th:for="*{name}" class="visually-hidden">Name: </label>
+                        <input class="form-control" type="text" placeholder="Name" th:field="*{name}">
+                    </div>
+					<div class="col-auto">
+                        <label th:for="*{description}" class="visually-hidden">Description: </label>
+                        <input class="form-control" type="text" placeholder="Description" th:field="*{description}">
+                    </div>
+                    <div>
+                        <button class="btn btn-primary btn-block" type="submit">Find</button>
+                    </div>
+                </div>
+            </form>
+        </div>-->
+
+        <div class="col-3 col-sm-8">
+            <h2>Suit Types</h2>
+            <table class="table table-striped">
+                <tr>
+                    <th scope="col">id</th>
+					<th scope="col">Photo</th>
+                    <th scope="col">Suit class</th>
+                    <th scope="col">Beds</th>
+                    <th scope="col">Area</th>
+                    <th scope="col">Current Price</th>
+					<th scope="col">Minimum Price</th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                </tr>
+                <tr th:each="e : ${entities}">
+                    <th scope="row" th:text="${e.id}"></th>
+					<td >
+						<a th:if="${e.mainphoto ne null}" th:href="@{'/' + ${pathToStorage} + '/' + ${e.mainphoto.id} + '/' + ${e.mainphoto.filename}}">
+							<img th:src="@{'/' + ${pathToStorage} + '/' + ${e.mainphoto.id} + '/' + ${e.mainphoto.filename}}" class="img-fluid" th:alt="${e.mainphoto.filename}">
+						</a>
+						<span th:if="${e.mainphoto eq null}" th:text="'No photo'" />
+					</td>
+                    <td th:text="${e.suitClass.suitclass}"></td>
+                    <td th:text="${e.beds.beds}"></td>
+                    <td th:text="${e.area}"></td>
+                    <td th:text="${e.currentprice}"></td>
+					<td th:text="${e.minimumprice}"></td>
+
+                    <td>
+                        <a class="btn btn-primary" th:href="@{'/suit/' + ${path}+'/'+${e.id}}" role="button">Edit</a>
+                    </td>
+                    <td>
+                        <form th:method="POST" th:action="@{'/suit/'+${path}+'/delete'}">
+                            <label class="visually-hidden" for="id"></label>
+                            <input class="form-check-input" type="hidden" name="id" th:value="${e.id}">
+                            <div th:replace="/fragments/common :: confirmFormDialog ('Delete?',
+                                'This action will delete all buildings, floors and suits in this resort.',
+                                'Delete',
+								${e.id})">
+                                <button class="btn btn-primary btn-block" type="submit">Delete</button>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+<div th:fragment="entity (path, entity, bedsList, suitClasses, pathToStorage)">
+    <div class="row">
+
+        <div class="col-6 col-sm-3">
+            <h2>Suit Type</h2>
+            <form th:method="POST" th:object="${entity}" th:action="@{'/suit/'+${path}+'/update'}">
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+                        <label th:for="*{id}">Id: <span th:text="*{id}"></span></label>
+                        <input class="form-check-input" type="hidden" th:field="*{id}"/>
+                    </div>
+                </div>
+
+				
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+						<label th:for="*{mainphoto}" class="visually-hidden"></label>
+                        <input class="form-check-input" type="hidden" th:field="*{mainphoto}"/>
+						<a th:if="${entity.mainphoto ne null}" th:href="@{'/' + ${pathToStorage} + '/' + ${entity.mainphoto.id} + '/' + ${entity.mainphoto.filename}}">
+						<img th:src="@{'/' + ${pathToStorage} + '/' + *{mainphoto.id} + '/' + *{mainphoto.filename}}" class="img-fluid" th:alt="*{mainphoto.filename}">
+						</a>
+						<span th:if="${entity.mainphoto eq null}" th:text="'No photo'" />						
+                    </div>
+                </div>
+				<div class="col-auto">
+				    <label th:for="*{suitClass}">Suit class:</label>
+					<select class="form-select" aria-label="Suit class" th:field="*{suitClass}">
+						  <option value="" selected >Select suit class</option>
+						  <option th:each="sc : ${suitClasses}" th:text="${sc.suitclass}" th:value="${sc.id}"></option>
+					</select>
+                </div>	
+				<div class="col-auto">
+				    <label th:for="*{beds}">Beds:</label>
+					<select class="form-select" aria-label="Select beds" th:field="*{beds}">
+						  <option value="" selected >Select beds</option>
+						  <option th:each="b : ${bedsList}" th:text="${b.beds}" th:value="${b.id}"></option>
+					</select>
+                </div>				
+				<div class="col-auto">
+						<label th:for="*{area}">Area: <span th:text="*{area}"></span></label>
+                        <input class="form-check-input" type="hidden" th:field="*{area}"/>
+                 </div>
+				<div class="col-auto">
+						<label th:for="*{currentprice}">Current price: <span th:text="*{currentprice}"></span></label>
+                        <input class="form-check-input" type="hidden" th:field="*{currentprice}"/>
+                 </div>
+				<div class="col-auto">
+						<label th:for="*{minimumprice}">Minimum price: <span th:text="*{minimumprice}"></span></label>
+                        <input class="form-check-input" type="hidden" th:field="*{minimumprice}"/>
+                 </div>			
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+                        <button class="btn btn-primary btn-block" type="submit">Save</button>
+                    </div>
+                </div>
+            </form>
+            <form th:method="POST" th:object="${entity}" th:action="@{'/suit/'+${path}+'/delete'}">
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+                        <label class="visually-hidden" th:for="*{id}"></label>
+                        <input class="form-check-input" type="hidden" th:field="*{id}"/>
+                        <div th:replace="/fragments/common :: confirmFormDialog ('Delete?',
+                        'Delete?',
+                        'Delete',
+						*{id})">
+                            <button class="btn btn-primary btn-block" type="submit">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

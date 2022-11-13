@@ -20,8 +20,8 @@ import java.util.List;
 @Slf4j
 @Controller
 public class SuitTypeController {
-    private static final String FRAGMENT_NAME = "SuitType";
-    private static final String SECTION_NAME = "SuitType";
+    private static final String FRAGMENT_NAME = "suittypes";
+    private static final String SECTION_NAME = "suit";
     private static final String REQUEST_MAPPING = "/" + SECTION_NAME + "/" + FRAGMENT_NAME;
     private final SuitTypeService service;
 
@@ -55,8 +55,8 @@ public class SuitTypeController {
         SuitType newEntity = new SuitType();
         model.addAttribute("fragment", FRAGMENT_NAME);
         model.addAttribute("newEntity", newEntity);
-        model.addAttribute("Beds", this.bedsService.findAll());
-        model.addAttribute("SuitClasses", this.suitClassService.findAll());
+        model.addAttribute("beds", this.bedsService.findAll());
+        model.addAttribute("suitClasses", this.suitClassService.findAll());
         model.addAttribute("pathToStorage", this.uploadService.getStorage().toString());
         return SECTION_NAME + "/" + FRAGMENT_NAME;
     }
@@ -86,8 +86,8 @@ public class SuitTypeController {
         if (entity != null) {
             model.addAttribute("fragment", FRAGMENT_NAME);
             model.addAttribute("entity", entity);
-            model.addAttribute("Beds", this.bedsService.findAll());
-            model.addAttribute("SuitClasses", this.suitClassService.findAll());
+            model.addAttribute("beds", this.bedsService.findAll());
+            model.addAttribute("suitClasses", this.suitClassService.findAll());
             model.addAttribute("pathToStorage", this.uploadService.getStorage().toString());
         }
         return SECTION_NAME + "/" + FRAGMENT_NAME;
