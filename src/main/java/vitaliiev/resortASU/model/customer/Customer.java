@@ -29,14 +29,14 @@ public class Customer {
     private Date birthdate;
     @ManyToOne
     private Gender gender_id;
-    @ManyToOne
-    @EqualsAndHashCode.Exclude
-    private Appeal appeal_id;
+//    @ManyToOne
+//    @EqualsAndHashCode.Exclude
+//    private Appeal appeal_id;
     @EqualsAndHashCode.Exclude
     private String address;
     private Timestamp lastchanged;
-    @OneToMany
-    private Set<Document> documents;
+//    @OneToMany
+//    private Set<Document> documents;
     @ManyToMany(mappedBy = "customers")
     private Set<Reserve> reserves;
 }

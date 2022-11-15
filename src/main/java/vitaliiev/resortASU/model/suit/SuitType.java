@@ -33,10 +33,10 @@ public class SuitType {
     @ManyToOne
     @JoinColumn(name = "mainphoto")
     private Photo mainphoto;
-    @ManyToMany
-    @JoinTable(name = "suitfeatures", joinColumns = @JoinColumn(name = "features_id"),
-        inverseJoinColumns = @JoinColumn(name = "suittype_id"))
-    private Set<Features> features;
+//    @ManyToMany
+//    @JoinTable(name = "suitfeatures", joinColumns = @JoinColumn(name = "features_id"),
+//        inverseJoinColumns = @JoinColumn(name = "suittype_id"))
+//    private Set<Features> features;
     @ManyToMany
     @JoinTable(name = "suitservices", joinColumns = @JoinColumn(name = "services_id"),
             inverseJoinColumns = @JoinColumn(name = "suittype_id"))
