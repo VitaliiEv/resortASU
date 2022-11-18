@@ -72,7 +72,7 @@
 						</a>
 					</td>						
                     <td><span th:if="${e.resorts} ne null" th:each="r : ${e.resorts}"><p><a th:href="@{'/resort/resort/'+${r.id}}" th:text="${r.name}"></a/></p></td>
-					<td><span th:if="${e.suitTypes) ne null" th:each="st : ${e.suitTypes}"><p><a th:href="@{'/suit/suit/'+${st.id}}" th:text="${st.suitClass.suitclass}+ ', '+ ${st.beds.beds}"></a/></p></td>				
+					<td><span th:if="${e.suitTypes} ne null" th:each="st : ${e.suitTypes}"><p><a th:href="@{'/suit/suit/'+${st.id}}" th:text="${st.suitClass.suitclass}+ ', '+ ${st.beds.beds}"></a/></p></td>				
                     <td>
                         <a class="btn btn-primary" th:href="@{'/'+${path}+'/'+${e.id}}" role="button">Edit</a>
                     </td>
@@ -124,17 +124,19 @@
                     </div>
                 </div>
 				<div class="row g-2 align-items-center">
-					<span class="col-auto">Attach as main photo for suit type:</span>
+					<p class="col-auto">Attach as main photo for suit type:</p>
 					<div class="col-auto" th:if="${not #lists.isEmpty(allSuitTypes)}" th:each="st : ${allSuitTypes}">
-						<input class="form-check-input" type="checkbox" th:field="*{suitTypes}"	th:value="${st.id}"/>
-						<label class="form-check-label" th:for="${#ids.prev('suitTypes')}" th:text="${st.suitClass.suitclass}+ ', '+ ${st.beds.beds}"></label>
+						<p>
+							<input class="form-check-input" type="checkbox" th:field="*{suitTypes}"	th:value="${st.id}"/>
+							<label class="form-check-label" th:for="${#ids.prev('suitTypes')}" th:text="${st.suitClass.suitclass}+ ', '+ ${st.beds.beds}"></label>
+						</p>
 					</div>
 					<div class="col-auto" th:if="${#lists.isEmpty(allSuitTypes)}">
 							<p>No suit types found</p>
 					</div>					
 				</div>
 				<div class="row g-2 align-items-center">
-					<span class="col-auto">Attach as main photo for resort:</span>
+					<p class="col-auto">Attach as main photo for resort:</p>
 					<div class="col-auto" th:if="${not #lists.isEmpty(allResorts)}" th:each="resort : ${allResorts}">
 						<p>
 							<input class="form-check-input" type="checkbox" th:field="*{resorts}"	th:value="${resort.id}"/>
