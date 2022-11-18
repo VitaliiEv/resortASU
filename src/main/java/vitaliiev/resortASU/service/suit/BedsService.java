@@ -11,10 +11,15 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import vitaliiev.resortASU.ResortASUGeneralException;
 import vitaliiev.resortASU.model.suit.Beds;
 import vitaliiev.resortASU.repository.suit.BedsRepository;
 
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -63,6 +68,26 @@ public class BedsService {
         return repository.findAll(Sort.by("id"));
     }
 
+    public Set<Beds> findDistinctByBedsQuantity(Collection<Beds> beds) {
+        if (beds.isEmpty()) {
+            throw new ResortASUGeneralException("Got empty list.");
+        }
+        return beds.stream()
+                .map(b -> {
+                    Beds newBed = new Beds();
+                    newBed.setBeds_adult(b.getBeds_adult());
+                    newBed.setBeds_child(b.getBeds_child());
+                    return newBed;
+                })
+                .collect(Collectors.toSet());
+    }
+
+    public List<Beds> getSortedBeds(Collection<Beds> beds, Comparator<Beds> comparator) {
+        if (beds.isEmpty()) {
+            throw new ResortASUGeneralException("Got empty list.");
+        }
+        return beds.stream().sorted(comparator).collect(Collectors.toList());
+    }
 
     @Caching(
             put = {@CachePut(cacheNames = CACHE_NAME, key = "#result?.id")},
@@ -85,7 +110,8 @@ public class BedsService {
         try {
             Beds entity = this.findById(id);
             if (!entity.getSuitTypes().isEmpty()) {
-                String message = "Can't delete row because it used i nsuit types:" + entity.getSuitTypes().toString();
+                String message =
+                        "Can't delete row because it is used in suit types:" + entity.getSuitTypes().toString();
                 log.warn(message);
                 throw new DataIntegrityViolationException(message);
             }
