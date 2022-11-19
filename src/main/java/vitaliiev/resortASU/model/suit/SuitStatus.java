@@ -19,6 +19,6 @@ public class SuitStatus {
     private Integer id;
     @EqualsAndHashCode.Include
     private String status;
-    @OneToMany
+    @OneToMany(mappedBy = "suitstatus")
     private Set<Suit> suits;
 }

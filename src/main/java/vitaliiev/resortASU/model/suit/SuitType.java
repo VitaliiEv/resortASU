@@ -22,13 +22,18 @@ public class SuitType {
     private Integer id;
     @ManyToOne
     @JoinColumn(name="suitclass")
+    @EqualsAndHashCode.Include
     private SuitClass suitClass;
     private Timestamp lastchanged;
     @ManyToOne
     @JoinColumn(name="beds")
+    @EqualsAndHashCode.Include
     private Beds beds;
+    @EqualsAndHashCode.Include
     private Double area;
+    @EqualsAndHashCode.Include
     private BigDecimal currentprice;
+    @EqualsAndHashCode.Include
     private BigDecimal minimumprice;
     @ManyToOne
     @JoinColumn(name = "mainphoto")
@@ -42,4 +47,6 @@ public class SuitType {
             inverseJoinColumns = @JoinColumn(name = "suittype_id"))
     private Set<Services> services;
     private Boolean deleted = false;
+    @OneToMany(mappedBy = "suittype")
+    private Set<Suit> suits;
 }

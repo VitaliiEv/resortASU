@@ -20,6 +20,6 @@ public class PaymentType {
     @EqualsAndHashCode.Include
     private String paymenttype;
     private Boolean enabled = true;
-    @OneToMany
+    @OneToMany(mappedBy = "paymenttype")
     private Set<Reserve> reserves;
 }

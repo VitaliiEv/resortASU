@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+	<title th:text="|#{title.prefix} Search for suits|">Search for suits</title>
+</head>
+<body>
+	<div th:replace="fragments/bootstrap :: bootstrap"></div>
+	<div th:replace="fragments/navigation :: menu"></div>
+	<div class="container">
+
+    <div class="row" th:with="path=@{'/search'}">
+
+        <div class="col-3 col-sm-2">
+
+	            <h3>Search</h3>
+				<form th:method="POST" th:object="${searchRequest}" th:action="@{${path}+'/find'}">
+					<div class="row g-2 align-items-center">
+						<div class="col-auto">
+							<label th:for="*{adultBeds}">Adult beds: </label>
+							<input class="form-control" type="number" placeholder="Adult beds" th:field="*{adultBeds}">
+						</div>
+						<div class="col-auto">
+							<label th:for="*{childBeds}">Child beds: </label>
+							<input class="form-control" type="number" placeholder="Child beds" th:field="*{childBeds}">
+						</div>
+						<div class="col-auto">
+							<label th:for="*{checkIn}">Check in: </label>
+							<input class="form-control" type="date" placeholder="Child beds" th:field="*{checkIn}">
+						</div>
+						<div class="col-auto">
+							<label th:for="*{checkOut}">Check out: </label>
+							<input class="form-control" type="date" placeholder="Child beds" th:field="*{checkOut}">
+						</div>
+						<div class="col-auto">
+							<select class="form-select" aria-label="Suit class" th:field="*{suitClassId}">
+								  <option value="" selected >Suit class</option>
+								  <option th:each="class : ${suitClasses}" th:text="${class.suitclass}" th:value="${class.id}">Class</option>
+							</select>
+						</div>
+						<div>
+							<ul class="text-warning" th:if="${#fields.hasErrors('*')}">
+								<li th:each="err : ${#fields.errors('*')}" th:text="${err}"/>
+								<li th:if="${additionalErrors} neq null" th:text="${additionalErrors}"/>
+							</ul>
+						</div>
+						<div>
+							<button class="btn btn-primary btn-block" type="submit">Find</button>
+						</div>
+					</div>
+
+				</form>
+			</div>
+
+			<div class="col-3 col-sm-8">
+				<h2>Search results</h2>
+				<div th:if="${searchResults eq null}"><p>No search was done</p></div>
+
+				<div th:if="${searchResults ne null}">
+					<h5>Search results for <span th:text="${request.adultBeds}"/> adults, <span th:text="${request.childBeds}"/> childs, from <span th:text="${request.checkIn}"/> to <span th:text="${request.checkOut}"/></h5>
+					<div th:each="searchResult: ${searchResults}">
+						<form th:method="POST" th:action="@{'/reserve/add'}">						
+							<table class="table table-striped">
+								<tr>
+									<th scope="col" class="col-3">Photo</th>
+									<th scope="col">Suit class</th>
+									<th scope="col">Beds</th>
+									<th scope="col">Price</th>
+									<th scope="col">Quantity</th>
+								</tr>
+								<tr th:each="suitType : ${searchResult.suitTypes}">
+									<td>
+										<a th:if="${suitType.photo ne null}" th:href="@{'/' + ${pathToStorage} + '/' + ${suitType.photo.id} + '/' + ${suitType.photo.filename}}">
+											<img th:src="@{'/' + ${pathToStorage} + '/' + ${suitType.photo.id} + '/' + ${suitType.photo.filename}}" class="img-fluid" th:alt="${suitType.photo.filename}">
+										</a>
+										<span th:if="${suitType.photo eq null}" th:text="'No photo'" />
+									</td>
+									<td th:text="${suitType.suitClass}">Suit class</td>
+									<td th:text="${suitType.beds}">Beds</td>
+									<td th:text="${suitType.price}">Price</td>
+									<td th:text="${suitType.quantity}">Quantity</td>
+								</tr>
+								<tr class="table-success">
+									<td colspan="4">Total price: <span th:text="${searchResult.totalPrice}"/>
+									</td>	
+									<td>
+										<button class="btn btn-primary btn-block" type="submit">Reserve</button>
+									</td>									
+								</tr>
+							</table>	
+						</form>						
+					</div>
+
+				</div>
+			</div>
+
+		</div>
+
+	</div>
+
+</div>
+</body>
+</html>

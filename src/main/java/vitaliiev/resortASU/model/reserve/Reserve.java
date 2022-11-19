@@ -21,10 +21,13 @@ public class Reserve {
     private Date checkin;
     private Date checkout;
     @ManyToOne
+    @JoinColumn(name="paymentstatus")
     private PaymentStatus paymentstatus;
     @ManyToOne
+    @JoinColumn(name="paymenttype")
     private PaymentType paymenttype;
     @ManyToOne
+    @JoinColumn(name="status")
     private ReserveStatus reserveStatus;
     private Timestamp created;
     private Timestamp lastchanged;

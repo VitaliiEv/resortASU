@@ -2,51 +2,70 @@ package vitaliiev.resortASU.service.search;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
+import vitaliiev.resortASU.ResortASUGeneralException;
+import vitaliiev.resortASU.dto.SuitSearchRequest;
+import vitaliiev.resortASU.dto.SuitSearchResultSet;
 import vitaliiev.resortASU.model.suit.Beds;
+import vitaliiev.resortASU.model.suit.SuitType;
 import vitaliiev.resortASU.service.suit.BedsService;
+import vitaliiev.resortASU.service.suit.SuitClassService;
 import vitaliiev.resortASU.service.suit.SuitTypeService;
 
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
 @Slf4j
 @Service
+//@Transactional
 public class SearchService {
 
-    private static final ExampleMatcher SEARCH_CONDITIONS_MATCH_ALL = ExampleMatcher
-            .matching()
-            .withIgnoreNullValues()
-            .withMatcher("suitClass", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
-            .withMatcher("beds", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
-            .withMatcher("area", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
-            .withMatcher("currentprice", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
-            .withMatcher("minimumprice", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
-            .withMatcher("mainphoto", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
-            .withMatcher("deleted", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
-            .withIgnorePaths("id", "lastchanged", "features", "services");
-
     private final SuitTypeService suitTypeService;
+    private final SuitClassService suitClassService;
     private final BedsService bedsService;
 
     @Autowired
-    public SearchService(SuitTypeService suitTypeService, BedsService bedsService) {
+     public SearchService(SuitTypeService suitTypeService, SuitClassService suitClassService, BedsService bedsService) {
         this.suitTypeService = suitTypeService;
+        this.suitClassService = suitClassService;
         this.bedsService = bedsService;
     }
-    // search steps
-    // 1. find acceptable beds combinations
-    // 2. for each bed combination
-    //      2a. for each bed check if there are free suits
-    //      2b. if no free suits found - drop combination
+
+    /**
+     * search steps
+    * 1. find acceptable beds combinations
+    * 2. for each bed combination find set of suitType combinations
+     * 3. for each suit combination check if there is enough free suits
+     */
+    public List<SuitSearchResultSet> find(SuitSearchRequest request) throws ResortASUGeneralException {
+        validateRequest(request);
+        BedsCombinationList bedsSearchRequest = formBedsSearchRequest(request.getAdultBeds(), request.getChildBeds());
+        SuitTypeCombinationList suitTypeCombinationList = formSuitTypeSearchRequest(bedsSearchRequest, request);
+        SuitTypeSearch suitTypeSearch = new SuitTypeSearch(request.getCheckIn(), request.getCheckOut(),
+                suitTypeCombinationList);
+        suitTypeSearch.performSearch();
+        return suitTypeSearch.getSearchResults();
+    }
+
+    public void validateRequest(SuitSearchRequest request) throws ResortASUGeneralException {
+        LocalDate today = LocalDate.now();
+        if (request.getCheckIn().toLocalDate().isBefore(today)) {
+            throw new ResortASUGeneralException("Check-in date can't be from past");
+        }
+        if (request.getCheckOut().toLocalDate().isBefore(today)) {
+            throw new ResortASUGeneralException("Check-out date can't be from past");
+        }
+        if (!request.getCheckIn().before(request.getCheckOut())) {
+            throw new ResortASUGeneralException("Check-out date before check-in date.");
+        }
+    }
 
     /**
      * Finds one optimal combination of beds from sorted descending beds list
      * In case if there can be several combinations of suits it will first search
-     * for suits with bigger quantity of adult beds, then with bigger quantity of child beds
-     *
+     * for suits with bigger quantity of adult beds, then with bigger quantity of child beds.
      * For example, we need to search for 3 adult beds and 1 child bed.
      * This algorithm will give you suits: 2a+1c, 1a+0c
      * and it will never give you suits: 1a+1c, 2a+0c;
@@ -92,11 +111,26 @@ public class SearchService {
         return null;
     }
 
-    public BedsSearchRequest formBedsSearchRequest(int bedsAdult, int bedsChild) {
+    public BedsCombinationList formBedsSearchRequest(int bedsAdult, int bedsChild) {
         BedsQuantityCombination bedsQuantityCombination = findPossibleBedsCombinations(bedsAdult, bedsChild);
-        BedsSearchRequest bedsSearchRequest = new BedsSearchRequest(bedsQuantityCombination, this.bedsService.findAll());
+        BedsCombinationList bedsSearchRequest = new BedsCombinationList(bedsQuantityCombination, this.bedsService.findAll());
         bedsSearchRequest.formSearchRequest();
         return bedsSearchRequest;
+    }
+
+    public SuitTypeCombinationList formSuitTypeSearchRequest(BedsCombinationList bedsSearchRequest, SuitSearchRequest suitSearchRequest) {
+        List<SuitType> suitTypes;
+        if (suitSearchRequest.getSuitClassId() != null) {
+            SuitType suitType = new SuitType();
+            suitType.setSuitClass(suitClassService.findById(suitSearchRequest.getSuitClassId()));
+            suitType.setDeleted(false);
+            suitTypes =  this.suitTypeService.find(suitType);
+        } else {
+            suitTypes = this.suitTypeService.findAllPresent();
+        }
+        SuitTypeCombinationList suitTypeCombinationList = new SuitTypeCombinationList(bedsSearchRequest, suitTypes);
+        suitTypeCombinationList.formSearchRequest();
+        return suitTypeCombinationList;
     }
 
 }

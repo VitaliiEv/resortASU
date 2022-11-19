@@ -25,7 +25,11 @@ public class Beds {
     @EqualsAndHashCode.Include
     @Column(name = "beds_child")
     private Integer beds_child;
-    @OneToMany
+    @OneToMany(mappedBy = "beds")
     private Set<SuitType> suitTypes;
+
+    public boolean quantityEquals(Beds bed) {
+        return this.beds_adult.equals(bed.getBeds_adult()) && this.beds_child.equals(bed.getBeds_child());
+    }
 
 }

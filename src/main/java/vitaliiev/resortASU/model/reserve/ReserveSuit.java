@@ -19,8 +19,10 @@ public class ReserveSuit {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name="reserve_id")
     private Reserve reserve;
     @ManyToOne
+    @JoinColumn(name="suit_id")
     private Suit suit;
     private BigDecimal price;
     @OneToMany

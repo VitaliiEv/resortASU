@@ -21,11 +21,13 @@ public class Suit {
     @EqualsAndHashCode.Include
     private String number;
     @ManyToOne
+    @JoinColumn(name="suitstatus")
     private SuitStatus suitstatus;
     @ManyToOne
+    @JoinColumn(name="suittype")
     private SuitType suittype;
     private String comment;
-    @OneToMany
+    @OneToMany(mappedBy = "suit")
     private Set<ReserveSuit> reserveSuit;
     private Boolean deleted = false;
 }
