@@ -9,46 +9,24 @@
     <nav class="navbar navbar-expand-lg bg-light">
         <div class="container-fluid">
             <a class="navbar-brand" href="#" th:text="#{title.prefix}"></a>
-			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-				<span class="navbar-toggler-icon"></span>
-			</button>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
                         <a class="nav-link" href="/search">Search</a>
                     </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                           aria-expanded="false">
-                            Suit
-                        </a>
-                        <ul class="dropdown-menu">
-<!--                            <li><a class="dropdown-item" href="#">Free Suits</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="#">Need Maintenance</a></li>
-                            <li><a class="dropdown-item" href="#">Check-in today</a></li>
-                            <li><a class="dropdown-item" href="#">Check-out today</a></li>
-							<li>
-                                <hr class="dropdown-divider">
-                            </li>-->
-<!--                            <li><a class="dropdown-item" href="/suit/suits">Suits</a></li>	-->						
-                            <li><a class="dropdown-item" href="/suit/suittypes">Suit Types</a></li>
-<!--                            <li><a class="dropdown-item" href="/suit/suitclasses">Classes</a></li>
-                            <li><a class="dropdown-item" href="/suit/beds">Beds</a></li>
-                            <li><a class="dropdown-item" href="/suit/features">Features</a></li>
-                            <li><a class="dropdown-item" href="/suit/services">Services</a></li>-->								
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown">
+
+                    <li sec:authorize="hasRole('ROLE_PROPERTY_MANAGER')" class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                            aria-expanded="false">
                             Reservation
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Search</a></li>
                             <li><a class="dropdown-item" href="#">New (unaccepted)</a></li>
                             <li>
                                 <hr class="dropdown-divider">
@@ -57,17 +35,41 @@
                             <li><a class="dropdown-item" href="#">Check-in today</a></li>
                             <li><a class="dropdown-item" href="#">Check-out today</a></li>
                         </ul>
-
                     </li>
-                   <li class="nav-item dropdown">
+
+                    <li sec:authorize="hasRole('ROLE_CONTENT_MANAGER')" class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            Suit
+                        </a>
+                        <ul class="dropdown-menu">
+                            <!--                            <li><a class="dropdown-item" href="#">Free Suits</a></li>
+                                                        <li>
+                                                            <hr class="dropdown-divider">
+                                                        </li>
+                                                        <li><a class="dropdown-item" href="#">Need Maintenance</a></li>
+                                                        <li><a class="dropdown-item" href="#">Check-in today</a></li>
+                                                        <li><a class="dropdown-item" href="#">Check-out today</a></li>
+                                                        <li>
+                                                            <hr class="dropdown-divider">
+                                                        </li>-->
+                            <!--                            <li><a class="dropdown-item" href="/suit/suits">Suits</a></li>	-->
+                            <li><a class="dropdown-item" href="/suit/suittypes">Suit Types</a></li>
+                            <!--                            <li><a class="dropdown-item" href="/suit/suitclasses">Classes</a></li>
+                                                        <li><a class="dropdown-item" href="/suit/beds">Beds</a></li>
+                                                        <li><a class="dropdown-item" href="/suit/features">Features</a></li>
+                                                        <li><a class="dropdown-item" href="/suit/services">Services</a></li>-->
+                        </ul>
+                    </li>
+                    <li sec:authorize="hasRole('ROLE_CONTENT_MANAGER')" class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                            aria-expanded="false">
                             Resort
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="/resort/resort">Resort</a></li>						
+                            <li><a class="dropdown-item" href="/resort/resort">Resort</a></li>
                             <li><a class="dropdown-item" href="/resort/buildings">Buildings</a></li>
-                            <li><a class="dropdown-item" href="/resort/floors">Floors</a></li>							
+                            <li><a class="dropdown-item" href="/resort/floors">Floors</a></li>
                             <li><a class="dropdown-item" href="/resort/classes">Classes</a></li>
                             <li><a class="dropdown-item" href="/resort/types">Types</a></li>
                             <li>
@@ -78,40 +80,41 @@
                             <li><a class="dropdown-item" href="#">Check-out today</a></li>
                         </ul>
                     </li>
-                    <li class="nav-item">
+                    <li sec:authorize="hasRole('ROLE_CONTENT_MANAGER')" class="nav-item">
                         <a class="nav-link" href="/photos">Photos</a>
-                    </li>										
+                    </li>
+
                     <div sec:authorize="hasRole('ROLE_ADMIN')">
-					    <li class="nav-item dropdown">
-							 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-							   aria-expanded="false">
-								Admin
-							</a>
-							<ul class="dropdown-menu">
-								<li><a class="dropdown-item" href="/admin/users">Users</a></li>
-								<li><a class="dropdown-item" href="/admin/roles">Roles</a></li>
-							</ul>
-						</li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                               aria-expanded="false">
+                                Admin
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/admin/users">Users</a></li>
+                                <li><a class="dropdown-item" href="/admin/roles">Roles</a></li>
+                            </ul>
+                        </li>
                     </div>
                 </ul>
 
 
                 <div sec:authorize="isAuthenticated()">
                     <div class="row g-3 align-items-center">
-										
+
                         <div class="col-auto">
-							<ul class="navbar-nav me-auto mb-2 mb-lg-0">
-								<li class="nav-item">
-									<a class="nav-link" href="/user" sec:authentication="principal.username">Profile</a>
-								</li>
-							</ul>
+                            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/user" sec:authentication="principal.username">Profile</a>
+                                </li>
+                            </ul>
                         </div>
                         <div class="col-auto">
                             <a href="/logout" class="btn btn-primary" role="button">Logout</a>
                         </div>
                     </div>
                 </div>
-				 <div sec:authorize="!isAuthenticated()">
+                <div sec:authorize="!isAuthenticated()">
                     <div class="row g-3 align-items-center">
                         <div class="col-auto">
                             <a href="/login" class="btn btn-primary" role="button">Login</a>
