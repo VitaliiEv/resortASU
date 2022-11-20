@@ -20,6 +20,7 @@ import vitaliiev.resortASU.model.auth.User;
 import vitaliiev.resortASU.repository.auth.UserRepository;
 import vitaliiev.resortASU.utils.CollectionElementFieldMatcher;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,6 +57,7 @@ public class UserService implements UserDetailsService {
             evict = {@CacheEvict(cacheNames = "usersList", allEntries = true)}
     )
     public User create(User user) throws DataIntegrityViolationException {
+        user.setRoles(new HashSet<>());
         user.addRole(roleService.getUser());
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
