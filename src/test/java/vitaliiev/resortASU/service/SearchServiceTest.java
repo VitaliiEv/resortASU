@@ -30,9 +30,9 @@ class SearchServiceTest extends ResortApplicationTests {
     @Test
     void find() {
         List<SuitSearchResultSet> result1 = searchService.find(new SuitSearchRequest(1, 0,
-                Date.valueOf("2022-11-19"), Date.valueOf("2022-11-20"), null));
+                Date.valueOf("2023-11-19"), Date.valueOf("2023-11-20"), null));
         List<SuitSearchResultSet> result2 = searchService.find(new SuitSearchRequest(2, 0,
-                Date.valueOf("2022-11-19"), Date.valueOf("2022-11-20"), null));
+                Date.valueOf("2023-11-19"), Date.valueOf("2023-11-20"), null));
         System.out.println("finished");
     }
 

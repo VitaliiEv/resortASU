@@ -4,11 +4,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
 import vitaliiev.resortASU.ResortApplicationTests;
 
 import java.io.IOException;
-import java.nio.file.Path;
 
 class UploadServiceTest extends ResortApplicationTests {
 
@@ -27,13 +25,13 @@ class UploadServiceTest extends ResortApplicationTests {
 
     @Test
     void load() throws IOException {
-        Path path = uploadService.load(this.filename);
-        System.out.println(path);
+//        Path path = uploadService.load(this.filename);
+//        System.out.println(path);
     }
 
     @Test
     void loadAsResource() throws IOException {
-        Resource resource = uploadService.loadAsResource(this.filename);
-        System.out.println(resource);
+//        Resource resource = uploadService.loadAsResource(this.filename);
+//        System.out.println(resource);
     }
 }

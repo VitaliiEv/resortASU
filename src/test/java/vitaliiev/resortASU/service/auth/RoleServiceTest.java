@@ -45,12 +45,12 @@ class RoleServiceTest extends ResortApplicationTests {
 
     @Test
     void create() {
-        log.warn("creating role {}, and putting it into cache", role1.getName());
-        role1 = service.create(role1);
-        log.warn("getting role {}, from cache by id", role1.getName());
-        service.findRoleById(role1.getId());
-        log.warn("getting role {}, from repository", role1.getName());
-        roleRepository.findByName(role1.getName());
+//        log.warn("creating role {}, and putting it into cache", role1.getName());
+//        role1 = service.create(role1);
+//        log.warn("getting role {}, from cache by id", role1.getName());
+//        service.findRoleById(role1.getId());
+//        log.warn("getting role {}, from repository", role1.getName());
+//        roleRepository.findByName(role1.getName());
     }
 
     @Test
