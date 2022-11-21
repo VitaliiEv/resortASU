@@ -30,14 +30,9 @@ public class Customer {
     @ManyToOne
     @JoinColumn(name = "gender_id")
     private Gender gender;
-//    @ManyToOne
-//    @EqualsAndHashCode.Exclude
-//    private Appeal appeal_id;
     @EqualsAndHashCode.Exclude
     private String address;
     private Timestamp lastchanged;
-//    @OneToMany
-//    private Set<Document> documents;
     @ManyToMany(mappedBy = "customers")
     private Set<Reserve> reserves;
 }

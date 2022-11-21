@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Suit Types</title>
+</head>
+<body>
+<div th:fragment="entities (path, entities, newEntity, genders)">
+    <div class="row">
+
+        <div class="col-3 col-sm-2">
+            <h3>Search</h3>
+            <form th:method="POST" th:object="${newEntity}" th:action="@{${path}+'/find'}">
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+                        <label th:for="*{firstname}" class="visually-hidden">Firstname: </label>
+                        <input class="form-control" type="text" placeholder="Firstname" th:field="*{firstname}">
+                    </div>
+			
+					<div class="col-auto">
+							<label th:for="*{surname}" class="visually-hidden">Surname: </label>
+							<input class="form-control" type="text" placeholder="Surname" th:field="*{surname}">
+					</div>	
+					<div class="col-auto">
+							<label th:for="*{middlename}" class="visually-hidden">Middlename: </label>
+							<input class="form-control" type="text" placeholder="Middlename" th:field="*{middlename}">
+					</div>	
+					<div class="col-auto">
+							<label th:for="*{phone}" class="visually-hidden">Phone: </label>
+							<input class="form-control" type="tel" placeholder="Phone" th:field="*{phone}">
+					</div>	
+					<div class="col-auto">
+							<label th:for="*{email}" class="visually-hidden">Email: </label>
+							<input class="form-control" type="email" placeholder="Email" th:field="*{email}">
+					</div>						
+					<div class="col-auto">
+							<label th:for="*{birthdate}" class="visually-hidden">Birthdate: </label>
+							<input class="form-control" type="date" placeholder="Email" th:field="*{birthdate}">
+					</div>										
+					<div class="col-auto">
+							<select class="form-select" aria-label="Gender" th:field="*{gender}">
+								  <option value="" selected >Genders</option>
+								  <option th:each="g : ${genders}" th:text="${g.gender}" th:value="${g.id}">Gender</option>
+							</select>
+					</div>				
+                    <div>
+                        <button class="btn btn-primary btn-block" type="submit">Find</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-3 col-sm-8">
+            <h2>Customers</h2>
+            <table class="table table-striped">
+                <tr>
+					<th scope="col">Firstname</th>
+                    <th scope="col">Surname</th>
+                    <th scope="col">Middlename</th>		
+					<th scope="col">Birthdate</th>					
+                    <th scope="col">Phone</th>
+                    <th scope="col">Email</th>
+                    <th scope="col"></th>
+                </tr>
+                <tr th:each="e : ${entities}">			
+                    <td scope="row" th:text="${e.firstname}"></td>
+                    <td th:text="${e.surname}"></td>							
+                    <td th:text="${e.middlename}"></td>	
+                    <td th:text="${e.birthdate}"></td>					
+                    <td th:text="${e.phone}"></td>					
+                    <td th:text="${e.email}"></td>
+                    <td>
+                        <a class="btn btn-primary" th:href="@{'/customer/' + ${path}+'/'+${e.id}}" role="button">Edit</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+<div th:fragment="entity (path, entity, genders)">
+    <div class="row">
+
+
+
+        <div class="col-6 col-sm-3">
+            <h2>Reserve</h2>
+            <form th:method="POST" th:object="${entity}" th:action="@{'/reserve/'+${path}+'/update'}">
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+                        <label th:for="*{id}">Id: <span th:text="*{id}"></span></label>
+                        <input class="form-check-input" type="hidden" th:field="*{id}"/>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center">
+<!--					<div class="col-auto">
+							<select class="form-select" aria-label="Reserve status" th:field="*{reserveStatus}">
+								  <option value="" selected >Reserve status</option>
+								  <option th:each="status : ${reserveStatuses}" th:text="${status.status}" th:value="${status.id}">Reserve status</option>
+							</select>
+					</div>	-->			
+					<div class="col-auto">
+							<select class="form-select" aria-label="Payment status" th:field="*{paymentstatus}">
+								  <option value="" selected >Payment status</option>
+								  <option th:each="status : ${paymentStatuses}" th:text="${status.paymentstatus}" th:value="${status.id}">Payment status</option>
+							</select>
+					</div>
+					<div class="col-auto">
+							<select class="form-select" aria-label="Payment type" th:field="*{paymenttype}">
+								  <option value="" selected >Payment type</option>
+								  <option th:each="type : ${paymentTypes}" th:text="${type.paymenttype}" th:value="${type.id}">Payment type</option>
+							</select>
+					</div>
+                </div>
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+						<label th:for="*{checkin}" >Check-in: <span th:text="*{checkin}"/></label>
+                        <input class="form-check-input" type="hidden" th:field="*{checkin}"/>					
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+						<label th:for="*{checkout}" >Check-out: <span th:text="*{checkout}"/></label>
+                        <input class="form-check-input" type="hidden" th:field="*{checkout}"/>					
+                    </div>
+                </div>					
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+						<p>Custumers:</p>
+						<p th:each="customer : ${entity.customers}" th:text="${customer.firstname + ' ' + customer.surname + ' ' + customer.birthdate}" ></p>
+                    </div>
+                </div>	
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+						<p>Suits:</p>
+						<p th:each="rs : ${entity.reserveSuit}" th:text="${rs.suit.number + ' ' + rs.suit.suitType.beds.beds}" ></p>
+                    </div>
+                </div>				
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+                        <button class="btn btn-primary btn-block" type="submit">Save</button>
+                    </div>
+                </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
