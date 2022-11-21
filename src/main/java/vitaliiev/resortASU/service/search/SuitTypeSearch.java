@@ -46,7 +46,7 @@ public class SuitTypeSearch {
                 if (this.cache.containsKey(entry.getKey())) {
                     freeSuits = this.cache.get(entry.getKey());
                 } else {
-                    freeSuits = countMatchingSuits(entry.getKey(), isAvailable(checkIn, checkOut));
+                    freeSuits = countMatchingSuits(entry.getKey(), s -> isAvailable(this.checkIn, this.checkOut, s));
                     this.cache.put(entry.getKey(), freeSuits);
                 }
                 if (freeSuits >= requestedSuits) {
@@ -70,22 +70,28 @@ public class SuitTypeSearch {
                 .count();
     }
 
-    public Predicate<Suit> isAvailable(Date checkIn, Date checkOut) {
-        return suit -> suit.getReserveSuit().stream()
-                .map(ReserveSuit::getReserve)
-                .filter(reserveStatusCheck())
-                .allMatch(periodsDontOverlap(checkIn, checkOut));
+    public boolean isAvailable(Date checkIn, Date checkOut, Suit suit) {
+        if (suit.getDeleted()) {
+            return false;
+        }
+        Set<ReserveSuit> reserveSuits = suit.getReserveSuit();
+        for (ReserveSuit reserveSuit : reserveSuits) {
+            Reserve reserve = reserveSuit.getReserve();
+            if (reserveStatusCheck(reserve) || !periodsDontOverlap(checkIn, checkOut, reserve)) {
+                return false;
+            }
+        }
+        return true;
     }
 
-
-    public Predicate<Reserve> periodsDontOverlap(Date checkIn, Date checkOut) {
-        return reserve -> checkIn.after(reserve.getCheckout()) || checkIn.equals(reserve.getCheckout()) ||
-                checkOut.before(reserve.getCheckin()) || checkOut.equals(reserve.getCheckin());
+    public boolean periodsDontOverlap(Date checkIn, Date checkOut, Reserve existingReserve) {
+        return checkIn.after(existingReserve.getCheckout()) || checkIn.equals(existingReserve.getCheckout()) ||
+                checkOut.before(existingReserve.getCheckin()) || checkOut.equals(existingReserve.getCheckin());
     }
 
-    public Predicate<Reserve> reserveStatusCheck() {
+    public boolean reserveStatusCheck(Reserve reserve) {
         List<String> allowedStatuses = List.of("Accepted", "Finished");
-        return reserve -> allowedStatuses.stream()
+        return allowedStatuses.stream()
                 .anyMatch(status -> status.equalsIgnoreCase(reserve.getReserveStatus().getStatus()));
     }
 }
