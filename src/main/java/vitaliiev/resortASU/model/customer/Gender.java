@@ -18,7 +18,7 @@ public class Gender {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @EqualsAndHashCode.Include
-    private String appeal;
+    private String gender;
     @OneToMany
     private Set<Customer> customers;
 }
