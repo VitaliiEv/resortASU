@@ -30,7 +30,6 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -44,8 +43,7 @@ public class ReserveService {
 
     private static final ExampleMatcher SEARCH_CONDITIONS_MATCH_ALL = ExampleMatcher
             .matching()
-            .withIncludeNullValues()
-            .withMatcher("number", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
+            .withIgnoreNullValues()
             .withMatcher("checkin", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
             .withMatcher("checkout", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
             .withMatcher("paymentstatus", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
@@ -84,6 +82,10 @@ public class ReserveService {
         return repository.save(entity);
     }
 
+    @Caching(
+            put = {@CachePut(cacheNames = CACHE_NAME, key = "#result?.id")},
+            evict = {@CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
+    )
     public Reserve create(ReserveRequest request) throws DataIntegrityViolationException {
         Reserve reserve = new Reserve();
         ReserveStatus reserveStatus = this.reserveStatusService.findAll().stream()
@@ -120,6 +122,56 @@ public class ReserveService {
         return reserve;
     }
 
+    @Caching(
+            put = {@CachePut(cacheNames = CACHE_NAME, key = "#result?.id")},
+            evict = {@CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
+    )
+    public Reserve accept(Long id) {
+        Reserve reserve = repository.findById(id).orElseThrow();
+        List<ReserveStatus> reserveStatuses = this.reserveStatusService.findAll();
+        ReserveStatus created = reserveStatuses.stream()
+                .filter(status -> status.getStatus().equalsIgnoreCase("Created"))
+                .findAny()
+                .orElseThrow();
+        if (reserve.getReserveStatus().equals(created)) {
+            ReserveStatus newStatus = reserveStatuses.stream()
+                    .filter(status -> status.getStatus().equalsIgnoreCase("Accepted"))
+                    .findAny()
+                    .orElseThrow();
+            for (ReserveSuit reserveSuit : reserve.getReserveSuit()) {
+                if (!isAvailable(reserve.getCheckin(), reserve.getCheckout(), reserveSuit.getSuit())) {
+                    return reserve;
+
+                }
+            }
+            reserve.setReserveStatus(newStatus);
+            this.update(reserve);
+        }
+        return reserve;
+    }
+
+    @Caching(
+            put = {@CachePut(cacheNames = CACHE_NAME, key = "#result?.id")},
+            evict = {@CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
+    )
+    public Reserve decline(Long id) {
+        Reserve reserve = repository.findById(id).orElseThrow();
+        List<ReserveStatus> reserveStatuses = this.reserveStatusService.findAll();
+        ReserveStatus created = reserveStatuses.stream()
+                .filter(status -> status.getStatus().equals("Created"))
+                .findAny()
+                .orElseThrow();
+        if (reserve.getReserveStatus().equals(created)) {
+            ReserveStatus newStatus = reserveStatuses.stream()
+                    .filter(status -> status.getStatus().equals("Declined"))
+                    .findAny()
+                    .orElseThrow();
+            reserve.setReserveStatus(newStatus);
+            this.update(reserve);
+        }
+        return reserve;
+    }
+
     @Cacheable(cacheNames = CACHE_NAME, key = "#id")
     public Reserve findById(Long id) {
         return repository.findById(id).orElse(null);
@@ -149,7 +201,6 @@ public class ReserveService {
             return entity;
         }
     }
-
 
     public ReserveRequest updateReserveRequest(ReserveRequest reserveRequest) {
         reserveRequest.getSuitTypes().forEach(st -> {
@@ -182,7 +233,7 @@ public class ReserveService {
         Set<Suit> suits = new HashSet<>(this.suitService.findAllPresent());
         suits = suits.stream()
                 .filter(s -> s.getSuittype().equals(this.suitTypeService.findById(suitSearchResult.getSuitTypeId())))
-                .filter(isAvailable(reserve.getCheckin(), reserve.getCheckout()))
+                .filter(s -> isAvailable(reserve.getCheckin(), reserve.getCheckout(), s))
                 .limit(exactSuits)
                 .collect(Collectors.toSet());
         if (suits.size() < exactSuits) {
@@ -192,21 +243,29 @@ public class ReserveService {
         return suits;
     }
 
-    public Predicate<Suit> isAvailable(Date checkIn, Date checkOut) { // fixme duplicate suit type search
-        return suit -> suit.getReserveSuit().stream()
-                .map(ReserveSuit::getReserve)
-                .filter(reserveStatusCheck())
-                .allMatch(periodsDontOverlap(checkIn, checkOut));
+
+    public boolean isAvailable(Date checkIn, Date checkOut, Suit suit) {
+        if (suit.getDeleted()) {
+            return false;
+        }
+        Set<ReserveSuit> reserveSuits = suit.getReserveSuit();
+        for (ReserveSuit reserveSuit : reserveSuits) {
+            Reserve reserve = reserveSuit.getReserve();
+            if (reserveAccepted(reserve) && !periodsDontOverlap(checkIn, checkOut, reserve)) {
+                return false;
+            }
+        }
+        return true;
     }
 
-    public Predicate<Reserve> periodsDontOverlap(Date checkIn, Date checkOut) {
-        return reserve -> checkIn.after(reserve.getCheckout()) || checkIn.equals(reserve.getCheckout()) ||
-                checkOut.before(reserve.getCheckin()) || checkOut.equals(reserve.getCheckin());
+    public boolean periodsDontOverlap(Date checkIn, Date checkOut, Reserve existingReserve) {
+        return checkIn.after(existingReserve.getCheckout()) || checkIn.equals(existingReserve.getCheckout()) ||
+                checkOut.before(existingReserve.getCheckin()) || checkOut.equals(existingReserve.getCheckin());
     }
 
-    public Predicate<Reserve> reserveStatusCheck() {
+    public boolean reserveAccepted(Reserve reserve) {
         List<String> allowedStatuses = List.of("Accepted", "Finished");
-        return reserve -> allowedStatuses.stream()
+        return allowedStatuses.stream()
                 .anyMatch(status -> status.equalsIgnoreCase(reserve.getReserveStatus().getStatus()));
     }
 

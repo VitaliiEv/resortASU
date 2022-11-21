@@ -28,7 +28,8 @@ public class Customer {
     private String email;
     private Date birthdate;
     @ManyToOne
-    private Gender gender_id;
+    @JoinColumn(name = "gender_id")
+    private Gender gender;
 //    @ManyToOne
 //    @EqualsAndHashCode.Exclude
 //    private Appeal appeal_id;

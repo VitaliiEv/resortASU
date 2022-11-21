@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vitaliiev.resortASU.dto.ReserveRequest;
@@ -32,7 +33,6 @@ public class ReserveController {
     private final PaymentTypeService paymentTypeService;
 
     private final UploadService uploadService;
-
     @Autowired
     public ReserveController(ReserveService service, ReserveStatusService reserveStatusService,
                              PaymentStatusService paymentStatusService, PaymentTypeService paymentTypeService,
@@ -75,11 +75,11 @@ public class ReserveController {
         return REQUEST_MAPPING + "/confirm";
     }
 
-    @GetMapping(REQUEST_MAPPING + "/confirm")
-    public String addCustomers(Model model) {
-
-        return "redirect:" + REQUEST_MAPPING;
-    }
+//    @GetMapping(REQUEST_MAPPING + "/confirm")
+//    public String addCustomers(Model model) {
+//
+//        return "redirect:" + REQUEST_MAPPING;
+//    }
 
     @PostMapping(REQUEST_MAPPING + "/confirm")
     public String confirm(@ModelAttribute(name = "reserve") ReserveRequest request, Model model) {
@@ -88,20 +88,32 @@ public class ReserveController {
     }
 
 
-//    @GetMapping(REQUEST_MAPPING + "/{id}")
-//    public String read(@PathVariable Long id, Model model) {
-//        Reserve entity = service.findById(id);
-//        if (entity != null) {
-//            model.addAttribute("fragment", FRAGMENT_NAME);
-//            model.addAttribute("entity", entity);
-//        }
-//        return SECTION_NAME + "/" + FRAGMENT_NAME;
-//    }
+    @GetMapping(REQUEST_MAPPING + "/{id}")
+    public String read(@PathVariable Long id, Model model) {
+        Reserve entity = service.findById(id);
+        if (entity != null) {
+            model.addAttribute("fragment", FRAGMENT_NAME);
+            model.addAttribute("entity", entity);
+        }
+        return SECTION_NAME + "/" + FRAGMENT_NAME;
+    }
+
+    @PostMapping(REQUEST_MAPPING + "/accept")
+    public String accept(@ModelAttribute(name = "id") Long id) {
+        service.accept(id);
+        return "redirect:" + REQUEST_MAPPING;
+    }
+
+    @PostMapping(REQUEST_MAPPING + "/decline")
+    public String decline(@ModelAttribute(name = "id") Long id) {
+        service.decline(id);
+        return "redirect:" + REQUEST_MAPPING;
+    }
 
     //    @PostMapping(REQUEST_MAPPING + "/update")
 //    public String update(@ModelAttribute(name = "entity") Reserve entity) {
 //        service.update(entity);
-//        return "redirect:/Reserve/" + FRAGMENT_NAME + "/" + entity.getId();
+//        return "redirect:/reserve/" + FRAGMENT_NAME + "/" + entity.getId();
 //    }
 
     @ModelAttribute

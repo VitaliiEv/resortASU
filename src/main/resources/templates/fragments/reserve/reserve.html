@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Suit Types</title>
+</head>
+<body>
+<div th:fragment="entities (path, entities, newEntity, reserveStatuses, paymentTypes, paymentStatuses)">
+    <div class="row">
+
+        <div class="col-3 col-sm-2">
+            <h3>Search</h3>
+            <form th:method="POST" th:object="${newEntity}" th:action="@{${path}+'/find'}">
+                <div class="row g-2 align-items-center">
+					<div class="col-auto">
+							<select class="form-select" aria-label="Reserve status" th:field="*{reserveStatus}">
+								  <option value="" selected >Reserve status</option>
+								  <option th:each="status : ${reserveStatuses}" th:text="${status.status}" th:value="${status.id}">Reserve status</option>
+							</select>
+					</div>				
+					<div class="col-auto">
+							<select class="form-select" aria-label="Payment status" th:field="*{paymentstatus}">
+								  <option value="" selected >Payment status</option>
+								  <option th:each="status : ${paymentStatuses}" th:text="${status.paymentstatus}" th:value="${status.id}">Payment status</option>
+							</select>
+					</div>
+					<div class="col-auto">
+							<select class="form-select" aria-label="Payment type" th:field="*{paymenttype}">
+								  <option value="" selected >Payment type</option>
+								  <option th:each="type : ${paymentTypes}" th:text="${type.paymenttype}" th:value="${type.id}">Payment type</option>
+							</select>
+					</div>
+                    <div>
+                        <button class="btn btn-primary btn-block" type="submit">Find</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-3 col-sm-8">
+            <h2>Reserves</h2>
+            <table class="table table-striped">
+                <tr>
+                    <th scope="col">Id</th>
+					<th scope="col">CheckIn</th>
+                    <th scope="col">ChekOut</th>
+                    <th scope="col">Suits</th>				
+                    <th scope="col">Status</th>
+                    <th scope="col">Payment type</th>
+					<th scope="col">Payment status</th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+					<th scope="col"></th>
+                </tr>
+                <tr th:each="e : ${entities}">
+                    <th scope="row" th:text="${e.id}"></th>
+                    <td th:text="${e.checkin}"></td>
+                    <td th:text="${e.checkout}"></td>
+					<td >
+						<p th:each="rs: ${e.reserveSuit}" th:text="${rs.suit.number + ' ' + rs.suit.suittype.beds.beds}"></p>
+					</td>									
+                    <td th:text="${e.reserveStatus.status}"></td>	
+                    <td th:text="${e.paymenttype.paymenttype}"></td>					
+                    <td th:text="${e.paymentstatus.paymentstatus}"></td>
+                    <td>
+                        <a class="btn btn-primary" th:href="@{'/reserve/' + ${path}+'/'+${e.id}}" role="button">Edit</a>
+                    </td>
+                    <td>
+                        <div th:if="${e.reserveStatus.status} eq 'Created'">
+								<form sec:authorize="hasRole('ROLE_PROPERTY_MANAGER')" th:method="POST" th:action="@{'/reserve/'+${path}+'/accept'}">
+									<label class="visually-hidden" for="id"></label>
+									<input class="form-check-input" type="hidden" name="id" th:value="${e.id}">
+									<button class="btn btn-primary btn-block" type="submit">Accept</button>
+								</form>
+
+						</div>
+                    </td>
+					<td>
+                        <div th:if="${e.reserveStatus.status} eq 'Created'">
+						
+								<form sec:authorize="hasRole('ROLE_PROPERTY_MANAGER')" th:method="POST" th:action="@{'/reserve/'+${path}+'/decline'}">
+									<label class="visually-hidden" for="id"></label>
+									<input class="form-check-input" type="hidden" name="id" th:value="${e.id}">
+									<button class="btn btn-primary btn-block" type="submit">Decline</button>
+								</form>
+						</div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+<div th:fragment="entity (path, entity, reserveStatuses, paymentTypes, paymentStatuses)">
+    <div class="row">
+
+
+
+        <div class="col-6 col-sm-3">
+            <h2>Reserve</h2>
+            <form th:method="POST" th:object="${entity}" th:action="@{'/reserve/'+${path}+'/update'}">
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+                        <label th:for="*{id}">Id: <span th:text="*{id}"></span></label>
+                        <input class="form-check-input" type="hidden" th:field="*{id}"/>
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center">
+<!--					<div class="col-auto">
+							<select class="form-select" aria-label="Reserve status" th:field="*{reserveStatus}">
+								  <option value="" selected >Reserve status</option>
+								  <option th:each="status : ${reserveStatuses}" th:text="${status.status}" th:value="${status.id}">Reserve status</option>
+							</select>
+					</div>	-->			
+					<div class="col-auto">
+							<select class="form-select" aria-label="Payment status" th:field="*{paymentstatus}">
+								  <option value="" selected >Payment status</option>
+								  <option th:each="status : ${paymentStatuses}" th:text="${status.paymentstatus}" th:value="${status.id}">Payment status</option>
+							</select>
+					</div>
+					<div class="col-auto">
+							<select class="form-select" aria-label="Payment type" th:field="*{paymenttype}">
+								  <option value="" selected >Payment type</option>
+								  <option th:each="type : ${paymentTypes}" th:text="${type.paymenttype}" th:value="${type.id}">Payment type</option>
+							</select>
+					</div>
+                </div>
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+						<label th:for="*{checkin}" >Check-in: <span th:text="*{checkin}"/></label>
+                        <input class="form-check-input" type="hidden" th:field="*{checkin}"/>					
+                    </div>
+                </div>
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+						<label th:for="*{checkout}" >Check-out: <span th:text="*{checkout}"/></label>
+                        <input class="form-check-input" type="hidden" th:field="*{checkout}"/>					
+                    </div>
+                </div>					
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+						<p>Custumers:</p>
+						<p th:each="customer : ${entity.customers}" th:text="${customer.firstname + ' ' + customer.surname + ' ' + customer.birthdate}" ></p>
+                    </div>
+                </div>	
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+						<p>Suits:</p>
+						<p th:each="rs : ${entity.reserveSuit}" th:text="${rs.suit.number + ' ' + rs.suit.suittype.beds.beds}" ></p>
+                    </div>
+                </div>				
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+                        <button class="btn btn-primary btn-block" type="submit">Save</button>
+                    </div>
+                </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

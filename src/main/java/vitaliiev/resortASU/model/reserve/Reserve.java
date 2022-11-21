@@ -21,19 +21,20 @@ public class Reserve {
     private Date checkin;
     private Date checkout;
     @ManyToOne
-    @JoinColumn(name="paymentstatus")
+    @JoinColumn(name = "paymentstatus")
     private PaymentStatus paymentstatus;
     @ManyToOne
-    @JoinColumn(name="paymenttype")
+    @JoinColumn(name = "paymenttype")
     private PaymentType paymenttype;
     @ManyToOne
-    @JoinColumn(name="status")
+    @JoinColumn(name = "status")
     private ReserveStatus reserveStatus;
     private Timestamp created;
     private Timestamp lastchanged;
     @ManyToMany
     @JoinTable(name = "customerreserve",
-            joinColumns = @JoinColumn(name = "customer_id"))
+            joinColumns = @JoinColumn(name = "\"reserve_id\"", referencedColumnName = "\"id\""),
+            inverseJoinColumns = @JoinColumn(name = "\"customer_id\"", referencedColumnName = "\"id\""))
     private Set<Customer> customers;
     @OneToMany(mappedBy = "reserve")
     private Set<ReserveSuit> reserveSuit;
