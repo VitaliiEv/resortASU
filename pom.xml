@@ -10,13 +10,12 @@
     </parent>
     <groupId>vitaliiev</groupId>
     <artifactId>resort</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.9</version>
     <packaging>war</packaging>
     <name>resort</name>
     <description>resort</description>
     <properties>
         <java.version>17</java.version>
-        <spring.boot.version>2.7.4</spring.boot.version>
     </properties>
     <dependencies>
         <dependency>
