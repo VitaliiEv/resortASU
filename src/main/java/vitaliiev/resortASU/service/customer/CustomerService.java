@@ -33,7 +33,7 @@ public class CustomerService {
             .withMatcher("middlename", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
             .withMatcher("phone", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
             .withMatcher("email", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
-            .withMatcher("gender_id", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
+            .withMatcher("gender", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
             .withMatcher("phone", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
             .withIgnorePaths("id", "documents", "reserves");
 
