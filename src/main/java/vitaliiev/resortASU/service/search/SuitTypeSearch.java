@@ -77,7 +77,7 @@ public class SuitTypeSearch {
         Set<ReserveSuit> reserveSuits = suit.getReserveSuit();
         for (ReserveSuit reserveSuit : reserveSuits) {
             Reserve reserve = reserveSuit.getReserve();
-            if (reserveStatusCheck(reserve) || !periodsDontOverlap(checkIn, checkOut, reserve)) {
+            if (reserveAccepted(reserve) && !periodsDontOverlap(checkIn, checkOut, reserve)) {
                 return false;
             }
         }
@@ -89,7 +89,7 @@ public class SuitTypeSearch {
                 checkOut.before(existingReserve.getCheckin()) || checkOut.equals(existingReserve.getCheckin());
     }
 
-    public boolean reserveStatusCheck(Reserve reserve) {
+    public boolean reserveAccepted(Reserve reserve) {
         List<String> allowedStatuses = List.of("Accepted", "Finished");
         return allowedStatuses.stream()
                 .anyMatch(status -> status.equalsIgnoreCase(reserve.getReserveStatus().getStatus()));
