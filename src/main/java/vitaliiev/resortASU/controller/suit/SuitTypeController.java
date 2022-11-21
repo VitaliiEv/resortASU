@@ -55,9 +55,6 @@ public class SuitTypeController {
         SuitType newEntity = new SuitType();
         model.addAttribute("fragment", FRAGMENT_NAME);
         model.addAttribute("newEntity", newEntity);
-        model.addAttribute("beds", this.bedsService.findAll());
-        model.addAttribute("suitClasses", this.suitClassService.findAll());
-        model.addAttribute("pathToStorage", this.uploadService.getStorage().toString());
         return SECTION_NAME + "/" + FRAGMENT_NAME;
     }
 
@@ -86,9 +83,6 @@ public class SuitTypeController {
         if (entity != null) {
             model.addAttribute("fragment", FRAGMENT_NAME);
             model.addAttribute("entity", entity);
-            model.addAttribute("beds", this.bedsService.findAll());
-            model.addAttribute("suitClasses", this.suitClassService.findAll());
-            model.addAttribute("pathToStorage", this.uploadService.getStorage().toString());
         }
         return SECTION_NAME + "/" + FRAGMENT_NAME;
     }
@@ -103,5 +97,12 @@ public class SuitTypeController {
     public String delete(@RequestParam(name = "id") Integer id) {
         service.delete(id);
         return "redirect:" + REQUEST_MAPPING;
+    }
+
+    @ModelAttribute
+    public void addAttributes(Model model) {
+        model.addAttribute("beds", this.bedsService.findAll());
+        model.addAttribute("suitClasses", this.suitClassService.findAll());
+        model.addAttribute("pathToStorage", this.uploadService.getStorage().toString());
     }
 }

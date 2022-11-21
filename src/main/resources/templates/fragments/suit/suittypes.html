@@ -10,38 +10,42 @@
 
         <div class="col-3 col-sm-2">
             <h3>Add</h3>
-<!--            <form th:method="POST" th:object="${newEntity}" th:action="@{${path}+'/create'}">
+            <form th:method="POST" th:object="${newEntity}" th:action="@{${path}+'/create'}">
                 <div class="row g-2 align-items-center">
-                    <label th:for="*{id}" class="visually-hidden">Id</label>
-                    <input type="hidden" id="id" required th:field="*{id}" th:value="*{id}"/>
-                    <div class="col-auto">
-						<ul th:if="${creationError} ne null" class="text-warning">
+					<div th:if="${creationError} ne null" class="col-auto">
+						<ul class="text-warning">
 							<li th:text="${creationError}"/>
 						</ul>
-                        <label th:for="*{name}" class="visually-hidden">Name: </label>
-                        <input class="form-control" type="text" placeholder="Name" th:field="*{name}">
                     </div>
 					<div class="col-auto">
-                        <label th:for="*{description}" class="form-label">Description: </label>
-						<textarea class="form-control" rows="3" th:field="*{description}"></textarea>
-                    </div>
-					<div class="col-auto">
-						<select class="form-select" aria-label="Select type" th:field="*{resorttype}">
-							  <option value="" selected >Select type</option>
-							  <option th:each="type : ${resortTypes}" th:text="${type.name}" th:value="${type.id}">type</option>
+						<select class="form-select" aria-label="Suit class" th:field="*{suitClass}">
+							  <option value="" selected >Suit class</option>
+							  <option th:each="class : ${suitClasses}" th:text="${class.suitclass}" th:value="${class.id}">Class</option>
 						</select>
+					</div>
+					<div class="col-auto">
+						<select class="form-select" aria-label="Beds" th:field="*{beds}">
+							  <option value="" selected >Beds</option>
+							  <option th:each="bed : ${beds}" th:text="${bed.beds}" th:value="${bed.id}">Beds</option>
+						</select>
+					</div>					
+					<div class="col-auto">
+                        <label th:for="*{area}" class="visually-hidden">Area, sq.m: </label>
+                        <input class="form-control" type="text" placeholder="Area" th:field="*{area}">
                     </div>
 					<div class="col-auto">
-						<select class="form-select" aria-label="Select type" th:field="*{resortClass}">
-							  <option value="" selected >Select class</option>
-							  <option th:each="class : ${resortClasses}" th:text="${class.resortClass}" th:value="${class.id}">type</option>
-						</select>
-                    </div>					
+                        <label th:for="*{minimumprice}" class="visually-hidden">Minimum price: </label>
+                        <input class="form-control" type="text" placeholder="Minimum price" th:field="*{minimumprice}">
+                    </div>
+					<div class="col-auto">
+                        <label th:for="*{currentprice}" class="visually-hidden">Current price: </label>
+                        <input class="form-control" type="text" placeholder="Current price" th:field="*{currentprice}">
+                    </div>				
                     <div class="col-auto">
                         <button class="btn btn-primary btn-block" type="submit">Add</button>
                     </div>
                 </div>
-            </form>-->
+            </form>
 <!--            <h3>Search</h3>
             <form th:method="POST" th:object="${newEntity}" th:action="@{${path}+'/find'}">
                 <div class="row g-2 align-items-center">
@@ -59,8 +63,8 @@
                         <button class="btn btn-primary btn-block" type="submit">Find</button>
                     </div>
                 </div>
-            </form>
-        </div>-->
+            </form>-->
+        </div>
 
         <div class="col-3 col-sm-8">
             <h2>Suit Types</h2>

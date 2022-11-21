@@ -44,7 +44,7 @@
 								<li th:if="${additionalErrors} neq null" th:text="${additionalErrors}"/>
 							</ul>
 						</div>
-						<div>
+						<div >
 							<button class="btn btn-primary btn-block" type="submit">Find</button>
 						</div>
 					</div>
@@ -57,9 +57,14 @@
 				<div th:if="${searchResults eq null}"><p>No search was done</p></div>
 
 				<div th:if="${searchResults ne null}">
-					<h5>Search results for <span th:text="${request.adultBeds}"/> adults, <span th:text="${request.childBeds}"/> childs, from <span th:text="${request.checkIn}"/> to <span th:text="${request.checkOut}"/></h5>
-					<div th:each="searchResult: ${searchResults}">
-						<form th:method="POST" th:action="@{'/reserve/add'}">						
+					<h5>Search results for <span th:text="${completedSearchRequest.adultBeds}"/> adults, <span th:text="${completedSearchRequest.childBeds}"/> childs, from <span th:text="${completedSearchRequest.checkIn}"/> to <span th:text="${completedSearchRequest.checkOut}"/></h5>
+					<div th:each="searchResult, iterStatSearch  : ${searchResults}">
+						<form th:method="POST" th:action="@{'/reserve/reserve/create'}" th:object="${reserve}">								
+							<input type="hidden" id="checkIn" name="checkIn" th:value="${completedSearchRequest.checkIn}"/>	
+							<input type="hidden" id="checkOut" name="checkOut" th:value="${completedSearchRequest.checkOut}"/>	
+							<input type="hidden" id="adultBeds" name="adultBeds" th:value="${completedSearchRequest.adultBeds}"/>	
+							<input type="hidden" id="childBeds" name="childBeds" th:value="${completedSearchRequest.childBeds}"/>								
+							
 							<table class="table table-striped">
 								<tr>
 									<th scope="col" class="col-3">Photo</th>
@@ -68,8 +73,19 @@
 									<th scope="col">Price</th>
 									<th scope="col">Quantity</th>
 								</tr>
-								<tr th:each="suitType : ${searchResult.suitTypes}">
-									<td>
+								<tr th:each="suitType, iterStatSuitType : ${searchResult.suitTypes}">
+										
+									<td>								
+										<input type="hidden" th:id="'suitTypes' + ${iterStatSuitType.index} + '.suitTypeId'"
+											th:name="'suitTypes[' + ${iterStatSuitType.index} + '].suitTypeId'"
+											th:value="${suitType.suitTypeId}" />	
+										<input type="hidden" th:id="'suitTypes' + ${iterStatSuitType.index} + '.quantity'"
+											th:name="'suitTypes[' + ${iterStatSuitType.index} + '].quantity'"
+											th:value="${suitType.quantity}" />											
+										<input type="hidden" th:id="'suitTypes' + ${iterStatSuitType.index} + '.price'"
+											th:name="'suitTypes[' + ${iterStatSuitType.index} + '].price'"
+											th:value="${suitType.price}" />
+									
 										<a th:if="${suitType.photo ne null}" th:href="@{'/' + ${pathToStorage} + '/' + ${suitType.photo.id} + '/' + ${suitType.photo.filename}}">
 											<img th:src="@{'/' + ${pathToStorage} + '/' + ${suitType.photo.id} + '/' + ${suitType.photo.filename}}" class="img-fluid" th:alt="${suitType.photo.filename}">
 										</a>
@@ -83,8 +99,8 @@
 								<tr class="table-success">
 									<td colspan="4">Total price: <span th:text="${searchResult.totalPrice}"/>
 									</td>	
-									<td>
-										<button class="btn btn-primary btn-block" type="submit">Reserve</button>
+									<td>									
+										<button sec:authorize="isAuthenticated()" class="btn btn-primary btn-block" type="submit">Reserve</button>
 									</td>									
 								</tr>
 							</table>	
@@ -98,6 +114,5 @@
 
 	</div>
 
-</div>
 </body>
 </html>

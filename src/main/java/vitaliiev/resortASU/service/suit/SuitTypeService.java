@@ -93,11 +93,11 @@ public class SuitTypeService {
                     @CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
     )
     public void delete(Integer id) {
-//        SuitType entity = this.findById(id);
-//        entity.setDeleted(true);
+        SuitType entity = this.findById(id);
+        entity.setDeleted(true);
         try {
-//            repository.save(entity);
-            repository.deleteById(id);
+            repository.save(entity);
+//            repository.deleteById(id);
         } catch (DataIntegrityViolationException e) {
             log.warn(e.getMessage());
         }
