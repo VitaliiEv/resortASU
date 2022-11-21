@@ -9,13 +9,6 @@ INSERT INTO resort."user_resortASU"
 (username, "password")
 VALUES('admin', '$2a$10$B0L9OAweQXvCLm6PzAaxj.yHV4I0P.FOdKc7QX7zsxy22XKkFNunu');
 
-INSERT INTO resort.appeal
-(appeal)
-VALUES('MR'),
-('MRS'),
-('MS'),
-('DR');
-
 INSERT INTO resort.beds
 (beds, beds_adult, beds_child)
 VALUES('One bed for adult', 1, 0),
