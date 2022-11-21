@@ -22,7 +22,8 @@
                     </li>
 
                     <li sec:authorize="hasRole('ROLE_PROPERTY_MANAGER')" class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+						<a class="nav-link" href="/reserve/reserve">Reservations</a>
+<!--                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                            aria-expanded="false">
                             Reservation
                         </a>
@@ -34,7 +35,7 @@
                             <li><a class="dropdown-item" href="#">Not payed</a></li>
                             <li><a class="dropdown-item" href="#">Check-in today</a></li>
                             <li><a class="dropdown-item" href="#">Check-out today</a></li>
-                        </ul>
+                        </ul>-->
                     </li>
 
                     <li sec:authorize="hasRole('ROLE_CONTENT_MANAGER')" class="nav-item dropdown">
@@ -43,7 +44,7 @@
                             Suit
                         </a>
                         <ul class="dropdown-menu">
-                            <!--                            <li><a class="dropdown-item" href="#">Free Suits</a></li>
+<!--                            <li><a class="dropdown-item" href="#">Free Suits</a></li>
                                                         <li>
                                                             <hr class="dropdown-divider">
                                                         </li>
@@ -69,15 +70,9 @@
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="/resort/resort">Resort</a></li>
                             <li><a class="dropdown-item" href="/resort/buildings">Buildings</a></li>
-                            <li><a class="dropdown-item" href="/resort/floors">Floors</a></li>
+<!--                            <li><a class="dropdown-item" href="/resort/floors">Floors</a></li>-->
                             <li><a class="dropdown-item" href="/resort/classes">Classes</a></li>
                             <li><a class="dropdown-item" href="/resort/types">Types</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="#">Not payed</a></li>
-                            <li><a class="dropdown-item" href="#">Check-in today</a></li>
-                            <li><a class="dropdown-item" href="#">Check-out today</a></li>
                         </ul>
                     </li>
                     <li sec:authorize="hasRole('ROLE_CONTENT_MANAGER')" class="nav-item">
