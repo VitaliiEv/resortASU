@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vitaliiev.resortASU.ResortASUGeneralException;
+import vitaliiev.resortASU.dto.ReserveRequest;
 import vitaliiev.resortASU.dto.SuitSearchRequest;
 import vitaliiev.resortASU.dto.SuitSearchResultSet;
 import vitaliiev.resortASU.service.UploadService;
@@ -53,8 +54,11 @@ public class SearchController {
         }
         try {
             List<SuitSearchResultSet> results = this.service.find(suitSearchRequest);
-            redirectAttributes.addFlashAttribute("request", suitSearchRequest);
+            ReserveRequest reserveRequest = new ReserveRequest();
+            redirectAttributes.addFlashAttribute("reserve", reserveRequest);
+            redirectAttributes.addFlashAttribute("completedSearchRequest", suitSearchRequest);
             redirectAttributes.addFlashAttribute("searchResults", results);
+
         } catch (ResortASUGeneralException e) {
             log.warn(e.getMessage());
             redirectAttributes.addFlashAttribute("additionalErrors", e.getMessage()); //fixme

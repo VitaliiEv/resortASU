@@ -73,6 +73,7 @@ public class SuitTypeSearch {
     public Predicate<Suit> isAvailable(Date checkIn, Date checkOut) {
         return suit -> suit.getReserveSuit().stream()
                 .map(ReserveSuit::getReserve)
+                .filter(reserveStatusCheck())
                 .allMatch(periodsDontOverlap(checkIn, checkOut));
     }
 
@@ -80,5 +81,11 @@ public class SuitTypeSearch {
     public Predicate<Reserve> periodsDontOverlap(Date checkIn, Date checkOut) {
         return reserve -> checkIn.after(reserve.getCheckout()) || checkIn.equals(reserve.getCheckout()) ||
                 checkOut.before(reserve.getCheckin()) || checkOut.equals(reserve.getCheckin());
+    }
+
+    public Predicate<Reserve> reserveStatusCheck() {
+        List<String> allowedStatuses = List.of("Accepted", "Finished");
+        return reserve -> allowedStatuses.stream()
+                .anyMatch(status -> status.equalsIgnoreCase(reserve.getReserveStatus().getStatus()));
     }
 }

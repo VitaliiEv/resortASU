@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+	<title th:text="|#{title.prefix} Reserve|">Reserve</title>
+</head>
+<body>
+	<div th:replace="fragments/bootstrap :: bootstrap"></div>
+	<div th:replace="fragments/navigation :: menu"></div>
+	<div class="container">
+
+    <div class="row">
+
+        <div class="col-3 col-sm-8">
+
+			<h2>Reserve for <span th:text="${reserve.adultBeds}"/> adults, <span th:text="${reserve.childBeds}"/> childs, from <span th:text="${reserve.checkIn}"/> to <span th:text="${reserve.checkOut}"/></h2>
+			
+
+
+			<form th:method="POST" th:action="@{'/reserve/reserve/confirm'}" th:object="${reserve}">	
+<!--				<div class="col-auto">
+						<select class="form-select" aria-label="Payment type" th:field="*{paymentType}">
+							  <option value="" selected >Payment type</option>
+							  <option th:each="type : ${paymentTypes}" th:text="${type.paymenttype}" th:value="${type.id}">Type</option>
+						</select>
+					</div>		-->				
+					<input type="hidden" th:field="*{checkIn}"/>	
+					<input type="hidden" th:field="*{checkOut}"/>
+					<input type="hidden" th:field="*{adultBeds}"/>
+					<input type="hidden" th:field="*{childBeds}"/>					
+					
+					<table class="table table-striped">
+						<tr>
+							<th scope="col" class="col-3">Photo</th>
+							<th scope="col">Suit class</th>
+							<th scope="col">Beds</th>
+							<th scope="col">Price</th>
+							<th scope="col">Quantity</th>
+						</tr>
+						<tr th:each="suitType, iterStatSuitType: ${reserve.suitTypes}">
+								
+							<td>								
+<!--								<input type="hidden" th:field="*{suitType.suitTypeId}"/>
+								<input type="hidden" th:field="*{suitType.quantity}"/>	
+								<input type="hidden" th:field="*{suitType.price}"/>-->		
+								
+								<input type="hidden" th:id="'suitTypes' + ${iterStatSuitType.index} + '.suitTypeId'"
+									th:name="'suitTypes[' + ${iterStatSuitType.index} + '].suitTypeId'"
+									th:value="${suitType.suitTypeId}" />	
+								<input type="hidden" th:id="'suitTypes' + ${iterStatSuitType.index} + '.quantity'"
+									th:name="'suitTypes[' + ${iterStatSuitType.index} + '].quantity'"
+									th:value="${suitType.quantity}" />											
+								<input type="hidden" th:id="'suitTypes' + ${iterStatSuitType.index} + '.price'"
+									th:name="'suitTypes[' + ${iterStatSuitType.index} + '].price'"
+									th:value="${suitType.price}" />								
+							
+								<a th:if="${suitType.photo ne null}" th:href="@{'/' + ${pathToStorage} + '/' + ${suitType.photo.id} + '/' + ${suitType.photo.filename}}">
+									<img th:src="@{'/' + ${pathToStorage} + '/' + ${suitType.photo.id} + '/' + ${suitType.photo.filename}}" class="img-fluid" th:alt="${suitType.photo.filename}">
+								</a>
+								<span th:if="${suitType.photo eq null}" th:text="'No photo'" />
+							</td>
+							<td th:text="${suitType.suitClass}">Suit class</td>
+							<td th:text="${suitType.beds}">Beds</td>
+							<td th:text="${suitType.price}">Price</td>
+							<td th:text="${suitType.quantity}">Quantity</td>
+						</tr>
+						<tr class="table-success">
+							<td colspan="5">Total price: <span th:text="${reserve.getTotalPrice()}"/>
+							</td>										
+						</tr>
+						<tr>
+							<td colspan="5">
+								<select class="form-select" aria-label="Payment type" th:field="*{paymentType}">
+									  <option value="" selected >Payment type</option>
+									  <option th:each="type : ${paymentTypes}" th:text="${type.paymenttype}" th:value="${type.id}">Type</option>
+								</select>
+							</td>			
+						</tr>
+						<tr>	
+							<td colspan="5">								
+								<button class="btn btn-primary btn-block" type="submit">Confirm</button>
+							</td>									
+						</tr>						
+					</table>	
+				</form>						
+
+
+
+			</div>
+
+		</div>
+
+	</div>
+
+</body>
+</html>

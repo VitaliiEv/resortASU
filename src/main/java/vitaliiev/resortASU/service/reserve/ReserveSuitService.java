@@ -2,7 +2,11 @@ package vitaliiev.resortASU.service.reserve;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Sort;
@@ -34,6 +38,14 @@ public class ReserveSuitService {
     @Autowired
     public ReserveSuitService(ReserveSuitRepository repository) {
         this.repository = repository;
+    }
+
+    @Caching(
+            put = {@CachePut(cacheNames = CACHE_NAME, key = "#result?.id")},
+            evict = {@CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
+    )
+    public ReserveSuit create(ReserveSuit entity) throws DataIntegrityViolationException {
+        return repository.save(entity);
     }
 
     @Cacheable(cacheNames = CACHE_NAME, key = "#id")

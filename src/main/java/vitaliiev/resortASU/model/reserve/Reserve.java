@@ -35,7 +35,7 @@ public class Reserve {
     @JoinTable(name = "customerreserve",
             joinColumns = @JoinColumn(name = "customer_id"))
     private Set<Customer> customers;
-    @OneToMany
+    @OneToMany(mappedBy = "reserve")
     private Set<ReserveSuit> reserveSuit;
 
     public void addCustomer(Customer customer) {
