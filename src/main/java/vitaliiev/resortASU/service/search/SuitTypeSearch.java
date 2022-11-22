@@ -5,7 +5,7 @@ import lombok.Getter;
 import vitaliiev.resortASU.dto.SuitSearchResultSet;
 import vitaliiev.resortASU.model.suit.Suit;
 import vitaliiev.resortASU.model.suit.SuitType;
-import vitaliiev.resortASU.utils.ReserveValidation;
+import vitaliiev.resortASU.service.reserve.ReserveValidationService;
 
 import java.sql.Date;
 import java.util.*;
@@ -16,6 +16,7 @@ public class SuitTypeSearch {
     private final Date checkIn;
     private final Date checkOut;
     private final SuitTypeCombinationList suitTypeCombinationList;
+
 
     private final Map<SuitType, Integer> cache = new HashMap<>();
     @Getter
@@ -46,7 +47,7 @@ public class SuitTypeSearch {
                     freeSuits = this.cache.get(entry.getKey());
                 } else {
                     freeSuits = countMatchingSuits(entry.getKey(),
-                            s -> ReserveValidation.suitIsAvailable(this.checkIn, this.checkOut, s));
+                            s -> ReserveValidationService.suitIsAvailable(this.checkIn, this.checkOut, s));
                     this.cache.put(entry.getKey(), freeSuits);
                 }
                 if (freeSuits >= requestedSuits) {
