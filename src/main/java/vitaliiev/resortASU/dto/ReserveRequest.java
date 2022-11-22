@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -58,4 +59,17 @@ public class ReserveRequest {
         return this.totalPrice;
     }
 
+    public void initCustomerLists() {
+        if (this.adultBeds == 0) {
+            throw new IllegalArgumentException("Adult beds cant be null");
+        }
+        this.adults = new ArrayList<>(this.adultBeds);
+        this.children = new ArrayList<>(this.childBeds);
+        for (int i = 0; i < this.adultBeds; i++) {
+            adults.add(new Customer());
+        }
+        for (int i = 0; i < this.childBeds; i++) {
+            children.add(new Customer());
+        }
+    }
 }

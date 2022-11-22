@@ -29,7 +29,6 @@ import vitaliiev.resortASU.service.suit.SuitTypeService;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -228,33 +227,15 @@ public class ReserveService {
 
     public ReserveRequest updateReserveRequest(ReserveRequest reserveRequest) {
         reserveRequest.getSuitTypes().forEach(this::updateSuitSearchRequest);
-        this.initCustomerLists(reserveRequest);
+        reserveRequest.initCustomerLists();
         return reserveRequest;
     }
 
     public void updateSuitSearchRequest(SuitSearchResult suitSearchResult) {
         SuitType suitType = this.suitTypeService.findById(suitSearchResult.getSuitTypeId());
-        suitSearchResult.setPhoto(suitType.getMainphoto());
-        suitSearchResult.setBeds(suitType.getBeds().getBeds());
-        suitSearchResult.setPrice(suitType.getCurrentprice());
-        suitSearchResult.setSuitClass(suitType.getSuitClass().getSuitclass());
+        suitSearchResult.update(suitType);
     }
 
-    public void initCustomerLists(ReserveRequest reserveRequest) {
-        if (reserveRequest == null) {
-            throw new IllegalArgumentException("Request must not be null or empty");
-        }
-        List<Customer> adults = new ArrayList<>(reserveRequest.getAdultBeds());
-        List<Customer> children = new ArrayList<>(reserveRequest.getChildBeds());
-        for (int i = 0; i < reserveRequest.getAdultBeds(); i++) {
-            adults.add(new Customer());
-        }
-        for (int i = 0; i < reserveRequest.getChildBeds(); i++) {
-            children.add(new Customer());
-        }
-        reserveRequest.setAdults(adults);
-        reserveRequest.setChildren(children);
-    }
 
     private Set<ReserveSuit> mapSuitTypeToReserveSuits(Reserve reserve, SuitSearchResult suitSearchResult) {
         Set<ReserveSuit> reserveSuits = new HashSet<>(suitSearchResult.getQuantity());

@@ -27,4 +27,11 @@ public class SuitSearchResult {
         this.quantity = quantity;
     }
 
+    public void update(SuitType suitType) {
+        this.photo = suitType.getMainphoto();
+        this.beds = suitType.getBeds().getBeds();
+        this.price = suitType.getCurrentprice();
+        this.suitClass = suitType.getSuitClass().getSuitclass();
+    }
+
 }
