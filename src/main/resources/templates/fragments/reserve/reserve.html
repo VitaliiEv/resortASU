@@ -52,7 +52,7 @@
                     <th scope="col"></th>
 					<th scope="col"></th>
                 </tr>
-                <tr th:each="e : ${entities}">
+                <tr th:each="e : ${entities}" th:class="${e.needsAttention()} ? 'table-danger'">
                     <th scope="row" th:text="${e.id}"></th>
                     <td th:text="${e.checkin}"></td>
                     <td th:text="${e.checkout}"></td>
@@ -140,7 +140,7 @@
                 </div>					
                 <div class="row g-2 align-items-center">
                     <div class="col-auto">
-						<p>Custumers:</p>
+						<p>Customers:</p>
 						<p th:each="customer : ${entity.customers}" th:text="${customer.firstname + ' ' + customer.surname + ' ' + customer.birthdate}" ></p>
                     </div>
                 </div>	
