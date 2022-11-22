@@ -91,7 +91,7 @@
 								<input class="form-control" type="text" placeholder="Middlename" th:field="*{adults[__${itemStat.index}__].middlename}">							
 							</td>
 							<td scope="row">
-								<select class="form-select" aria-label="Payment status" th:field="*{adults[__${itemStat.index}__].gender}">
+								<select class="form-select" aria-label="Gender" th:field="*{adults[__${itemStat.index}__].gender}">
 									  <option value="" selected >Gender</option>
 									  <option th:each="g : ${genders}" th:text="${g.gender}" th:value="${g.id}">Gender</option>
 								</select>								
@@ -128,7 +128,7 @@
 								<input class="form-control" type="text" placeholder="Middlename" th:field="*{children[__${itemStat.index}__].middlename}">							
 							</td>
 							<td scope="row">
-								<select class="form-select" aria-label="Payment status" th:field="*{adults[__${itemStat.index}__].gender}">
+								<select class="form-select" aria-label="Gender" th:field="*{adults[__${itemStat.index}__].gender}">
 									  <option value="" selected >Gender</option>
 									  <option th:each="g : ${genders}" th:text="${g.gender}" th:value="${g.id}">Gender</option>
 								</select>								

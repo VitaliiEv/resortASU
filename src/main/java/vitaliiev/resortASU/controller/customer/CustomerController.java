@@ -79,7 +79,7 @@ public class CustomerController {
     @PostMapping(REQUEST_MAPPING + "/update")
     public String update(@ModelAttribute(name = "entity") Customer entity) {
         service.update(entity);
-        return "redirect:/Customer/" + FRAGMENT_NAME + "/" + entity.getId();
+        return "redirect:/customer/" + FRAGMENT_NAME + "/" + entity.getId();
     }
 
     @PostMapping(REQUEST_MAPPING + "/delete")

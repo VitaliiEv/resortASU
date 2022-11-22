@@ -82,67 +82,67 @@
 <div th:fragment="entity (path, entity, genders)">
     <div class="row">
 
-
-
         <div class="col-6 col-sm-3">
-            <h2>Reserve</h2>
-            <form th:method="POST" th:object="${entity}" th:action="@{'/reserve/'+${path}+'/update'}">
+            <h2>Customer</h2>
+            <form th:method="POST" th:object="${entity}" th:action="@{'/customer/'+${path}+'/update'}">
                 <div class="row g-2 align-items-center">
                     <div class="col-auto">
                         <label th:for="*{id}">Id: <span th:text="*{id}"></span></label>
-                        <input class="form-check-input" type="hidden" th:field="*{id}"/>
+                        <input class="form-control" type="text" th:field="*{id}"/>
                     </div>
                 </div>
-                <div class="row g-2 align-items-center">
-<!--					<div class="col-auto">
-							<select class="form-select" aria-label="Reserve status" th:field="*{reserveStatus}">
-								  <option value="" selected >Reserve status</option>
-								  <option th:each="status : ${reserveStatuses}" th:text="${status.status}" th:value="${status.id}">Reserve status</option>
-							</select>
-					</div>	-->			
+				<div class="row g-2 align-items-center">
 					<div class="col-auto">
-							<select class="form-select" aria-label="Payment status" th:field="*{paymentstatus}">
-								  <option value="" selected >Payment status</option>
-								  <option th:each="status : ${paymentStatuses}" th:text="${status.paymentstatus}" th:value="${status.id}">Payment status</option>
-							</select>
-					</div>
-					<div class="col-auto">
-							<select class="form-select" aria-label="Payment type" th:field="*{paymenttype}">
-								  <option value="" selected >Payment type</option>
-								  <option th:each="type : ${paymentTypes}" th:text="${type.paymenttype}" th:value="${type.id}">Payment type</option>
-							</select>
-					</div>
-                </div>
-                <div class="row g-2 align-items-center">
-                    <div class="col-auto">
-						<label th:for="*{checkin}" >Check-in: <span th:text="*{checkin}"/></label>
-                        <input class="form-check-input" type="hidden" th:field="*{checkin}"/>					
-                    </div>
-                </div>
-                <div class="row g-2 align-items-center">
-                    <div class="col-auto">
-						<label th:for="*{checkout}" >Check-out: <span th:text="*{checkout}"/></label>
-                        <input class="form-check-input" type="hidden" th:field="*{checkout}"/>					
-                    </div>
-                </div>					
-                <div class="row g-2 align-items-center">
-                    <div class="col-auto">
-						<p>Custumers:</p>
-						<p th:each="customer : ${entity.customers}" th:text="${customer.firstname + ' ' + customer.surname + ' ' + customer.birthdate}" ></p>
-                    </div>
-                </div>	
-                <div class="row g-2 align-items-center">
-                    <div class="col-auto">
-						<p>Suits:</p>
-						<p th:each="rs : ${entity.reserveSuit}" th:text="${rs.suit.number + ' ' + rs.suit.suitType.beds.beds}" ></p>
+                        <label th:for="*{firstname}">Firstname: <span th:text="*{firstname}"></span></label>
+                        <input class="form-control"  type="text" th:field="*{firstname}"/>
                     </div>
                 </div>				
+				<div class="row g-2 align-items-center">
+					<div class="col-auto">
+                        <label th:for="*{surname}">Surname: <span th:text="*{surname}"></span></label>
+                        <input class="form-control"  type="text" th:field="*{surname}"/>
+                    </div>
+                </div>	
+				<div class="row g-2 align-items-center">
+					<div class="col-auto">
+                        <label th:for="*{middlename}">Middlename: <span th:text="*{middlename}"></span></label>
+                        <input class="form-control" type="text" th:field="*{middlename}"/>
+                    </div>
+                </div>
+				<div class="row g-2 align-items-center">
+					<div class="col-auto">
+						<select class="form-select" aria-label="Gender" th:field="*{gender}">
+							  <option value="" selected >Gender</option>
+							  <option th:each="g : ${genders}" th:text="${g.gender}" th:value="${g.id}">Gender</option>
+						</select>	
+                    </div>
+                </div>
+				<div class="row g-2 align-items-center">
+					<div class="col-auto">
+                        <label th:for="*{birthdate}">Birthdate: <span th:text="*{birthdate}"></span></label>
+                        <input class="form-control"  type="date" th:field="*{birthdate}"/>
+                    </div>
+                </div>
+				<div class="row g-2 align-items-center">
+					<div class="col-auto">
+                        <label th:for="*{phone}">Phone: <span th:text="*{phone}"></span></label>
+                        <input class="form-control" type="tel" th:field="*{phone}"/>
+                    </div>
+                </div>				
+				<div class="row g-2 align-items-center">
+					<div class="col-auto">
+                        <label th:for="*{email}">Email: <span th:text="*{email}"></span></label>
+                        <input class="form-control"  type="email" th:field="*{email}"/>
+                    </div>
+                </div>						
+			
                 <div class="row g-2 align-items-center">
                     <div class="col-auto">
                         <button class="btn btn-primary btn-block" type="submit">Save</button>
                     </div>
                 </div>
-        </div>
+			</form>
+		</div>
     </div>
 </div>
 </body>
