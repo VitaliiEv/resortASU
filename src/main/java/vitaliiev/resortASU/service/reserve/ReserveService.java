@@ -25,8 +25,8 @@ import vitaliiev.resortASU.service.customer.CustomerService;
 import vitaliiev.resortASU.service.search.SuitSearchResult;
 import vitaliiev.resortASU.service.suit.SuitService;
 import vitaliiev.resortASU.service.suit.SuitTypeService;
+import vitaliiev.resortASU.utils.ReserveValidation;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.HashSet;
@@ -162,7 +162,7 @@ public class ReserveService {
                     .findAny()
                     .orElseThrow();
             for (ReserveSuit reserveSuit : reserve.getReserveSuit()) {
-                if (!isAvailable(reserve.getCheckin(), reserve.getCheckout(), reserveSuit.getSuit())) {
+                if (!ReserveValidation.suitIsAvailable(reserve.getCheckin(), reserve.getCheckout(), reserveSuit.getSuit())) {
                     return reserve;
 
                 }
@@ -256,7 +256,7 @@ public class ReserveService {
         Set<Suit> suits = new HashSet<>(this.suitService.findAllPresent());
         suits = suits.stream()
                 .filter(s -> s.getSuittype().equals(this.suitTypeService.findById(suitSearchResult.getSuitTypeId())))
-                .filter(s -> isAvailable(reserve.getCheckin(), reserve.getCheckout(), s))
+                .filter(s -> ReserveValidation.suitIsAvailable(reserve.getCheckin(), reserve.getCheckout(), s))
                 .limit(exactSuits)
                 .collect(Collectors.toSet());
         if (suits.size() < exactSuits) {
@@ -264,32 +264,6 @@ public class ReserveService {
         }
 //        Set<Suit> suits = suitTypeService.findById(suitSearchResult.getSuitTypeId()).getSuits();
         return suits;
-    }
-
-
-    public boolean isAvailable(Date checkIn, Date checkOut, Suit suit) {
-        if (suit.getDeleted()) {
-            return false;
-        }
-        Set<ReserveSuit> reserveSuits = suit.getReserveSuit();
-        for (ReserveSuit reserveSuit : reserveSuits) {
-            Reserve reserve = reserveSuit.getReserve();
-            if (reserveAccepted(reserve) && !periodsDontOverlap(checkIn, checkOut, reserve)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public boolean periodsDontOverlap(Date checkIn, Date checkOut, Reserve existingReserve) {
-        return checkIn.after(existingReserve.getCheckout()) || checkIn.equals(existingReserve.getCheckout()) ||
-                checkOut.before(existingReserve.getCheckin()) || checkOut.equals(existingReserve.getCheckin());
-    }
-
-    public boolean reserveAccepted(Reserve reserve) {
-        List<String> allowedStatuses = List.of("Accepted", "Finished");
-        return allowedStatuses.stream()
-                .anyMatch(status -> status.equalsIgnoreCase(reserve.getReserveStatus().getStatus()));
     }
 
 }

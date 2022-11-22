@@ -3,10 +3,9 @@ package vitaliiev.resortASU.service.search;
 
 import lombok.Getter;
 import vitaliiev.resortASU.dto.SuitSearchResultSet;
-import vitaliiev.resortASU.model.reserve.Reserve;
-import vitaliiev.resortASU.model.reserve.ReserveSuit;
 import vitaliiev.resortASU.model.suit.Suit;
 import vitaliiev.resortASU.model.suit.SuitType;
+import vitaliiev.resortASU.utils.ReserveValidation;
 
 import java.sql.Date;
 import java.util.*;
@@ -46,7 +45,8 @@ public class SuitTypeSearch {
                 if (this.cache.containsKey(entry.getKey())) {
                     freeSuits = this.cache.get(entry.getKey());
                 } else {
-                    freeSuits = countMatchingSuits(entry.getKey(), s -> isAvailable(this.checkIn, this.checkOut, s));
+                    freeSuits = countMatchingSuits(entry.getKey(),
+                            s -> ReserveValidation.suitIsAvailable(this.checkIn, this.checkOut, s));
                     this.cache.put(entry.getKey(), freeSuits);
                 }
                 if (freeSuits >= requestedSuits) {
@@ -70,28 +70,4 @@ public class SuitTypeSearch {
                 .count();
     }
 
-    public boolean isAvailable(Date checkIn, Date checkOut, Suit suit) {
-        if (suit.getDeleted()) {
-            return false;
-        }
-        Set<ReserveSuit> reserveSuits = suit.getReserveSuit();
-        for (ReserveSuit reserveSuit : reserveSuits) {
-            Reserve reserve = reserveSuit.getReserve();
-            if (reserveAccepted(reserve) && !periodsDontOverlap(checkIn, checkOut, reserve)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public boolean periodsDontOverlap(Date checkIn, Date checkOut, Reserve existingReserve) {
-        return checkIn.after(existingReserve.getCheckout()) || checkIn.equals(existingReserve.getCheckout()) ||
-                checkOut.before(existingReserve.getCheckin()) || checkOut.equals(existingReserve.getCheckin());
-    }
-
-    public boolean reserveAccepted(Reserve reserve) {
-        List<String> allowedStatuses = List.of("Accepted", "Finished");
-        return allowedStatuses.stream()
-                .anyMatch(status -> status.equalsIgnoreCase(reserve.getReserveStatus().getStatus()));
-    }
 }
