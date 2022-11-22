@@ -35,4 +35,18 @@ public class Customer {
     private Timestamp lastchanged;
     @ManyToMany(mappedBy = "customers")
     private Set<Reserve> reserves;
+
+    public void addReserve(Reserve reserve) {
+        if (!this.reserves.contains(reserve)) {
+            this.reserves.add(reserve);
+            reserve.addCustomer(this);
+        }
+    }
+
+    public void removeReserve(Reserve reserve) {
+        if (this.reserves.contains(reserve)) {
+            this.reserves.add(reserve);
+            reserve.removeCustomer(this);
+        }
+    }
 }

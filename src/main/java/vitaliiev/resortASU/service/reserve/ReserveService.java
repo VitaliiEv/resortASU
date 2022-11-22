@@ -25,14 +25,12 @@ import vitaliiev.resortASU.service.customer.CustomerService;
 import vitaliiev.resortASU.service.search.SuitSearchResult;
 import vitaliiev.resortASU.service.suit.SuitService;
 import vitaliiev.resortASU.service.suit.SuitTypeService;
-import vitaliiev.resortASU.utils.ReserveValidation;
 
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -59,6 +57,7 @@ public class ReserveService {
 
     private final ReserveSuitService reserveSuitService;
 
+    private final ReserveValidationService reserveValidationService;
     private final SuitService suitService;
     private final SuitTypeService suitTypeService;
 
@@ -69,12 +68,13 @@ public class ReserveService {
 
     @Autowired
     public ReserveService(ReserveRepository repository, ReserveStatusService reserveStatusService,
-                          ReserveSuitService reserveSuitService, SuitService suitService,
-                          SuitTypeService suitTypeService, PaymentStatusService paymentStatusService,
-                          CustomerService customerService) {
+                          ReserveSuitService reserveSuitService, ReserveValidationService reserveValidationService,
+                          SuitService suitService, SuitTypeService suitTypeService,
+                          PaymentStatusService paymentStatusService, CustomerService customerService) {
         this.repository = repository;
         this.reserveStatusService = reserveStatusService;
         this.reserveSuitService = reserveSuitService;
+        this.reserveValidationService = reserveValidationService;
         this.suitService = suitService;
         this.suitTypeService = suitTypeService;
         this.paymentStatusService = paymentStatusService;
@@ -116,22 +116,24 @@ public class ReserveService {
         Set<Customer> customers = new HashSet<>();
         customers.addAll(request.getAdults());
         customers.addAll(request.getAdults());
+        reserve.setCustomers(new HashSet<>());
         for (Customer c : customers) {
-            c.setReserves(new HashSet<>());
-            c.getReserves().add(reserve);
             List<Customer> similar = this.customerService.find(c);
             if (similar.isEmpty()) {
+                c.setReserves(new HashSet<>());
+                c.addReserve(reserve);
                 this.customerService.create(c);
             } else if (similar.size() == 1) {
+                c.addReserve(reserve);
                 this.customerService.update(c);
             } else {
                 throw new ResortASUGeneralException("Several matching customers found.");
             }
         }
-
+//        reserve.setCustomers(customers);
         Set<ReserveSuit> reserveSuits = new HashSet<>();
         for (SuitSearchResult suitSearchResult : request.getSuitTypes()) {
-            Set<ReserveSuit> temp = mapSuitTypeToReserveSuits(reserve, suitSearchResult);
+            Set<ReserveSuit> temp = mapSearchResultToReserveSuits(reserve, suitSearchResult);
             reserveSuits.addAll(temp);
         }
         reserveSuits.forEach(rs -> {
@@ -141,6 +143,7 @@ public class ReserveService {
             this.suitService.update(s);
         });
         reserve.setReserveSuit(reserveSuits);
+        reserve.setValid(true);
         reserve = this.update(reserve);
         return reserve;
     }
@@ -161,14 +164,23 @@ public class ReserveService {
                     .filter(status -> status.getStatus().equalsIgnoreCase("Accepted"))
                     .findAny()
                     .orElseThrow();
-            for (ReserveSuit reserveSuit : reserve.getReserveSuit()) {
-                if (!ReserveValidation.suitIsAvailable(reserve.getCheckin(), reserve.getCheckout(), reserveSuit.getSuit())) {
-                    return reserve;
-
-                }
+            reserve = this.reserveValidationService.validate(reserve);
+            if (!reserve.isValid()) {
+                reserve = this.reserveValidationService.reValidate(reserve);
             }
-            reserve.setReserveStatus(newStatus);
-            this.update(reserve);
+            if (reserve.isValid()) {
+                reserve.setReserveStatus(newStatus);
+                this.update(reserve);
+            }
+//            for (ReserveSuit reserveSuit : reserve.getReserveSuit()) {
+//                if (this.reserveValidationService.suitIsAvailable(reserve.getCheckin(), reserve.getCheckout(),
+//                        reserveSuit.getSuit())) {
+//                    return reserve; //fixme only firs suit checked
+//                    // todo validate here
+//                }
+//            }
+//            reserve.setReserveStatus(newStatus);
+//            this.update(reserve);
         }
         return reserve;
     }
@@ -207,6 +219,8 @@ public class ReserveService {
 
     @Cacheable(cacheNames = CACHE_LIST_NAME)
     public List<Reserve> findAll() {
+        List<Reserve> reserves = repository.findAll(Sort.by("id"));
+        this.validateNew(reserves);
         return repository.findAll(Sort.by("id"));
     }
 
@@ -237,10 +251,10 @@ public class ReserveService {
     }
 
 
-    private Set<ReserveSuit> mapSuitTypeToReserveSuits(Reserve reserve, SuitSearchResult suitSearchResult) {
+    private Set<ReserveSuit> mapSearchResultToReserveSuits(Reserve reserve, SuitSearchResult suitSearchResult) {
         Set<ReserveSuit> reserveSuits = new HashSet<>(suitSearchResult.getQuantity());
 
-        Set<Suit> suits = getMatchingSuits(reserve, suitSearchResult);
+        Set<Suit> suits = this.reserveValidationService.getMatchingSuits(reserve, suitSearchResult);
         for (Suit suit : suits) {
             ReserveSuit reserveSuit = new ReserveSuit();
             reserveSuit.setReserve(reserve);
@@ -251,19 +265,11 @@ public class ReserveService {
         return reserveSuits;
     }
 
-    private Set<Suit> getMatchingSuits(Reserve reserve, SuitSearchResult suitSearchResult) {
-        int exactSuits = suitSearchResult.getQuantity();
-        Set<Suit> suits = new HashSet<>(this.suitService.findAllPresent());
-        suits = suits.stream()
-                .filter(s -> s.getSuittype().equals(this.suitTypeService.findById(suitSearchResult.getSuitTypeId())))
-                .filter(s -> ReserveValidation.suitIsAvailable(reserve.getCheckin(), reserve.getCheckout(), s))
-                .limit(exactSuits)
-                .collect(Collectors.toSet());
-        if (suits.size() < exactSuits) {
-            throw new ResortASUGeneralException("Not enough suits found");
+    private void validateNew(List<Reserve> reserves) {
+        for (Reserve reserve : reserves) {
+            if (reserve.getReserveStatus().getStatus().equalsIgnoreCase("Created")) {
+                this.reserveValidationService.validate(reserve);
+            }
         }
-//        Set<Suit> suits = suitTypeService.findById(suitSearchResult.getSuitTypeId()).getSuits();
-        return suits;
     }
-
 }

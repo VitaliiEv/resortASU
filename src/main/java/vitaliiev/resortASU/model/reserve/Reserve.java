@@ -39,17 +39,24 @@ public class Reserve {
     @OneToMany(mappedBy = "reserve")
     private Set<ReserveSuit> reserveSuit;
 
+    @Transient
+    private boolean valid = false;
+
+    public boolean needsAttention() {
+        return !this.valid && this.reserveStatus.getStatus().equalsIgnoreCase("Created");
+    }
+
     public void addCustomer(Customer customer) {
-        if (this.customers.contains(customer)) {
+        if (!this.customers.contains(customer)) {
             this.customers.add(customer);
-            customer.getReserves().add(this);
+            customer.addReserve(this);
         }
     }
 
     public void removeCustomer(Customer customer) {
         if (this.customers.contains(customer)) {
             this.customers.remove(customer);
-            customer.getReserves().remove(this);
+            customer.removeReserve(this);
         }
     }
 }
