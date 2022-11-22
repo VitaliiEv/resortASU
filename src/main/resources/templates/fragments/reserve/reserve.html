@@ -67,7 +67,9 @@
                     </td>
                     <td>
                         <div th:if="${e.reserveStatus.status} eq 'Created'">
-								<form sec:authorize="hasRole('ROLE_PROPERTY_MANAGER')" th:method="POST" th:action="@{'/reserve/'+${path}+'/accept'}">
+								<form sec:authorize="hasRole('ROLE_PROPERTY_MANAGER')" 
+									th:if="not ${e.needsAttention()}" 
+									th:method="POST" th:action="@{'/reserve/'+${path}+'/accept'}">
 									<label class="visually-hidden" for="id"></label>
 									<input class="form-check-input" type="hidden" name="id" th:value="${e.id}">
 									<button class="btn btn-primary btn-block" type="submit">Accept</button>
