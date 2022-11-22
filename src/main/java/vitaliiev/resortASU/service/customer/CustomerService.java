@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import vitaliiev.resortASU.model.customer.Customer;
 import vitaliiev.resortASU.repository.customer.CustomerRepository;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 
 @Slf4j
@@ -27,7 +29,7 @@ public class CustomerService {
 
     private static final ExampleMatcher SEARCH_CONDITIONS_MATCH_ALL = ExampleMatcher
             .matching()
-            .withIncludeNullValues()
+            .withIgnoreNullValues()
             .withMatcher("firstname", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
             .withMatcher("surname", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
             .withMatcher("middlename", ExampleMatcher.GenericPropertyMatchers.exact().ignoreCase())
@@ -49,6 +51,7 @@ public class CustomerService {
             evict = {@CacheEvict(cacheNames = CACHE_LIST_NAME, allEntries = true)}
     )
     public Customer create(Customer entity) throws DataIntegrityViolationException {
+        entity.setLastchanged(Timestamp.from(Instant.now()));
         return repository.save(entity);
     }
 
@@ -81,6 +84,7 @@ public class CustomerService {
     public Customer update(Customer entity) {
 
         try {
+            entity.setLastchanged(Timestamp.from(Instant.now()));
             return repository.save(entity);
         } catch (DataIntegrityViolationException e) {
             log.warn(e.getMessage());

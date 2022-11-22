@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import vitaliiev.resortASU.ResortASUGeneralException;
 import vitaliiev.resortASU.dto.ReserveRequest;
+import vitaliiev.resortASU.model.customer.Customer;
 import vitaliiev.resortASU.model.reserve.PaymentStatus;
 import vitaliiev.resortASU.model.reserve.Reserve;
 import vitaliiev.resortASU.model.reserve.ReserveStatus;
@@ -20,6 +21,7 @@ import vitaliiev.resortASU.model.reserve.ReserveSuit;
 import vitaliiev.resortASU.model.suit.Suit;
 import vitaliiev.resortASU.model.suit.SuitType;
 import vitaliiev.resortASU.repository.reserve.ReserveRepository;
+import vitaliiev.resortASU.service.customer.CustomerService;
 import vitaliiev.resortASU.service.search.SuitSearchResult;
 import vitaliiev.resortASU.service.suit.SuitService;
 import vitaliiev.resortASU.service.suit.SuitTypeService;
@@ -27,6 +29,7 @@ import vitaliiev.resortASU.service.suit.SuitTypeService;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -62,16 +65,21 @@ public class ReserveService {
 
     private final PaymentStatusService paymentStatusService;
 
+    private final CustomerService customerService;
+
+
     @Autowired
     public ReserveService(ReserveRepository repository, ReserveStatusService reserveStatusService,
                           ReserveSuitService reserveSuitService, SuitService suitService,
-                          SuitTypeService suitTypeService, PaymentStatusService paymentStatusService) {
+                          SuitTypeService suitTypeService, PaymentStatusService paymentStatusService,
+                          CustomerService customerService) {
         this.repository = repository;
         this.reserveStatusService = reserveStatusService;
         this.reserveSuitService = reserveSuitService;
         this.suitService = suitService;
         this.suitTypeService = suitTypeService;
         this.paymentStatusService = paymentStatusService;
+        this.customerService = customerService;
     }
 
     @Caching(
@@ -105,12 +113,28 @@ public class ReserveService {
         reserve.setLastchanged(now);
         reserve.setCreated(now);
         reserve = repository.save(reserve); // must be done here, because later we will need resort Id
+
+        Set<Customer> customers = new HashSet<>();
+        customers.addAll(request.getAdults());
+        customers.addAll(request.getAdults());
+        for (Customer c : customers) {
+            c.setReserves(new HashSet<>());
+            c.getReserves().add(reserve);
+            List<Customer> similar = this.customerService.find(c);
+            if (similar.isEmpty()) {
+                this.customerService.create(c);
+            } else if (similar.size() == 1) {
+                this.customerService.update(c);
+            } else {
+                throw new ResortASUGeneralException("Several matching customers found.");
+            }
+        }
+
         Set<ReserveSuit> reserveSuits = new HashSet<>();
         for (SuitSearchResult suitSearchResult : request.getSuitTypes()) {
             Set<ReserveSuit> temp = mapSuitTypeToReserveSuits(reserve, suitSearchResult);
             reserveSuits.addAll(temp);
         }
-
         reserveSuits.forEach(rs -> {
             rs = this.reserveSuitService.create(rs);
             Suit s = rs.getSuit();
@@ -203,15 +227,33 @@ public class ReserveService {
     }
 
     public ReserveRequest updateReserveRequest(ReserveRequest reserveRequest) {
-        reserveRequest.getSuitTypes().forEach(st -> {
-            SuitType suitType = this.suitTypeService.findById(st.getSuitTypeId());
-            st.setPhoto(suitType.getMainphoto());
-            st.setBeds(suitType.getBeds().getBeds());
-            st.setPrice(suitType.getCurrentprice());
-            st.setSuitClass(suitType.getSuitClass().getSuitclass());
-        });
-
+        reserveRequest.getSuitTypes().forEach(this::updateSuitSearchRequest);
+        this.initCustomerLists(reserveRequest);
         return reserveRequest;
+    }
+
+    public void updateSuitSearchRequest(SuitSearchResult suitSearchResult) {
+        SuitType suitType = this.suitTypeService.findById(suitSearchResult.getSuitTypeId());
+        suitSearchResult.setPhoto(suitType.getMainphoto());
+        suitSearchResult.setBeds(suitType.getBeds().getBeds());
+        suitSearchResult.setPrice(suitType.getCurrentprice());
+        suitSearchResult.setSuitClass(suitType.getSuitClass().getSuitclass());
+    }
+
+    public void initCustomerLists(ReserveRequest reserveRequest) {
+        if (reserveRequest == null) {
+            throw new IllegalArgumentException("Request must not be null or empty");
+        }
+        List<Customer> adults = new ArrayList<>(reserveRequest.getAdultBeds());
+        List<Customer> children = new ArrayList<>(reserveRequest.getChildBeds());
+        for (int i = 0; i < reserveRequest.getAdultBeds(); i++) {
+            adults.add(new Customer());
+        }
+        for (int i = 0; i < reserveRequest.getChildBeds(); i++) {
+            children.add(new Customer());
+        }
+        reserveRequest.setAdults(adults);
+        reserveRequest.setChildren(children);
     }
 
     private Set<ReserveSuit> mapSuitTypeToReserveSuits(Reserve reserve, SuitSearchResult suitSearchResult) {

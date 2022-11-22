@@ -12,7 +12,6 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -41,28 +40,6 @@ public class ReserveRequest {
     private List<Customer> adults;
     private List<Customer> children;
 
-    public ReserveRequest(SuitSearchRequest suitSearchRequest, int suitsQuantity) {
-        if (suitsQuantity <= 0) {
-            throw new IllegalArgumentException("Suits quantity must be >0. Got: " + suitsQuantity);
-        }
-        if (suitSearchRequest == null) {
-            throw new IllegalArgumentException("Search request must not be null or empty");
-        }
-        this.checkIn = suitSearchRequest.getCheckIn();
-        this.checkOut = suitSearchRequest.getCheckOut();
-        this.adultBeds = suitSearchRequest.getAdultBeds();
-        this.childBeds = suitSearchRequest.getChildBeds();
-        this.suitTypes = new ArrayList<>(suitsQuantity);
-        for (int i = 0; i < suitsQuantity; i++) {
-            this.suitTypes.add(new SuitSearchResult());
-        }
-        for (int i = 0; i < this.adultBeds; i++) {
-            this.adults.add(new Customer());
-        }
-        for (int i = 0; i < this.adultBeds; i++) {
-            this.adults.add(new Customer());
-        }
-    }
 
     public BigDecimal getTotalDays() {
         if (this.days.equals(BigDecimal.ZERO)) {

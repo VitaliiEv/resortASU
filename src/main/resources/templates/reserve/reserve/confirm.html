@@ -11,24 +11,19 @@
 
     <div class="row">
 
-        <div class="col-3 col-sm-8">
+        <div class="col-3 col-sm-10">
 
 			<h2>Reserve for <span th:text="${reserve.adultBeds}"/> adults, <span th:text="${reserve.childBeds}"/> childs, from <span th:text="${reserve.checkIn}"/> to <span th:text="${reserve.checkOut}"/></h2>
 			
 
 
-			<form th:method="POST" th:action="@{'/reserve/reserve/confirm'}" th:object="${reserve}">	
-<!--				<div class="col-auto">
-						<select class="form-select" aria-label="Payment type" th:field="*{paymentType}">
-							  <option value="" selected >Payment type</option>
-							  <option th:each="type : ${paymentTypes}" th:text="${type.paymenttype}" th:value="${type.id}">Type</option>
-						</select>
-					</div>		-->				
+			<form th:method="POST" th:action="@{'/reserve/reserve/confirm'}" th:object="${reserve}">				
 					<input type="hidden" th:field="*{checkIn}"/>	
 					<input type="hidden" th:field="*{checkOut}"/>
 					<input type="hidden" th:field="*{adultBeds}"/>
-					<input type="hidden" th:field="*{childBeds}"/>					
+					<input type="hidden" th:field="*{childBeds}"/>		
 					
+					<h3>Suits:</h3>
 					<table class="table table-striped">
 						<tr>
 							<th scope="col" class="col-3">Photo</th>
@@ -40,9 +35,6 @@
 						<tr th:each="suitType, iterStatSuitType: ${reserve.suitTypes}">
 								
 							<td>								
-<!--								<input type="hidden" th:field="*{suitType.suitTypeId}"/>
-								<input type="hidden" th:field="*{suitType.quantity}"/>	
-								<input type="hidden" th:field="*{suitType.price}"/>-->		
 								
 								<input type="hidden" th:id="'suitTypes' + ${iterStatSuitType.index} + '.suitTypeId'"
 									th:name="'suitTypes[' + ${iterStatSuitType.index} + '].suitTypeId'"
@@ -71,20 +63,85 @@
 						<tr>
 							<td colspan="5">
 								<select class="form-select" aria-label="Payment type" th:field="*{paymentType}">
-									  <option value="" selected >Payment type</option>
 									  <option th:each="type : ${paymentTypes}" th:text="${type.paymenttype}" th:value="${type.id}">Type</option>
 								</select>
 							</td>			
+						</tr>					
+					</table>
+					<h3>Adult customers:</h3>
+					<table class="table table-striped">
+						<tr>
+							<th scope="col">Firstname</th>
+							<th scope="col">Surname</th>
+							<th scope="col">Middlename</th>
+							<th scope="col">Gender</th>									
+							<th scope="col">Birthdate</th>					
+							<th scope="col">Phone</th>
+							<th scope="col">Email</th>
+
 						</tr>
-						<tr>	
-							<td colspan="5">								
-								<button class="btn btn-primary btn-block" type="submit">Confirm</button>
-							</td>									
-						</tr>						
-					</table>	
+						<tr th:each="adult, itemStat : *{adults}">			
+							<td scope="row">
+								<input class="form-control" type="text" placeholder="Firstname" th:field="*{adults[__${itemStat.index}__].firstname}">							
+							</td>
+							<td scope="row">
+								<input class="form-control" type="text" placeholder="Surname" th:field="*{adults[__${itemStat.index}__].surname}">							
+							</td>
+							<td scope="row">
+								<input class="form-control" type="text" placeholder="Middlename" th:field="*{adults[__${itemStat.index}__].middlename}">							
+							</td>
+							<td scope="row">
+								<select class="form-select" aria-label="Payment status" th:field="*{adults[__${itemStat.index}__].gender}">
+									  <option value="" selected >Gender</option>
+									  <option th:each="g : ${genders}" th:text="${g.gender}" th:value="${g.id}">Gender</option>
+								</select>								
+							</td>
+							<td scope="row">
+								<input class="form-control" type="date" placeholder="Birthdate" th:field="*{adults[__${itemStat.index}__].birthdate}">							
+							</td>
+							<td scope="row">
+								<input class="form-control" type="tel" placeholder="Phone" th:field="*{adults[__${itemStat.index}__].phone}">							
+							</td>
+							<td scope="row">
+								<input class="form-control" type="email" placeholder="Email" th:field="*{adults[__${itemStat.index}__].email}">							
+							</td>							
+						</tr>
+					</table>
+					<h3>Children customers:</h3>
+					<table class="table table-striped">
+						<tr>
+							<th scope="col">Firstname</th>
+							<th scope="col">Surname</th>
+							<th scope="col">Middlename</th>
+							<th scope="col">Gender</th>								
+							<th scope="col">Birthdate</th>					
+
+						</tr>
+						<tr th:each="child, itemStat : *{children}">			
+							<td scope="row">
+								<input class="form-control" type="text" placeholder="Firstname" th:field="*{children[__${itemStat.index}__].firstname}">							
+							</td>
+							<td scope="row">
+								<input class="form-control" type="text" placeholder="Surname" th:field="*{children[__${itemStat.index}__].surname}">							
+							</td>
+							<td scope="row">
+								<input class="form-control" type="text" placeholder="Middlename" th:field="*{children[__${itemStat.index}__].middlename}">							
+							</td>
+							<td scope="row">
+								<select class="form-select" aria-label="Payment status" th:field="*{adults[__${itemStat.index}__].gender}">
+									  <option value="" selected >Gender</option>
+									  <option th:each="g : ${genders}" th:text="${g.gender}" th:value="${g.id}">Gender</option>
+								</select>								
+							</td>							
+							<td scope="row">
+								<input class="form-control" type="date" placeholder="Birthdate" th:field="*{children[__${itemStat.index}__].birthdate}">							
+							</td>							
+						</tr>
+					</table>
+					<button class="btn btn-primary btn-block" type="submit">Confirm</button>					
 				</form>						
 
-
+					
 
 			</div>
 

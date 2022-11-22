@@ -54,6 +54,7 @@ public class SearchController {
         }
         try {
             List<SuitSearchResultSet> results = this.service.find(suitSearchRequest);
+//            ReserveRequest reserveRequest = new ReserveRequest(suitSearchRequest);
             ReserveRequest reserveRequest = new ReserveRequest();
             redirectAttributes.addFlashAttribute("reserve", reserveRequest);
             redirectAttributes.addFlashAttribute("completedSearchRequest", suitSearchRequest);

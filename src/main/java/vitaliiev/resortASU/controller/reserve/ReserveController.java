@@ -12,6 +12,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import vitaliiev.resortASU.dto.ReserveRequest;
 import vitaliiev.resortASU.model.reserve.Reserve;
 import vitaliiev.resortASU.service.UploadService;
+import vitaliiev.resortASU.service.customer.GenderService;
 import vitaliiev.resortASU.service.reserve.PaymentStatusService;
 import vitaliiev.resortASU.service.reserve.PaymentTypeService;
 import vitaliiev.resortASU.service.reserve.ReserveService;
@@ -33,15 +34,18 @@ public class ReserveController {
     private final PaymentTypeService paymentTypeService;
 
     private final UploadService uploadService;
+
+    private final GenderService genderService;
     @Autowired
     public ReserveController(ReserveService service, ReserveStatusService reserveStatusService,
                              PaymentStatusService paymentStatusService, PaymentTypeService paymentTypeService,
-                             UploadService uploadService) {
+                             UploadService uploadService, GenderService genderService) {
         this.service = service;
         this.reserveStatusService = reserveStatusService;
         this.paymentStatusService = paymentStatusService;
         this.paymentTypeService = paymentTypeService;
         this.uploadService = uploadService;
+        this.genderService = genderService;
     }
 
     @GetMapping(REQUEST_MAPPING)
@@ -66,20 +70,11 @@ public class ReserveController {
 
     @PostMapping(REQUEST_MAPPING + "/create")
     public String create(@ModelAttribute(name = "reserve") ReserveRequest request, Model model) {
-//        List<Customer> adults = new ArrayList<>(request.getAdultBeds());
-//        List<Customer> children = new ArrayList<>(request.getChildBeds());
         request = this.service.updateReserveRequest(request);
-//        model.addAttribute("adults", adults);
-//        model.addAttribute("children", children);
+        model.addAttribute("genders", this.genderService.findAll());
         model.addAttribute("reserve", request);
         return REQUEST_MAPPING + "/confirm";
     }
-
-//    @GetMapping(REQUEST_MAPPING + "/confirm")
-//    public String addCustomers(Model model) {
-//
-//        return "redirect:" + REQUEST_MAPPING;
-//    }
 
     @PostMapping(REQUEST_MAPPING + "/confirm")
     public String confirm(@ModelAttribute(name = "reserve") ReserveRequest request, Model model) {
