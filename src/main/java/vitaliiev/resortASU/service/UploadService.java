@@ -26,6 +26,13 @@ public class UploadService {
 
     public UploadService(Path storage, String[] filetypes) {
         this.storage = storage;
+        if (Files.notExists(storage)) {
+            try {
+                Files.createDirectory(storage);
+            } catch (IOException e) {
+                log.error("Can't create storage directory");
+            }
+        }
         this.filetypes = filetypes;
         StringBuilder pattern = new StringBuilder();
         for (int i = 0; i < filetypes.length; i++) {
