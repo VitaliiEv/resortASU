@@ -36,7 +36,7 @@ public class RoleService {
     }
     private static final ExampleMatcher SEARCH_CONDITIONS_MATCH_ALL = ExampleMatcher
             .matching()
-            .withIncludeNullValues()
+            .withIgnoreNullValues()
             .withMatcher("name", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
             .withIgnorePaths("id", "users");
 
