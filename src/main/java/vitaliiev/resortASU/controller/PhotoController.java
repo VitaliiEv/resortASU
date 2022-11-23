@@ -25,7 +25,8 @@ import java.util.List;
 public class PhotoController {
     private static final String FRAGMENT_NAME = "photos";
     private static final String SECTION_NAME = "";
-    private static final String REQUEST_MAPPING = "/" + FRAGMENT_NAME;
+    private static final String MAIN_VIEW = FRAGMENT_NAME;
+    private static final String REQUEST_MAPPING = "/" + MAIN_VIEW;
     private final PhotoService service;
     private final SuitTypeService suitTypeService;
     private final ResortService resortService;
@@ -48,7 +49,7 @@ public class PhotoController {
         model.addAttribute("newEntity", newEntity);
         model.addAttribute("allSuitTypes", suitTypeService.findAllPresent());
         model.addAttribute("allResorts", resortService.findAllPresent());
-        return SECTION_NAME + "/" + FRAGMENT_NAME;
+        return MAIN_VIEW;
     }
 
     @PostMapping(REQUEST_MAPPING + "/find")
@@ -92,7 +93,7 @@ public class PhotoController {
             model.addAttribute("allSuitTypes", suitTypeService.findAllPresent());
             model.addAttribute("allResorts", resortService.findAllPresent());
         }
-        return SECTION_NAME + "/" + FRAGMENT_NAME;
+        return MAIN_VIEW;
     }
 
     @GetMapping(REQUEST_MAPPING + "/{id}/{filename}")
