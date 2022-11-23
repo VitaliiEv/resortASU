@@ -17,7 +17,8 @@ import java.util.List;
 public class ResortTypeController {
     private static final String FRAGMENT_NAME = "types";
     private static final String SECTION_NAME = "resort";
-    private static final String REQUEST_MAPPING = "/" + SECTION_NAME + "/" + FRAGMENT_NAME;
+    private static final String MAIN_VIEW = SECTION_NAME + "/" + FRAGMENT_NAME;
+    private static final String REQUEST_MAPPING = "/" + MAIN_VIEW;
     private final ResortTypeService service;
 
     @Autowired
@@ -34,7 +35,7 @@ public class ResortTypeController {
         ResortType newEntity = new ResortType();
         model.addAttribute("fragment", FRAGMENT_NAME);
         model.addAttribute("newEntity", newEntity);
-        return SECTION_NAME + "/" + FRAGMENT_NAME;
+        return MAIN_VIEW;
     }
 
     @PostMapping(REQUEST_MAPPING + "/find")
@@ -63,13 +64,13 @@ public class ResortTypeController {
             model.addAttribute("fragment", FRAGMENT_NAME);
             model.addAttribute("entity", entity);
         }
-        return SECTION_NAME + "/" + FRAGMENT_NAME;
+        return MAIN_VIEW;
     }
 
     @PostMapping(REQUEST_MAPPING + "/update")
     public String update(@ModelAttribute(name = "entity") ResortType entity) {
         service.update(entity);
-        return "redirect:/resort/" + FRAGMENT_NAME + "/" + entity.getId();
+        return "redirect:" + REQUEST_MAPPING + "/" + entity.getId();
     }
 
     @PostMapping(REQUEST_MAPPING + "/delete")

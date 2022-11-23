@@ -8,8 +8,8 @@
 	<div th:replace="fragments/bootstrap :: bootstrap"></div>
 	<div th:replace="fragments/navigation :: menu"></div>
 	<div class="container">
-		<div th:replace="${entities} ? ~{${'/fragments/resort/' + fragment} :: entities (${fragment}, ${entities}, ${newEntity})} : ~{}"></div>
-		<div th:replace="${entity} ? ~{${'/fragments/resort/' + fragment} :: entity (${fragment}, ${entity})} : ~{}"></div>
+		<div th:replace="${entities} ? ~{${'fragments/resort/' + fragment} :: entities (${fragment}, ${entities}, ${newEntity})} : ~{}"></div>
+		<div th:replace="${entity} ? ~{${'fragments/resort/' + fragment} :: entity (${fragment}, ${entity})} : ~{}"></div>
 	</div>
 
 </div>
