@@ -26,7 +26,10 @@ public class ReserveController {
 
     private static final String FRAGMENT_NAME = "reserve";
     private static final String SECTION_NAME = "reserve";
-    private static final String REQUEST_MAPPING = "/" + SECTION_NAME + "/" + FRAGMENT_NAME;
+
+    private static final String MAIN_VIEW = SECTION_NAME + "/" + FRAGMENT_NAME;
+
+    private static final String REQUEST_MAPPING = "/" + MAIN_VIEW;
     private final ReserveService service;
 
     private final ReserveStatusService reserveStatusService;
@@ -57,7 +60,7 @@ public class ReserveController {
         Reserve newEntity = new Reserve();
         model.addAttribute("fragment", FRAGMENT_NAME);
         model.addAttribute("newEntity", newEntity);
-        return SECTION_NAME + "/" + FRAGMENT_NAME;
+        return MAIN_VIEW;
     }
 
     @PostMapping(REQUEST_MAPPING + "/find")
@@ -73,13 +76,13 @@ public class ReserveController {
         request = this.service.updateReserveRequest(request);
         model.addAttribute("genders", this.genderService.findAll());
         model.addAttribute("reserve", request);
-        return REQUEST_MAPPING + "/confirm";
+        return MAIN_VIEW + "/confirm";
     }
 
     @PostMapping(REQUEST_MAPPING + "/confirm")
     public String confirm(@ModelAttribute(name = "reserve") ReserveRequest request, Model model) {
         this.service.create(request);
-        return REQUEST_MAPPING;
+        return MAIN_VIEW;
     }
 
 
@@ -90,7 +93,7 @@ public class ReserveController {
             model.addAttribute("fragment", FRAGMENT_NAME);
             model.addAttribute("entity", entity);
         }
-        return SECTION_NAME + "/" + FRAGMENT_NAME;
+        return MAIN_VIEW;
     }
 
     @PostMapping(REQUEST_MAPPING + "/accept")

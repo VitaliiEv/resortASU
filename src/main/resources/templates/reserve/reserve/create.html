@@ -25,7 +25,7 @@
 
 				<div th:if="${searchResults ne null}">
 					<div th:each="searchResult, iterStatSearch  : ${searchResults}">
-						<form th:method="POST" th:action="@{'/reserve/reserve/create'}" th:object="${reserve}">	
+						<form th:method="POST" th:action="@{'create'}" th:object="${reserve}">	
 						
 							<input type="hidden" name="checkIn" 
 								th:id="${reserve.checkIn}"

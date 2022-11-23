@@ -17,7 +17,7 @@
 			
 
 
-			<form th:method="POST" th:action="@{'/reserve/reserve/confirm'}" th:object="${reserve}">				
+			<form th:method="POST" th:action="@{'confirm'}" th:object="${reserve}">				
 					<input type="hidden" th:field="*{checkIn}"/>	
 					<input type="hidden" th:field="*{checkOut}"/>
 					<input type="hidden" th:field="*{adultBeds}"/>
