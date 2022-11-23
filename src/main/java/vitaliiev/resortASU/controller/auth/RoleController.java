@@ -14,9 +14,14 @@ import java.util.List;
 
 @Slf4j
 @Controller
-@RequestMapping("/admin")
 public class RoleController {
-    private static final String ENTITY_NAME = "roles";
+    private static final String FRAGMENT_NAME = "roles";
+    private static final String SECTION_NAME = "admin";
+
+    private static final String MAIN_VIEW = SECTION_NAME + "/" + FRAGMENT_NAME;
+    private static final String REQUEST_MAPPING = "/" + MAIN_VIEW;
+
+
 
     private final RoleService service;
 
@@ -25,27 +30,27 @@ public class RoleController {
         this.service = service;
     }
 
-    @GetMapping(ENTITY_NAME)
+    @GetMapping(REQUEST_MAPPING)
     public String list(Model model) {
         if (!model.containsAttribute("entities")) {
             List<Role> entities = service.findAll();
             model.addAttribute("entities", entities);
         }
         Role newEntity = new Role();
-        model.addAttribute("fragment", ENTITY_NAME);
+        model.addAttribute("fragment", FRAGMENT_NAME);
         model.addAttribute("newEntity", newEntity);
-        return "admin/" + ENTITY_NAME;
+        return MAIN_VIEW;
     }
 
-    @PostMapping(ENTITY_NAME + "/find")
+    @PostMapping(REQUEST_MAPPING + "/find")
     public String find(@ModelAttribute(name = "entity") Role entity,
                        RedirectAttributes redirectAttributes) {
         List<Role> entities = service.find(entity);
         redirectAttributes.addFlashAttribute("entities", entities);
-        return "redirect:/admin/" + ENTITY_NAME;
+        return "redirect:" + REQUEST_MAPPING;
     }
 
-    @PostMapping(ENTITY_NAME + "/create")
+    @PostMapping(REQUEST_MAPPING + "/create")
     public String create(@ModelAttribute(name = "newEntity") Role role, RedirectAttributes redirectAttributes) {
         try {
             service.create(role);
@@ -54,28 +59,28 @@ public class RoleController {
             log.warn(message + e.getMessage());
             redirectAttributes.addFlashAttribute("creationError", message);
         }
-        return "redirect:/admin/" + ENTITY_NAME;
+        return "redirect:" + REQUEST_MAPPING;
     }
 
-    @GetMapping(ENTITY_NAME + "/{id}")
+    @GetMapping(REQUEST_MAPPING + "/{id}")
     public String read(@PathVariable Integer id, Model model) {
         Role entity = service.findRoleById(id);
         if (entity != null) {
-            model.addAttribute("fragment", ENTITY_NAME);
+            model.addAttribute("fragment", FRAGMENT_NAME);
             model.addAttribute("entity", entity);
         }
-        return "admin/" + ENTITY_NAME;
+        return MAIN_VIEW;
     }
 
-    @PostMapping(ENTITY_NAME + "/update")
+    @PostMapping(REQUEST_MAPPING + "/update")
     public String update(@ModelAttribute(name = "entity") Role entity) {
         service.update(entity);
-        return "redirect:/admin/" + ENTITY_NAME + "/" + entity.getId();
+        return "redirect:" + REQUEST_MAPPING + "/" + entity.getId();
     }
 
-    @PostMapping(ENTITY_NAME + "/delete")
+    @PostMapping(REQUEST_MAPPING + "/delete")
     public String delete(@RequestParam(name = "id") Integer id) {
         service.delete(id);
-        return "redirect:/admin/" + ENTITY_NAME;
+        return "redirect:" + REQUEST_MAPPING;
     }
 }

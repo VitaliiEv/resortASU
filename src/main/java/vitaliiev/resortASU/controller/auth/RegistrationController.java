@@ -28,18 +28,18 @@ public class RegistrationController {
     @GetMapping("/register")
     private String register(Model model) {
         model.addAttribute("user", new User());
-        return "/register";
+        return "register";
     }
 
     @PostMapping("/register")
     private String addUser(@ModelAttribute("user") @Valid User user, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("validationErrors", bindingResult.getAllErrors());
-            return "/register";
+            return "register";
         }
         if (!user.getPassword().equals(user.getPasswordConfirm())) {
             model.addAttribute("passwordError", "Passwords dont match");
-            return "/register";
+            return "register";
         }
         try {
             user = userService.create(user);
@@ -49,7 +49,7 @@ public class RegistrationController {
             String message = "Can't create user: user already exists. ";
             log.warn(message + e.getMessage());
             model.addAttribute("usernameError", message);
-            return "/register";
+            return "register";
         }
     }
 

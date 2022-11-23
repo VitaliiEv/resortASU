@@ -76,13 +76,13 @@
                     <td th:text="${role.name}"></td>
                     <td th:text="${role.enabled}"></td>
                     <td>
-                        <a class="btn btn-primary" th:href="@{${path}+'/'+${role.id}}" role="button">Edit</a>
+                        <a class="btn btn-primary" th:href="@{${path} + '/' + ${role.id}}" role="button">Edit</a>
                     </td>
                     <td>
-                        <form th:method="POST" th:action="@{'/admin/'+${path}+'/delete'}">
+                        <form th:method="POST" th:action="@{${path} + '/' + 'delete'}">
                             <label class="visually-hidden" for="id"></label>
                             <input class="form-check-input" type="hidden" name="id" th:value="${role.id}">
-                            <div th:replace="/fragments/common :: confirmFormDialog ('Delete?',
+                            <div th:replace="fragments/common :: confirmFormDialog ('Delete?',
                                 'This action will also delete this ROLE from all user profiles?',
                                 'Delete',
 								${role.id})">
@@ -102,7 +102,7 @@
 
         <div class="col-6 col-sm-3">
             <h2>Role</h2>
-            <form th:method="POST" th:object="${entity}" th:action="@{'/admin/'+${path}+'/update'}">
+            <form th:method="POST" th:object="${entity}" th:action="@{'update'}">
                 <div class="row g-2 align-items-center">
                     <div class="col-auto">
                         <label th:for="*{id}">Id: <span th:text="*{id}"></span></label>
@@ -128,12 +128,12 @@
                     </div>
                 </div>
             </form>
-            <form th:method="POST" th:object="${entity}" th:action="@{'/admin/'+${path}+'/delete'}">
+            <form th:method="POST" th:object="${entity}" th:action="@{'delete'}">
                 <div class="row g-2 align-items-center">
                     <div class="col-auto">
                         <label class="visually-hidden" th:for="*{id}"></label>
                         <input class="form-check-input" type="hidden" th:field="*{id}"/>
-                        <div th:replace="/fragments/common :: confirmFormDialog ('Delete?',
+                        <div th:replace="fragments/common :: confirmFormDialog ('Delete?',
                         'This action will also delete this ROLE from all user profiles?',
                         'Delete',
 						*{id})">

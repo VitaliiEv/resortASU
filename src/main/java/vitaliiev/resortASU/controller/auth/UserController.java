@@ -12,10 +12,13 @@ import vitaliiev.resortASU.service.auth.UserService;
 import java.util.List;
 
 @Controller
-@RequestMapping("/admin")
 public class UserController {
+    private static final String FRAGMENT_NAME = "users";
+    private static final String SECTION_NAME = "admin";
 
-    private static final String ENTITY_NAME = "users";
+    private static final String MAIN_VIEW = SECTION_NAME + "/" + FRAGMENT_NAME;
+    private static final String REQUEST_MAPPING = "/" + MAIN_VIEW;
+
     private final UserService userService;
     private final RoleService roleService;
 
@@ -25,7 +28,7 @@ public class UserController {
         this.roleService = roleService;
     }
 
-    @GetMapping(ENTITY_NAME)
+    @GetMapping(REQUEST_MAPPING)
     public String list(Model model) {
         if (!model.containsAttribute("entities")) {
             List<User> entities = userService.findAll();
@@ -33,39 +36,39 @@ public class UserController {
         }
         User newEntity = new User();
         model.addAttribute("newEntity", newEntity);
-        model.addAttribute("fragment", ENTITY_NAME);
+        model.addAttribute("fragment", FRAGMENT_NAME);
         model.addAttribute("roles", roleService.findAll());
-        return "admin/" + ENTITY_NAME;
+        return MAIN_VIEW;
     }
 
-    @PostMapping(ENTITY_NAME + "/find")
+    @PostMapping(REQUEST_MAPPING + "/find")
     public String find(@ModelAttribute(name = "entity") User entity,
                        RedirectAttributes redirectAttributes) {
         List<User> entities = userService.find(entity);
         redirectAttributes.addFlashAttribute("entities", entities);
-        return "redirect:/admin/" + ENTITY_NAME;
+        return "redirect:" + REQUEST_MAPPING;
     }
 
-    @GetMapping(ENTITY_NAME + "/{id}")
+    @GetMapping(REQUEST_MAPPING + "/{id}")
     public String read(@PathVariable Long id, Model model) {
         User entity = userService.findUserById(id);
         if (entity != null) {
-            model.addAttribute("fragment", ENTITY_NAME);
+            model.addAttribute("fragment", FRAGMENT_NAME);
             model.addAttribute("entity", entity);
             model.addAttribute("roles", roleService.findAll());
         }
-        return "admin/" + ENTITY_NAME;
+        return MAIN_VIEW;
     }
 
-    @PostMapping (ENTITY_NAME + "/update")
+    @PostMapping (REQUEST_MAPPING + "/update")
     public String update(@ModelAttribute(name = "entity") User entity) {
         userService.update(entity);
-        return "redirect:/admin/" + ENTITY_NAME + "/" + entity.getId();
+        return "redirect:" + REQUEST_MAPPING + "/" + entity.getId();
     }
 
-    @PostMapping(ENTITY_NAME + "/delete")
+    @PostMapping(REQUEST_MAPPING + "/delete")
     public String delete(@RequestParam(name = "id") Long id) {
         userService.delete(id);
-        return "redirect:/admin/" + ENTITY_NAME;
+        return "redirect:" + REQUEST_MAPPING;
     }
 }
