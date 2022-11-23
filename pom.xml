@@ -11,7 +11,7 @@
     <groupId>vitaliiev</groupId>
     <artifactId>resortASU</artifactId>
     <version>0.9</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <name>resort</name>
     <description>resort</description>
     <properties>
