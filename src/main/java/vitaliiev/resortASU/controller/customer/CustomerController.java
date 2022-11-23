@@ -19,7 +19,8 @@ import java.util.List;
 public class CustomerController {
     private static final String FRAGMENT_NAME = "customer";
     private static final String SECTION_NAME = "customer";
-    private static final String REQUEST_MAPPING = "/" + SECTION_NAME + "/" + FRAGMENT_NAME;
+    private static final String MAIN_VIEW = SECTION_NAME + "/" + FRAGMENT_NAME;
+    private static final String REQUEST_MAPPING = "/" + MAIN_VIEW;
     private final CustomerService service;
 
     private final GenderService genderService;
@@ -44,7 +45,7 @@ public class CustomerController {
         Customer newEntity = new Customer();
         model.addAttribute("fragment", FRAGMENT_NAME);
         model.addAttribute("newEntity", newEntity);
-        return SECTION_NAME + "/" + FRAGMENT_NAME;
+        return MAIN_VIEW;
     }
 
     @PostMapping(REQUEST_MAPPING + "/find")
@@ -73,13 +74,13 @@ public class CustomerController {
             model.addAttribute("fragment", FRAGMENT_NAME);
             model.addAttribute("entity", entity);
         }
-        return SECTION_NAME + "/" + FRAGMENT_NAME;
+        return MAIN_VIEW;
     }
 
     @PostMapping(REQUEST_MAPPING + "/update")
     public String update(@ModelAttribute(name = "entity") Customer entity) {
         service.update(entity);
-        return "redirect:/customer/" + FRAGMENT_NAME + "/" + entity.getId();
+        return "redirect:" + REQUEST_MAPPING + "/" + entity.getId();
     }
 
     @PostMapping(REQUEST_MAPPING + "/delete")

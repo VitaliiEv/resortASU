@@ -70,7 +70,7 @@
                     <td th:text="${e.phone}"></td>					
                     <td th:text="${e.email}"></td>
                     <td>
-                        <a class="btn btn-primary" th:href="@{'/customer/' + ${path}+'/'+${e.id}}" role="button">Edit</a>
+                        <a class="btn btn-primary" th:href="@{${path}+'/'+${e.id}}" role="button">Edit</a>
                     </td>
                 </tr>
             </table>
@@ -84,7 +84,7 @@
 
         <div class="col-6 col-sm-3">
             <h2>Customer</h2>
-            <form th:method="POST" th:object="${entity}" th:action="@{'/customer/'+${path}+'/update'}">
+            <form th:method="POST" th:object="${entity}" th:action="@{'update'}">
                 <div class="row g-2 align-items-center">
                     <div class="col-auto">
                         <label th:for="*{id}">Id: <span th:text="*{id}"></span></label>
