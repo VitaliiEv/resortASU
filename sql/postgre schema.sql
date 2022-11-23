@@ -429,6 +429,7 @@ CREATE TABLE resort.suittype
     currentprice numeric(10, 4)           NOT NULL,
     minimumprice numeric(10, 4)           NOT NULL,
     mainphoto    bigint NULL,
+	deleted bool NOT NULL DEFAULT false,	
     CONSTRAINT suittype_pkey PRIMARY KEY (id),
     CONSTRAINT fk_suit_suitclass1 FOREIGN KEY (suitclass) REFERENCES resort.suitclass (id),
     CONSTRAINT fk_suittype_beds1 FOREIGN KEY (beds) REFERENCES resort.beds (id),
