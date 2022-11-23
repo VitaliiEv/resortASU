@@ -24,7 +24,10 @@ import java.util.List;
 @Controller
 public class SearchController {
 
-    private static final String REQUEST_MAPPING = "/search";
+    private static final String SECTION_NAME = "search";
+
+    private static final String MAIN_VIEW = SECTION_NAME;
+    private static final String REQUEST_MAPPING = "/" + MAIN_VIEW;
     private final SearchService service;
 
     private final SuitClassService suitClassService;
@@ -40,7 +43,7 @@ public class SearchController {
 
     @GetMapping(REQUEST_MAPPING)
     public String view() {
-        return REQUEST_MAPPING;
+        return MAIN_VIEW;
     }
 
     @PostMapping(REQUEST_MAPPING + "/find")
@@ -50,7 +53,7 @@ public class SearchController {
                        Model model) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("validationErrors", bindingResult.getAllErrors());
-            return REQUEST_MAPPING;
+            return MAIN_VIEW;
         }
         try {
             List<SuitSearchResultSet> results = this.service.find(suitSearchRequest);

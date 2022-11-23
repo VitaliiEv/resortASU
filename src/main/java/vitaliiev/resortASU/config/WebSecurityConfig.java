@@ -28,11 +28,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter { // TODO: 1
                 .antMatchers("/register").not().fullyAuthenticated()
                 //Доступ только для пользователей с ролью Администратор
                 .antMatchers("/admin/**").hasRole("ADMIN")
-                .antMatchers("/resort/**" ).hasRole("CONTENT_MANAGER")
+                .antMatchers("/resort/**" ).hasRole("CONTENT_MANAGER") // todo fix suittypes permission
                 .antMatchers("/suit/**","/reserve/**" ).hasRole("PROPERTY_MANAGER")
                 .antMatchers("/reserve/reserve").hasRole("USER")
                 //Доступ разрешен всем пользователей
-                .antMatchers("/", "/search/**", "/photos/**").permitAll()
+                .antMatchers("/", "/search/**", "/photos/**").permitAll() // todo - fix everyone can edit photos
                 //Все остальные страницы требуют аутентификации
                 .anyRequest().authenticated()
                 .and()
