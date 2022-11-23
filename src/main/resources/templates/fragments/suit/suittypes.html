@@ -95,13 +95,13 @@
 					<td th:text="${e.minimumprice}"></td>
 
                     <td>
-                        <a class="btn btn-primary" th:href="@{'/suit/' + ${path}+'/'+${e.id}}" role="button">Edit</a>
+                        <a class="btn btn-primary" th:href="@{${path}+'/'+${e.id}}" role="button">Edit</a>
                     </td>
                     <td>
-                        <form th:method="POST" th:action="@{'/suit/'+${path}+'/delete'}">
+                        <form th:method="POST" th:action="@{${path}+'/delete'}">
                             <label class="visually-hidden" for="id"></label>
                             <input class="form-check-input" type="hidden" name="id" th:value="${e.id}">
-                            <div th:replace="/fragments/common :: confirmFormDialog ('Delete?',
+                            <div th:replace="fragments/common :: confirmFormDialog ('Delete?',
                                 'This action will delete all buildings, floors and suits in this resort.',
                                 'Delete',
 								${e.id})">
@@ -121,7 +121,7 @@
 
         <div class="col-6 col-sm-3">
             <h2>Suit Type</h2>
-            <form th:method="POST" th:object="${entity}" th:action="@{'/suit/'+${path}+'/update'}">
+            <form th:method="POST" th:object="${entity}" th:action="@{'update'}">
                 <div class="row g-2 align-items-center">
                     <div class="col-auto">
                         <label th:for="*{id}">Id: <span th:text="*{id}"></span></label>
@@ -172,12 +172,12 @@
                     </div>
                 </div>
             </form>
-            <form th:method="POST" th:object="${entity}" th:action="@{'/suit/'+${path}+'/delete'}">
+            <form th:method="POST" th:object="${entity}" th:action="@{'delete'}">
                 <div class="row g-2 align-items-center">
                     <div class="col-auto">
                         <label class="visually-hidden" th:for="*{id}"></label>
                         <input class="form-check-input" type="hidden" th:field="*{id}"/>
-                        <div th:replace="/fragments/common :: confirmFormDialog ('Delete?',
+                        <div th:replace="fragments/common :: confirmFormDialog ('Delete?',
                         'Delete?',
                         'Delete',
 						*{id})">

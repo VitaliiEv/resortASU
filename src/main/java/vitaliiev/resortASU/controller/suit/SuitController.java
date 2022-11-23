@@ -19,7 +19,8 @@ import java.util.List;
 public class SuitController {
     private static final String FRAGMENT_NAME = "suit";
     private static final String SECTION_NAME = "suit";
-    private static final String REQUEST_MAPPING = "/" + SECTION_NAME + "/" + FRAGMENT_NAME;
+    private static final String MAIN_VIEW = SECTION_NAME + "/" + FRAGMENT_NAME;
+    private static final String REQUEST_MAPPING = "/" + MAIN_VIEW;
     private final SuitService service;
 
     private final SuitTypeService suitTypeService;
@@ -44,7 +45,7 @@ public class SuitController {
         model.addAttribute("newEntity", newEntity);
         model.addAttribute("SuitTypes", this.suitTypeService.findAllPresent());
         model.addAttribute("SuitStatus", this.suitStatusService.findAll());
-        return SECTION_NAME + "/" + FRAGMENT_NAME;
+        return MAIN_VIEW;
     }
 
     @PostMapping(REQUEST_MAPPING + "/find")
@@ -75,13 +76,13 @@ public class SuitController {
             model.addAttribute("SuitTypes", this.suitTypeService.findAllPresent());
             model.addAttribute("SuitStatus", this.suitStatusService.findAll());
         }
-        return SECTION_NAME + "/" + FRAGMENT_NAME;
+        return MAIN_VIEW;
     }
 
     @PostMapping(REQUEST_MAPPING + "/update")
     public String update(@ModelAttribute(name = "entity") Suit entity) {
         service.update(entity);
-        return "redirect:/Suit/" + FRAGMENT_NAME + "/" + entity.getId();
+        return "redirect:" + REQUEST_MAPPING + "/" + entity.getId();
     }
 
     @PostMapping(REQUEST_MAPPING + "/delete")
